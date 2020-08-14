@@ -10,8 +10,8 @@ $tertiaryCColor: #FF9640;
 $backgroundColor: #E0E0E0;
 
 $fontHeaderColor: #FFFFFF;
-$fontSize: 120%;
-$fontSizeHeader: 120%;
+$fontSize: 90%;
+$fontSizeHeader: 125%;
 
 html {
   font-size: $fontSize;
@@ -39,8 +39,8 @@ header {
 
 .headerTile {
   background-color: $primaryAColor;
-  width: 8rem;
-  padding: 1rem 2.5rem 1rem 2.5rem;
+  width: 9.5rem;
+  padding: 1rem;
   display: inline-block;
   transition: 0.7s;
   text-align: center;
@@ -53,6 +53,7 @@ header {
 .headerRef {
   color: $fontHeaderColor;
   text-decoration: none;
+  font-size: $fontSizeHeader;
 }
 
 // ---------------------------- Footer ----------------------------
