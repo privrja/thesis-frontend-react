@@ -8,15 +8,15 @@ class Header extends React.Component {
         return (
             <header>
                 <div className={styles.headerContainer}>
-                    <HeaderTile text={'BBDGNC'}/>
-                    <HeaderTile text={'Containers'}/>
-                    <HeaderTile text={'Sequences'}/>
-                    <HeaderTile text={'Blocks'}/>
-                    <HeaderTile text={'Modification'}/>
-                    <HeaderTile text={'Import'}/>
-                    <HeaderTile text={'Export'}/>
-                    <HeaderTile text={'Settings'}/>
-                    <HeaderTile text={'Login'}/>
+                    <HeaderTile text={'BBDGNC'} url={'/'}/>
+                    <HeaderTile text={'Containers'} url={'/container'}/>
+                    <HeaderTile text={'Sequences'} url={'/sequence'}/>
+                    <HeaderTile text={'Blocks'} url={'/block'}/>
+                    <HeaderTile text={'Modifications'} url={'/modification'}/>
+                    <HeaderTile text={'Import'} url={'/import'}/>
+                    <HeaderTile text={'Export'} url={'/export'}/>
+                    <HeaderTile text={'Settings'} url={'/setup'}/>
+                    <HeaderTile text={'Login'} url={'/login'}/>
                 </div>
             </header>
         )
