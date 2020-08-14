@@ -1,0 +1,68 @@
+$primaryAColor: #0B61A4;
+$primaryBColor: #66A3D2;
+$primaryCColor: #3F92D2;
+$secondaryAColor: #FFAA00;
+$secondaryBColor: #FFD073;
+$secondaryCColor: #FFBF40;
+$tertiaryAColor: #FF7400;
+$tertiaryBColor: #FFB273;
+$tertiaryCColor: #FF9640;
+$backgroundColor: #E0E0E0;
+
+$fontHeaderColor: #FFFFFF;
+$fontSize: 120%;
+$fontSizeHeader: 120%;
+
+html {
+  font-size: $fontSize;
+}
+
+body {
+  background-color: $backgroundColor;
+}
+
+// ---------------------------- Header ----------------------------
+
+header {
+  background-color: $primaryBColor;
+  color: $fontHeaderColor;
+  font-size: $fontSizeHeader;
+  padding: 1rem;
+  margin: 0;
+  text-align: center;
+}
+
+.headerContainer {
+  width: 100%;
+  margin: auto;
+}
+
+.headerTile {
+  background-color: $primaryAColor;
+  width: 8rem;
+  padding: 1rem 2.5rem 1rem 2.5rem;
+  display: inline-block;
+  transition: 0.7s;
+  text-align: center;
+}
+
+.headerTile:hover {
+  background-color: $primaryCColor;
+}
+
+.headerRef {
+  color: $fontHeaderColor;
+  text-decoration: none;
+}
+
+// ---------------------------- Footer ----------------------------
+
+footer {
+  background-color: $primaryAColor;
+  position: fixed;
+  width: 100%;
+  height: 1.2rem;
+  left: 0;
+  bottom: 0;
+  padding: 0.3rem;
+}
