@@ -90,6 +90,32 @@ footer {
   background-position: center;
 }
 
+.mainPage {
+  background-image: none;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+}
+
+.drawerArea {
+  width: 50%;
+  height: 70vh;
+  margin: 1vh;
+  vertical-align: top;
+  display: inline-block;
+}
+
+.drawerInput {
+  width: 30%;
+  height: 70vh;
+  margin-top: 1vh;
+  display: inline-block;
+  vertical-align: top;
+}
+
 // ---------------------------- H ----------------------------
 
 h1 {
