@@ -96,7 +96,7 @@ class ContainerPage extends React.Component<any, State> {
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button>Detail</button>
                                     <button>Collaborators</button>
-                                    <button>Update</button>
+                                    <button>Edit</button>
                                     <button>Delete</button>
                                 </td>
                             </tr>
