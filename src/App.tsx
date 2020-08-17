@@ -5,6 +5,7 @@ import Header from "./template/Header";
 import Footer from "./template/Footer";
 import MainPage from "./page/MainPage";
 import LoginPage from "./page/LoginPage";
+import ContainerPage from "./page/ContainerPage";
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
             <Router>
                 <Route exact path='/' component={MainPage}/>
                 <Route path='/login/' component={LoginPage}/>
+                <Route path='/container/' component={ContainerPage}/>
             </Router>
 
             <Footer/>

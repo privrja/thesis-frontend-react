@@ -1,6 +1,7 @@
 import * as React from "react";
 import HeaderTile from "./HeaderTile";
 import styles from "../main.module.scss"
+import {TOKEN} from "../constant/ApiConstants";
 
 class Header extends React.Component {
 
@@ -16,7 +17,8 @@ class Header extends React.Component {
                     <HeaderTile text={'Import'} url={'/import'}/>
                     <HeaderTile text={'Export'} url={'/export'}/>
                     <HeaderTile text={'Settings'} url={'/setup'}/>
-                    <HeaderTile text={'Login'} url={'/login'}/>
+                    {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={'/logout'}/> :
+                        <HeaderTile text={'Login'} url={'/login'}/>}
                 </div>
             </header>
         )

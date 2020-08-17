@@ -11,8 +11,8 @@ $backgroundAColor: #FFFFFF;
 $backgroundBColor: #E0E0E0;
 
 $fontHeaderColor: #FFFFFF;
-$fontSize: 1.1vh;
-$fontSizeHeader: 1.6vh;
+$fontSize: 1.6vh;
+$fontSizeHeader: 2vh;
 
 html {
   font-size: $fontSize;
@@ -81,17 +81,16 @@ footer {
 
 .page {
   width: 90%;
-  height: 92vh;
+  height: 90vh;
   margin: auto;
   background-color: $backgroundAColor;
-  background-image: url("img/Merge.png");
   text-align: center;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-.mainPage {
-  background-image: none;
+.pageLogin {
+  background-image: url("img/Merge.png");
 }
 
 canvas {
@@ -126,6 +125,14 @@ h1 {
   text-align: left;
 }
 
+h2 {
+  padding: 1vh;
+  margin: 1vh 0;
+  font-size: $fontSizeHeader;
+  color: $tertiaryBColor;
+  text-align: center;
+}
+
 // ---------------------------- Forms ----------------------------
 
 label {
@@ -140,6 +147,7 @@ input {
 
 button {
   padding: 0.2vh 1vh;
+  margin: 1vh;
   background-color: $primaryBColor;
   color: $fontHeaderColor;
   border: 1px solid $primaryAColor;
@@ -149,6 +157,30 @@ button {
 button:hover {
   cursor: pointer;
   background-color: $secondaryCColor;
+}
+
+// ---------------------------- Table ----------------------------
+
+table {
+  margin: auto;
+  text-align: center;
+}
+
+thead tr {
+  background-color: $primaryCColor;
+  color: $fontHeaderColor;
+}
+
+tbody tr {
+  background-color: $backgroundBColor;
+}
+
+tbody tr:hover {
+  background-color: $primaryBColor;
+}
+
+td, th {
+  padding: 0.5vw 3vh;
 }
 
 // ---------------------------- Flash ----------------------------

@@ -29,7 +29,8 @@ class MainPage extends React.Component {
 
     handle(event: React.MouseEvent) {
         const drawArea = document.getElementById('drawArea');
-        if (drawArea) {
+        const smiles = document.getElementById('textSmiles');
+        if (drawArea && (smiles as HTMLTextAreaElement).value) {
             smilesDrawer.handleMouseClick(event);
         }
     }
@@ -45,7 +46,7 @@ class MainPage extends React.Component {
                     <h1>Home</h1>
 
                     <div className={styles.drawerArea}>
-                        <canvas id='drawArea' data-smiles='' onClick={this.handle}/>
+                        <canvas id='drawArea' onClick={this.handle}/>
                     </div>
                     <div className={styles.drawerInput}>
                         <textarea id='textSmiles' onInput={this.drawSmiles}/>

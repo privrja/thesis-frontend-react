@@ -49,8 +49,8 @@ class LoginPage extends React.Component<any> {
 
     render() {
         return (
-            <section className={styles.page}>
-                <section className={styles.pageLogin}>
+            <section className={styles.pageLogin + ' ' + styles.page}>
+                <section>
                     <h1>Login</h1>
 
                     <Flash textBad='Login failure!' textOk='Login sucessful!' ref={this.flashRef}/>
