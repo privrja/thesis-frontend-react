@@ -22,7 +22,7 @@ class MainPage extends React.Component {
         }
 
         let input = document.getElementById('textSmiles') as HTMLTextAreaElement;
-        SmilesDrawer.parse(input!.value, function (tree: any) {
+        SmilesDrawer.parse(input.value, function (tree: any) {
             smilesDrawer.draw(tree, 'drawArea', 'light', false);
         });
     }
