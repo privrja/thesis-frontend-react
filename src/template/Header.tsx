@@ -9,7 +9,7 @@ class Header extends React.Component {
         return (
             <header>
                 <div className={styles.headerContainer}>
-                    <HeaderTile text={'BBDGNC'} url={'/'}/>
+                    <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
                     <HeaderTile text={'Containers'} url={'/container'}/>
                     <HeaderTile text={'Sequences'} url={'/sequence'}/>
                     <HeaderTile text={'Blocks'} url={'/block'}/>

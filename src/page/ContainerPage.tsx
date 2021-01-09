@@ -5,14 +5,14 @@ import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 
 interface Container {
     id: number,
-    name: string,
+    containerName: string,
     visibility: string,
     mode: string
 }
 
 interface FreeContainer {
     id: number,
-    name: string,
+    containerName: string,
     visibility: string
 }
 
@@ -47,7 +47,13 @@ class ContainerPage extends React.Component<any, State> {
                 method: 'GET',
                 headers: {'x-auth-token': token}
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        localStorage.removeItem(TOKEN);
+                    }
+                    return response;
+                })
+                .then(response => response.status === 200 ? response.json() : [])
                 .then(response => this.setState({containers: response}));
         }
     }
@@ -88,7 +94,7 @@ class ContainerPage extends React.Component<any, State> {
                         {this.state.containers.map(container => (
                             <tr key={container.id}>
                                 <td>{container.id}</td>
-                                <td>{container.name}</td>
+                                <td>{container.containerName}</td>
                                 <td>{container.visibility}</td>
                                 <td>{container.mode}</td>
                                 <td>{container.id === this.state.selectedContainer ? '1' : '0'}</td>
@@ -119,7 +125,7 @@ class ContainerPage extends React.Component<any, State> {
                         {this.state.freeContainers.map(container => (
                             <tr key={container.id}>
                                 <td>{container.id}</td>
-                                <td>{container.name}</td>
+                                <td>{container.containerName}</td>
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? '1' : '0'}</td>
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
