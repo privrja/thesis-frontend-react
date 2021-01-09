@@ -1,5 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## CORS
+To test on local machine you need to use chrome without CORS policy check
+
+```”C:\Program Files (x86)\Google\Chrome\Application\chrome.exe” — disable-web-security — disable-gpu — user-data-dir=~/chromeTemp```
+
 ## Available Scripts
 
 In the project directory, you can run:
