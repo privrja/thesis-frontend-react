@@ -2,6 +2,10 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import Flash from "../component/Flash";
+import {Field, Form, Formik, FormikHelpers} from "formik";
+import {SelectInput, SelectOption} from "../component/SelectInput";
+import FlashType from "../component/FlashType";
 
 interface Container {
     id: number,
@@ -22,10 +26,23 @@ interface State {
     selectedContainer?: number;
 }
 
+interface Values {
+    containerName: string;
+    visibility: string;
+}
+
+const visibilityOptions = [
+    new SelectOption('PRIVATE'), new SelectOption('PUBLIC')
+];
+
 class ContainerPage extends React.Component<any, State> {
+
+    flashRef: React.RefObject<Flash>;
 
     constructor(props: any) {
         super(props);
+
+        this.flashRef = React.createRef();
 
         let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
         if (selectedContainer) {
@@ -71,13 +88,85 @@ class ContainerPage extends React.Component<any, State> {
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
     }
 
+    containerCreate(values: Values) {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'container', {
+                method: 'POST',
+                headers: {'x-auth-token': token, 'Content-Type': 'application/json'},
+                body: JSON.stringify({containerName: values.containerName, visibility: values.visibility})
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        localStorage.removeItem(token);
+                        response.json().then(data => {
+                            this.flashRef.current!.customText = data.message;
+                            this.flashRef.current!.activate(FlashType.BAD);
+                        });
+                    }
+                    return response;
+                })
+                .then(response => {
+                    if (response.status === 400) {
+                        response.json().then(data => {
+                            this.flashRef.current!.customText = data.message;
+                            this.flashRef.current!.activate(FlashType.BAD);
+                        });
+                    }
+                    return response;
+                })
+                .then(response => {
+                    if (response.status === 201) {
+                        this.flashRef.current!.activate(FlashType.OK);
+                        this.containers();
+                        this.freeContainers();
+                    }
+                });
+        } else {
+            this.flashRef.current!.customText = 'You need to login';
+            this.flashRef.current!.activate(FlashType.BAD);
+        }
+    }
+
     render() {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
                     <h1>Container</h1>
+                    <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
-                    <button className={styles.create}>Create new Container</button>
+                    {localStorage.getItem(TOKEN) !== null ?
+                        <div><h2>Create new container</h2>
+
+                            <Formik
+                                initialValues={{
+                                    containerName: '',
+                                    visibility: 'PRIVATE'
+                                }}
+                                onSubmit={(
+                                    values: Values,
+                                    {setSubmitting}: FormikHelpers<Values>
+                                ) => {
+                                    setTimeout(() => {
+                                        this.containerCreate(values);
+                                        setSubmitting(false);
+                                    }, 500);
+                                }}
+                            >
+                                <Form id="containerCreate">
+                                    <label htmlFor="containerName">Container name:</label>
+                                    <Field id="containerName" name="containerName"
+                                           placeholder='Your new Container Name'/>
+
+                                    <label htmlFor="visibility">Container visibility:</label>
+                                    <SelectInput id="visibility" name="visibility" options={visibilityOptions}/>
+
+                                    <button type="submit" className={styles.create}>Create new container</button>
+                                </Form>
+                            </Formik>
+                        </div> : <div/>
+
+                    }
 
                     <h2>Your containers</h2>
 

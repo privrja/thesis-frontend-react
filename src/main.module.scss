@@ -173,6 +173,12 @@ button:hover {
   background-color: $colorFlashBad;
 }
 
+select {
+  font-size: 1.3vh;
+  margin: 0 1vh;
+  padding: 0.2vh;
+}
+
 // ---------------------------- Table ----------------------------
 
 table {
@@ -201,7 +207,7 @@ td, th {
 
 .flash {
   visibility: visible;
-  width: 20vh;
+  width: fit-content;
   height: 1.6vh;
   margin: 1vh auto 1vh auto;
   padding: 1vh;

@@ -20,6 +20,8 @@ class Flash extends React.Component<Props, State> {
         textPending: 'Pending ...'
     };
 
+    public customText = '';
+
     constructor(props: Props) {
         super(props);
 
@@ -32,11 +34,11 @@ class Flash extends React.Component<Props, State> {
 
     render() {
         if (this.state.isActive && this.state.flashType === FlashType.OK) {
-            return <div className={styles.flashOk + " " + styles.flash}>{this.props.textOk}</div>
+            return <div className={styles.flashOk + " " + styles.flash}>{this.props.textOk} {this.customText}</div>
         } else if (this.state.isActive && this.state.flashType === FlashType.BAD) {
-            return <div className={styles.flashBad + " " + styles.flash}>{this.props.textBad}</div>
+            return <div className={styles.flashBad + " " + styles.flash}>{this.props.textBad} {this.customText}</div>
         } else if (this.state.isActive && this.state.flashType === FlashType.PENDING) {
-            return <div className={styles.flashPending + " " + styles.flash}>{this.props.textPending}</div>
+            return <div className={styles.flashPending + " " + styles.flash}>{this.props.textPending} {this.customText}</div>
         } else {
             return <div className={styles.hidden + " " + styles.flash}>{this.props.textBad}</div>
         }
