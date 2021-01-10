@@ -85,12 +85,19 @@ footer {
 
 .page {
   width: 90%;
-  height: 90vh;
   margin: auto;
   background-color: $backgroundAColor;
   text-align: center;
+  height: fit-content;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+section {
+  margin-bottom: 4vh;
+  padding-bottom: 2vh;
+  height: fit-content;
+  background-color: $backgroundAColor;
 }
 
 .pageLogin {
