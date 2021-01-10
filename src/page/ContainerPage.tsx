@@ -6,6 +6,7 @@ import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
 import FlashType from "../component/FlashType";
+import PopupYesNo from "../component/PopupYesNo";
 
 interface Container {
     id: number,
@@ -38,11 +39,15 @@ const visibilityOptions = [
 class ContainerPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
+    popupRef: React.RefObject<PopupYesNo>;
 
     constructor(props: any) {
         super(props);
 
         this.flashRef = React.createRef();
+        this.popupRef = React.createRef();
+        this.popup = this.popup.bind(this);
+        this.delete = this.delete.bind(this);
 
         let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
         if (selectedContainer) {
@@ -55,6 +60,11 @@ class ContainerPage extends React.Component<any, State> {
     componentDidMount(): void {
         this.containers();
         this.freeContainers();
+    }
+
+    popup(key: number) {
+        this.popupRef.current!.key = key;
+        this.popupRef.current!.activate();
     }
 
     containers() {
@@ -95,44 +105,55 @@ class ContainerPage extends React.Component<any, State> {
                 method: 'POST',
                 headers: {'x-auth-token': token, 'Content-Type': 'application/json'},
                 body: JSON.stringify({containerName: values.containerName, visibility: values.visibility})
-            })
-                .then(response => {
-                    if (response.status === 401) {
-                        localStorage.removeItem(token);
-                        response.json().then(data => {
-                            this.flashRef.current!.customText = data.message;
-                            this.flashRef.current!.activate(FlashType.BAD);
-                        });
-                    }
-                    return response;
-                })
-                .then(response => {
-                    if (response.status === 400) {
-                        response.json().then(data => {
-                            this.flashRef.current!.customText = data.message;
-                            this.flashRef.current!.activate(FlashType.BAD);
-                        });
-                    }
-                    return response;
-                })
-                .then(response => {
-                    if (response.status === 201) {
-                        this.flashRef.current!.activate(FlashType.OK);
-                        this.containers();
-                        this.freeContainers();
-                    }
-                });
+            }).then(response => {
+                if (response.status === 201) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.containers();
+                    this.freeContainers();
+                } else {
+                    response.json().then(data => {
+                        this.flashRef.current!.customText = data.message;
+                        this.flashRef.current!.activate(FlashType.BAD);
+                    });
+                }
+            });
         } else {
             this.flashRef.current!.customText = 'You need to login';
             this.flashRef.current!.activate(FlashType.BAD);
         }
     }
 
+    delete(key: string) {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'container/' + key, {
+                method: 'DELETE',
+                headers: {'x-auth-token': token},
+            }).then(response => {
+                if (response.status !== 204) {
+                    response.json().then(data => {
+                        this.flashRef.current!.customText = data.message;
+                        this.flashRef.current!.activate(FlashType.BAD);
+                    });
+                } else {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.containers();
+                    this.freeContainers();
+                }
+            })
+        } else {
+            this.flashRef.current!.customText = 'You need to login';
+            this.flashRef.current!.activate(FlashType.BAD);
+        }
+    }
+
+
     render() {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
                     <h1>Container</h1>
+                    <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
@@ -165,7 +186,6 @@ class ContainerPage extends React.Component<any, State> {
                                 </Form>
                             </Formik>
                         </div> : <div/>
-
                     }
 
                     <h2>Your containers</h2>
@@ -194,7 +214,8 @@ class ContainerPage extends React.Component<any, State> {
                                     <button>Detail</button>
                                     <button>Collaborators</button>
                                     <button>Edit</button>
-                                    <button className={styles.delete}>Delete</button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}

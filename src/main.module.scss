@@ -243,3 +243,28 @@ td, th {
 .hidden {
   visibility: hidden;
 }
+
+// ---------------------------- Popup ----------------------------
+
+.popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1vh 2vh;
+  border: 2px solid $colorFlashBad;
+  background-color: $backgroundAColor;
+  font-size: 3vh;
+}
+
+.popupButton {
+  font-size: 3vh;
+}
+
+.popupYes {
+  background-color: $colorFlashOk;
+}
+
+.popupNo {
+  background-color: $backgroundBColor;
+}
