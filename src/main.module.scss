@@ -85,10 +85,11 @@ footer {
 
 .page {
   width: 90%;
+  height: fit-content;
+  min-height: 90vh;
   margin: auto;
   background-color: $backgroundAColor;
   text-align: center;
-  height: fit-content;
   background-repeat: no-repeat;
   background-position: center;
 }
