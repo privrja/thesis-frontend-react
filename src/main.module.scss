@@ -10,6 +10,10 @@ $tertiaryCColor: #FF9640;
 $backgroundAColor: #FFFFFF;
 $backgroundBColor: #E0E0E0;
 
+$colorFlashOk: #72A337;
+$colorFlashBad: #F20915;
+$colorFlashPending: #FF7400;
+
 $fontHeaderColor: #FFFFFF;
 $fontSize: 1.6vh;
 $fontSizeHeader: 2vh;
@@ -159,6 +163,16 @@ button:hover {
   background-color: $secondaryCColor;
 }
 
+/* Create button */
+.create {
+  background-color: $colorFlashOk;
+}
+
+/* Delete button*/
+.delete {
+  background-color: $colorFlashBad;
+}
+
 // ---------------------------- Table ----------------------------
 
 table {
@@ -185,9 +199,6 @@ td, th {
 
 // ---------------------------- Flash ----------------------------
 
-$colorFlashOk: #72A337;
-$colorFlashBad: #F20915;
-
 .flash {
   visibility: visible;
   width: 20vh;
@@ -212,7 +223,7 @@ $colorFlashBad: #F20915;
 }
 
 .flashPending {
-  background-color: $tertiaryAColor;
+  background-color: $colorFlashPending;
 }
 
 .hidden {

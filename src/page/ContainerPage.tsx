@@ -77,6 +77,8 @@ class ContainerPage extends React.Component<any, State> {
                 <section className={styles.pageTable}>
                     <h1>Container</h1>
 
+                    <button className={styles.create}>Create new Container</button>
+
                     <h2>Your containers</h2>
 
                     <table>
@@ -103,7 +105,7 @@ class ContainerPage extends React.Component<any, State> {
                                     <button>Detail</button>
                                     <button>Collaborators</button>
                                     <button>Edit</button>
-                                    <button>Delete</button>
+                                    <button className={styles.delete}>Delete</button>
                                 </td>
                             </tr>
                         ))}
