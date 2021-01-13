@@ -212,6 +212,7 @@ class ContainerPage extends React.Component<any, State> {
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
                                     <button>Clone</button>
+                                    <button>Export</button>
                                     <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
                                 </td>
                             </tr>
