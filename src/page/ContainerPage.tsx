@@ -147,7 +147,6 @@ class ContainerPage extends React.Component<any, State> {
         }
     }
 
-
     render() {
         return (
             <section className={styles.page}>
@@ -212,8 +211,8 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
                                     <button>Clone</button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
                                 </td>
                             </tr>
                         ))}
