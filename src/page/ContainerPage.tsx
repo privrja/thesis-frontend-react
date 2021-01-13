@@ -211,11 +211,9 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.id === this.state.selectedContainer ? '1' : '0'}</td>
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
-                                    <button>Detail</button>
-                                    <button>Collaborators</button>
-                                    <button>Edit</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
-                                    </button>
+                                    <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
+                                    <button>Clone</button>
                                 </td>
                             </tr>
                         ))}
@@ -241,7 +239,6 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? '1' : '0'}</td>
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
-                                    <button>Detail</button>
                                     <button>Clone</button>
                                 </td>
                             </tr>

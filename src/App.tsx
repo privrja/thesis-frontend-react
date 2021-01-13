@@ -7,6 +7,7 @@ import MainPage from "./page/MainPage";
 import LoginPage from "./page/LoginPage";
 import ContainerPage from "./page/ContainerPage";
 import LogoutPage from "./page/LogoutPage";
+import ContainerDetailPage from "./page/ContainerDetailPage";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
                 <Route exact path='/' component={MainPage}/>
                 <Route path='/login/' component={LoginPage}/>
                 <Route path='/logout/' component={LogoutPage}/>
+                <Route path='/container/:id' component={ContainerDetailPage} />
                 <Route path='/container/' component={ContainerPage}/>
             </Router>
 
