@@ -125,6 +125,7 @@ canvas {
   margin-top: 1vh;
   display: inline-block;
   vertical-align: top;
+  text-align: left;
 }
 
 // ---------------------------- H ----------------------------
@@ -148,12 +149,10 @@ h2 {
 // ---------------------------- Forms ----------------------------
 
 label {
-  font-size: 1.3vh;
   padding: 1vh;
 }
 
 input {
-  font-size: 1.3vh;
   margin: 0 1vh;
 }
 
@@ -176,15 +175,31 @@ button:hover {
   background-color: $colorFlashOk;
 }
 
-/* Delete button*/
+/* Delete button */
 .delete {
   background-color: $colorFlashBad;
 }
 
+/* Select with options */
 select {
-  font-size: 1.3vh;
   margin: 0 1vh;
   padding: 0.2vh;
+}
+
+textarea {
+  height: 16vh;
+}
+
+.main {
+  width: 80%;
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.drawerInput label {
+  margin-top: 1.5vh;
 }
 
 // ---------------------------- Table ----------------------------
