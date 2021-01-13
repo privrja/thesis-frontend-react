@@ -207,7 +207,7 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.containerName}</td>
                                 <td>{container.visibility}</td>
                                 <td>{container.mode}</td>
-                                <td>{container.id === this.state.selectedContainer ? '1' : '0'}</td>
+                                <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
@@ -236,10 +236,11 @@ class ContainerPage extends React.Component<any, State> {
                             <tr key={container.id}>
                                 <td>{container.id}</td>
                                 <td>{container.containerName}</td>
-                                <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? '1' : '0'}</td>
+                                <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button>Clone</button>
+                                    <button>Export</button>
                                 </td>
                             </tr>
                         ))}

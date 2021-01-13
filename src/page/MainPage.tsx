@@ -49,6 +49,7 @@ class MainPage extends React.Component {
                     <h1>Home</h1>
 
                     <div className={styles.drawerArea}>
+                        <button>Export</button>
                         <canvas id='drawArea' onClick={this.handle}/>
                     </div>
 
@@ -76,7 +77,13 @@ class MainPage extends React.Component {
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
                         <input id="identifier" name="identifier" className={styles.main}/>
 
-                        <button onClick={this.buildBlocks}>Build Blocks</button>
+                        <div className={styles.buttons}>
+                            <button>Find</button>
+                            <button>Cannonical SMILES</button>
+                            <button>Unique SMILES</button>
+                            <button onClick={this.buildBlocks}>Build Blocks</button>
+                            <button>Save</button>
+                        </div>
                     </div>
 
                 </section>
