@@ -49,7 +49,6 @@ class MainPage extends React.Component {
                     <h1>Home</h1>
 
                     <div className={styles.drawerArea}>
-                        <button>Export</button>
                         <canvas id='drawArea' onClick={this.handle}/>
                     </div>
 
