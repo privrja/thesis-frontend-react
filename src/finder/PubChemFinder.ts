@@ -1,11 +1,13 @@
 import IFinder from "./IFinder";
 import SingleStructure from "./SingleStructure";
+import Sleep from "../helper/Sleep";
 
 const ENDPOINT_URI = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/";
 const PROPERTY_VALUES = "IUPACName,MolecularFormula,MonoisotopicMass,CanonicalSmiles/";
 const PROPERTY_CONSTANT = '/property/';
 const FORMAT_JSON = 'json';
 const CID_CONSTANT = 'cid/';
+const CIDS_CONSTANT = '/cids/';
 
 interface ListResponseJson {
     IdentifierList: {
@@ -25,6 +27,17 @@ interface PropertyResponseJson {
     CanonicalSMILES: string;
     IUPACName: string
     MonoisotopicMass: number
+}
+
+interface ListKeyResponseJson {
+    IdentifierList: {
+        ListKey: number
+        Size: number
+        EntrezDB: string
+        EntrezWebEnv: string
+        EntrezQueryKey: number
+        EntrezURL: string
+    }
 }
 
 class PubChemFinder implements IFinder {
@@ -50,26 +63,15 @@ class PubChemFinder implements IFinder {
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
-        return fetch(ENDPOINT_URI + 'name/' + name + '/cids/' + FORMAT_JSON + '?name_type=word', {
-                method: 'GET',
-            }
-        ).then(async response => {
-                if (response.status === 200) {
-                    let json = await response.json() as ListResponseJson;
-                    if (json.IdentifierList.CID.length > 1) {
-                        return this.findByIdentifiers(json.IdentifierList.CID as []);
-                    } else {
-                        return this.findByIdentifier(json.IdentifierList.CID[0].toString());
-                    }
-                }
-                return [];
-            }
-        );
+        return fetch(ENDPOINT_URI + 'name/' + name + CIDS_CONSTANT + FORMAT_JSON + '?name_type=word', {
+            method: 'GET',
+        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
     }
 
     findByFormula(formula: string): Promise<SingleStructure[]> {
-        // TODO
-        return new Promise<SingleStructure[]>(resolve => {});
+        return fetch(ENDPOINT_URI + 'fastformula/' + formula + CIDS_CONSTANT + FORMAT_JSON, {
+            method: 'GET'
+        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
     }
 
     findByIdentifiers(ids: []): Promise<SingleStructure[]> {
@@ -91,14 +93,37 @@ class PubChemFinder implements IFinder {
         });
     }
 
-    findByMass(mass: number): Promise<SingleStructure[]> {
-        // TODO
-        return new Promise<SingleStructure[]>(resolve => {});
+    findBySmiles(smiles: string): Promise<SingleStructure[]> {
+        return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?list_return=listkey', {
+            method: 'GET'
+        }).then(async response => {
+            console.log(response);
+            if (response.status === 200) {
+                let json = await response.json() as ListKeyResponseJson;
+                return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?listkey=' + json.IdentifierList.ListKey + '&listkey_start=' + 0 + '&listkey_count=200', {
+                    method: 'GET'
+                }).then(async response => { return response.status === 200 ? this.jsonListResult(response) : []});
+            } else {
+                return [];
+            }
+        });
     }
 
-    findBySmiles(smiles: string): Promise<SingleStructure[]>{
-        // TODO
-        return new Promise<SingleStructure[]>(resolve => {});
+    /**
+     * Pubchem not supported
+     * @param mass
+     */
+    findByMass(mass: number): Promise<SingleStructure[]> {
+        return Sleep.sleep(0).then(() => []);
+    }
+
+    private async jsonListResult(response: Response): Promise<SingleStructure[]> {
+        let json = await response.json() as ListResponseJson;
+        if (json.IdentifierList.CID.length > 1) {
+            return this.findByIdentifiers(json.IdentifierList.CID as []);
+        } else {
+            return this.findByIdentifier(json.IdentifierList.CID[0].toString());
+        }
     }
 
 }
