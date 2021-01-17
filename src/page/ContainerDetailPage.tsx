@@ -50,6 +50,7 @@ class ContainerDetailPage extends React.Component<any, State> {
             })
                 .then(response => {
                     if (response.status === 404) {
+                        this.flashRef.current!.activate(FlashType.BAD, 'Not found');
                     }
                     return response;
                 })
@@ -66,38 +67,49 @@ class ContainerDetailPage extends React.Component<any, State> {
     }
 
     delete() {
+        // TODO
+    }
 
+    containerH() {
+        return this.state.container.containerName + ' - '  + this.state.container.visibility;
+    }
+
+    collaboratorsH() {
+        return <h2 id='collaborators'>Collaborators</h2>
+    }
+
+    collaboratorsTable() {
+        return <table>
+            <thead>
+            <tr>
+                <th>User name</th>
+                <th>Mode</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {this.state.container.collaborators.map(collaborator => (
+                <tr>
+                    <td>{collaborator.nick}</td>
+                    <td>{collaborator.mode}</td>
+                    <td>
+                        <button className={styles.delete} onClick={() => this.popup(collaborator.userId)}>Delete</button>
+                    </td>
+                </tr>
+            ))}
+            </tbody>
+        </table>
     }
 
     render() {
         return (
             <section className={styles.page}>
                 <section>
-                    <h1>Container {this.state.container.containerName} - {this.state.container.visibility} </h1>
+                    <h1>Container { this.state.container ? this.containerH() : '' }</h1>
                     <PopupYesNo label={"Realy want to remove user from container?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2 id='collaborators'>Collaborators</h2>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>User name</th>
-                            <th>Mode</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.container.collaborators.map(collaborator => (
-                            <tr>
-                                <td>{collaborator.nick}</td>
-                                <td>{collaborator.mode}</td>
-                                <td>
-
-                                    <button className={styles.delete} onClick={() => this.popup(collaborator.userId)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    { this.state.container ? this.collaboratorsH()  : '' }
+                    { this.state.container ? this.collaboratorsTable()  : '' }
                 </section>
             </section>
         )
