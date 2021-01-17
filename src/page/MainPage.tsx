@@ -85,6 +85,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     select(molecule: SingleStructure, search?: number) {
+        this.flashRef.current!.deactivate();
         if(search === undefined) {
             let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
@@ -107,6 +108,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     show() {
+        this.flashRef.current!.deactivate();
         if (this.state.molecule?.database !== undefined) {
             window.open(ServerEnumHelper.getLink(this.state.molecule.database, this.state.molecule.identifier), '_blank');
         } else {
