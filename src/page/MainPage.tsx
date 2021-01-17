@@ -7,15 +7,21 @@ import {SelectInput} from "../component/SelectInput";
 import {ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
 import IFinder from "../finder/IFinder";
+import SingleStructure from "../finder/SingleStructure";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 
-class MainPage extends React.Component {
+interface State {
+    results: SingleStructure[];
+}
+
+class MainPage extends React.Component<any, State> {
 
     constructor(props: any, context: any) {
         super(props, context);
 
         this.find = this.find.bind(this);
+        this.state = {results: []};
     }
 
     drawSmiles() {
@@ -62,29 +68,41 @@ class MainPage extends React.Component {
         if (response.length === 0) {
             // TODO activate FLASH not found
         } else if (response.length === 1) {
-            let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
-            smilesInput!.value = response[0].smiles;
-            let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
-            formulaInput!.value = response[0].formula;
-            let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-            massInput!.value = response[0].mass.toString();
-            let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-            identifierInput!.value = response[0].identifier.toString();
-            let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
-            if (search !== SearchEnum.NAME) {
-                nameInput!.value = response[0].structureName.toString();
-            }
-            this.drawSmiles();
+            this.select(response[0], search);
         } else {
-            // TODO print findings and let user choose
+            this.setState({results: response});
+            SmilesDrawer.apply({width: 300, height: 300});
+            document.location.href = '#results';
         }
+    }
+
+    select(molecule: SingleStructure, search?: number) {
+        if(search === undefined) {
+            let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
+            search = Number(searchInput?.options[searchInput.selectedIndex].value);
+        }
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        smilesInput!.value = molecule.smiles;
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
+        formulaInput!.value = molecule.formula;
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
+        massInput!.value = molecule.mass.toString();
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
+        identifierInput!.value = molecule.identifier.toString();
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
+        if (search !== SearchEnum.NAME) {
+            nameInput!.value = molecule.structureName.toString();
+        }
+        this.drawSmiles();
+        this.setState({results: []});
+        document.location.href = '#home';
     }
 
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage}>
                 <section>
-                    <h1>Home</h1>
+                    <h1 id='home'>Home</h1>
 
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
@@ -124,6 +142,23 @@ class MainPage extends React.Component {
                     </div>
 
                 </section>
+
+                {this.state.results.length > 1 ?
+                    <section>
+                        <h1 id='results'>Results</h1>
+                        {this.state.results.map(molecule => (
+                            <section className={styles.results} title={molecule.structureName}>
+                                <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
+                                        data-smiles={molecule.smiles}/>
+                                <div className={styles.itemResults}>{molecule.formula}</div>
+                                <div className={styles.itemResults}>{molecule.mass}</div>
+                                <div className={styles.itemResults} onClick={() => this.select(molecule)}>Select</div>
+                            </section>
+                        ))}
+                    </section>
+                    :
+                    <section/>
+                }
             </section>
         )
     }

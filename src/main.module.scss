@@ -111,6 +111,12 @@ canvas {
   border: 1px solid black;
 }
 
+.canvasSmall {
+  width: 10%;
+  height: 10%;
+  border: none;
+}
+
 .drawerArea {
   width: 50%;
   height: 70vh;
@@ -127,6 +133,29 @@ canvas {
   vertical-align: top;
   text-align: left;
 }
+
+.results {
+  padding: 1vh;
+  display: inline-block;
+  border: 2px solid #000000;
+  border-radius: 2vh;
+  margin: 1vh;
+  background-color: $backgroundBColor;
+}
+
+.results:hover {
+  background-color: $backgroundAColor;
+}
+
+.itemResults {
+  font-size: 2.2vh;
+}
+
+.itemResults:hover {
+  background-color: $backgroundBColor;
+  border-radius: 4px;
+}
+
 
 // ---------------------------- H ----------------------------
 
