@@ -28,8 +28,13 @@ class Flash extends React.Component<Props, State> {
         this.state = {isActive: false, flashType: FlashType.OK};
     }
 
-    activate(flashType: FlashType) {
+    activate(flashType: FlashType, customText?: string) {
+        this.customText = customText === undefined ? '' : customText;
         this.setState({isActive: true, flashType: flashType});
+    }
+
+    setCustomText(text: string) {
+        this.customText = text;
     }
 
     render() {

@@ -112,14 +112,12 @@ class ContainerPage extends React.Component<any, State> {
                     this.freeContainers();
                 } else {
                     response.json().then(data => {
-                        this.flashRef.current!.customText = data.message;
-                        this.flashRef.current!.activate(FlashType.BAD);
+                        this.flashRef.current!.activate(FlashType.BAD, data.message);
                     });
                 }
             });
         } else {
-            this.flashRef.current!.customText = 'You need to login';
-            this.flashRef.current!.activate(FlashType.BAD);
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
         }
     }
 
@@ -132,8 +130,7 @@ class ContainerPage extends React.Component<any, State> {
             }).then(response => {
                 if (response.status !== 204) {
                     response.json().then(data => {
-                        this.flashRef.current!.customText = data.message;
-                        this.flashRef.current!.activate(FlashType.BAD);
+                        this.flashRef.current!.activate(FlashType.BAD, data.message);
                     });
                 } else {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -142,8 +139,7 @@ class ContainerPage extends React.Component<any, State> {
                 }
             })
         } else {
-            this.flashRef.current!.customText = 'You need to login';
-            this.flashRef.current!.activate(FlashType.BAD);
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
         }
     }
 

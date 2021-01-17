@@ -56,8 +56,7 @@ class ContainerDetailPage extends React.Component<any, State> {
                 .then(response => response.status === 200 ? response.json() : null)
                 .then(response => this.setState({container: response}));
         } else {
-            this.flashRef.current!.customText = 'You need to login';
-            this.flashRef.current!.activate(FlashType.BAD);
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
         }
     }
 

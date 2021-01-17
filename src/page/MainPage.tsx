@@ -8,6 +8,8 @@ import {ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
 import IFinder from "../finder/IFinder";
 import SingleStructure from "../finder/SingleStructure";
+import Flash from "../component/Flash";
+import FlashType from "../component/FlashType";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 
@@ -18,9 +20,12 @@ interface State {
 
 class MainPage extends React.Component<any, State> {
 
+    flashRef: React.RefObject<Flash>;
+
     constructor(props: any, context: any) {
         super(props, context);
 
+        this.flashRef = React.createRef();
         this.find = this.find.bind(this);
         this.show = this.show.bind(this);
         this.state = {results: []};
@@ -58,6 +63,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     async find() {
+        this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
@@ -65,13 +71,13 @@ class MainPage extends React.Component<any, State> {
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getIdentifier(search)) as HTMLInputElement | null;
         let finder: IFinder = ServerEnumHelper.getFinder(database);
         let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
-        console.log(response);
-
         if (response.length === 0) {
-            // TODO activate FLASH not found
+            this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
         } else if (response.length === 1) {
+            this.flashRef.current!.activate(FlashType.OK);
             this.select(response[0], search);
         } else {
+            this.flashRef.current!.activate(FlashType.OK, 'Found more, choose');
             this.setState({results: response});
             SmilesDrawer.apply({width: 300, height: 300});
             document.location.href = '#results';
@@ -101,7 +107,11 @@ class MainPage extends React.Component<any, State> {
     }
 
     show() {
-        window.open(ServerEnumHelper.getLink(this.state.molecule!.database, this.state.molecule!.identifier), '_blank');
+        if (this.state.molecule?.database !== undefined) {
+            window.open(ServerEnumHelper.getLink(this.state.molecule.database, this.state.molecule.identifier), '_blank');
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to show');
+        }
     }
 
     render() {
@@ -115,6 +125,7 @@ class MainPage extends React.Component<any, State> {
                     </div>
 
                     <div className={styles.drawerInput}>
+                        <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
                                      options={ServerEnumHelper.getServerOptions()}/>
