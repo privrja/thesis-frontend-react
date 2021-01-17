@@ -33,4 +33,20 @@ export class ServerEnumHelper {
         }
         return new PubChemFinder();
     }
+
+    static getLink(database: ServerEnum, identifier: string) {
+        switch (database) {
+            case ServerEnum.PUBCHEM:
+                return 'https://pubchem.ncbi.nlm.nih.gov/compound/' + identifier;
+            case ServerEnum.CHEMSPIDER:
+                break;
+            case ServerEnum.NORINE:
+                break;
+            case ServerEnum.PDB:
+                break;
+            case ServerEnum.CHEBI:
+                break;
+        }
+        return '';
+    }
 }

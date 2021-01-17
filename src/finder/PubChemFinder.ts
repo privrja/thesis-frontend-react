@@ -1,6 +1,7 @@
 import IFinder from "./IFinder";
 import SingleStructure from "./SingleStructure";
 import Sleep from "../helper/Sleep";
+import {ServerEnum} from "../enum/ServerEnum";
 
 const ENDPOINT_URI = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/";
 const PROPERTY_VALUES = "IUPACName,MolecularFormula,MonoisotopicMass,CanonicalSmiles/";
@@ -51,6 +52,7 @@ class PubChemFinder implements IFinder {
                 let json = await response.json() as SingleResponseJson;
                 return [new SingleStructure(
                     json.PropertyTable.Properties[0].CID.toString(),
+                    ServerEnum.PUBCHEM,
                     json.PropertyTable.Properties[0].IUPACName,
                     json.PropertyTable.Properties[0].CanonicalSMILES,
                     json.PropertyTable.Properties[0].MolecularFormula,
@@ -82,6 +84,7 @@ class PubChemFinder implements IFinder {
                 let json = await response.json() as SingleResponseJson;
                 return json.PropertyTable.Properties.map(e => new SingleStructure(
                     e.CID.toString(),
+                    ServerEnum.PUBCHEM,
                     e.IUPACName,
                     e.CanonicalSMILES,
                     e.MolecularFormula,

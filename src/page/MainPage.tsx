@@ -13,6 +13,7 @@ let smilesDrawer: SmilesDrawer.Drawer;
 
 interface State {
     results: SingleStructure[];
+    molecule?: SingleStructure;
 }
 
 class MainPage extends React.Component<any, State> {
@@ -21,6 +22,7 @@ class MainPage extends React.Component<any, State> {
         super(props, context);
 
         this.find = this.find.bind(this);
+        this.show = this.show.bind(this);
         this.state = {results: []};
     }
 
@@ -94,8 +96,12 @@ class MainPage extends React.Component<any, State> {
             nameInput!.value = molecule.structureName.toString();
         }
         this.drawSmiles();
-        this.setState({results: []});
+        this.setState({results: [], molecule: molecule});
         document.location.href = '#home';
+    }
+
+    show() {
+        window.open(ServerEnumHelper.getLink(this.state.molecule!.database, this.state.molecule!.identifier), '_blank');
     }
 
     render() {
@@ -134,6 +140,7 @@ class MainPage extends React.Component<any, State> {
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
+                            <button onClick={this.show}>Show original</button>
                             <button>Cannonical SMILES</button>
                             <button>Unique SMILES</button>
                             <button onClick={this.buildBlocks}>Build Blocks</button>
@@ -152,7 +159,7 @@ class MainPage extends React.Component<any, State> {
                                         data-smiles={molecule.smiles}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
                                 <div className={styles.itemResults}>{molecule.mass}</div>
-                                <div className={styles.itemResults} onClick={() => this.select(molecule)}>Select</div>
+                                <div className={styles.itemResults + ' ' + styles.cursorPointer} onClick={() => this.select(molecule)}>Select</div>
                             </section>
                         ))}
                     </section>
