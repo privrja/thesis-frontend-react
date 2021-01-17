@@ -8,13 +8,13 @@ export enum ServerEnum {
 
 export class ServerEnumHelper {
 
-    static getServerOptions(): SelectOption[] {
+    static getOptions(): SelectOption[] {
         return [
-            new SelectOption(ServerEnum.PUBCHEM.toString(), 'PubChem'),
-            new SelectOption(ServerEnum.CHEMSPIDER.toString(), 'ChemSpider'),
-            new SelectOption(ServerEnum.NORINE.toString(), 'Norine'),
-            new SelectOption(ServerEnum.PDB.toString(), 'PDB'),
-            new SelectOption(ServerEnum.CHEBI.toString(), 'ChEBI')
+            new SelectOption(ServerEnum.PUBCHEM.toString(), this.getName(ServerEnum.PUBCHEM)),
+            new SelectOption(ServerEnum.CHEMSPIDER.toString(), this.getName(ServerEnum.CHEMSPIDER)),
+            new SelectOption(ServerEnum.NORINE.toString(), this.getName(ServerEnum.NORINE)),
+            new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
+            new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI))
         ];
     }
 
@@ -34,6 +34,22 @@ export class ServerEnumHelper {
         return new PubChemFinder();
     }
 
+    static getName(value: ServerEnum) {
+        switch (value) {
+            default:
+            case ServerEnum.PUBCHEM:
+                return 'PubChem';
+            case ServerEnum.CHEMSPIDER:
+                return 'ChemSpider';
+            case ServerEnum.NORINE:
+                return 'Norine';
+            case ServerEnum.PDB:
+                return 'PDB';
+            case ServerEnum.CHEBI:
+                return 'ChEBI';
+        }
+    }
+
     static getLink(database: ServerEnum, identifier: string) {
         switch (database) {
             case ServerEnum.PUBCHEM:
@@ -46,7 +62,8 @@ export class ServerEnumHelper {
                 break;
             case ServerEnum.CHEBI:
                 break;
+            default:
+                return '';
         }
-        return '';
     }
 }

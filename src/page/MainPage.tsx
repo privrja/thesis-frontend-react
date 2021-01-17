@@ -10,6 +10,7 @@ import IFinder from "../finder/IFinder";
 import SingleStructure from "../finder/SingleStructure";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
+import Canonical from "../helper/Canonical";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 
@@ -25,25 +26,38 @@ class MainPage extends React.Component<any, State> {
     constructor(props: any, context: any) {
         super(props, context);
 
+
         this.flashRef = React.createRef();
         this.find = this.find.bind(this);
         this.show = this.show.bind(this);
+        this.canonical = this.canonical.bind(this);
+        this.unique = this.unique.bind(this);
+        this.buildBlocks = this.buildBlocks.bind(this);
         this.state = {results: []};
     }
 
-    drawSmiles() {
-        const area = document.getElementById('drawArea');
-        if (!smilesDrawer) {
-            smilesDrawer = new SmilesDrawer.Drawer({
-                width: area!.clientWidth,
-                height: area!.clientHeight,
-                drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
-                offsetX: area!.offsetLeft,
-                offsetY: area!.offsetTop,
-                themes: OPTION_THEMES,
-            });
-        }
+    componentDidMount(): void {
+        this.initializeSmilesDrawer();
+    }
 
+    initializeSmilesDrawer() {
+        const area = document.getElementById('drawArea');
+        smilesDrawer = new SmilesDrawer.Drawer({
+            width: area!.clientWidth,
+            height: area!.clientHeight,
+            compactDrawing: false,
+            drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
+            offsetX: area!.offsetLeft,
+            offsetY: area!.offsetTop,
+            themes: OPTION_THEMES,
+        });
+
+    }
+
+    drawSmiles() {
+        if (!smilesDrawer) {
+            this.initializeSmilesDrawer();
+        }
         let input = document.getElementById('smiles') as HTMLTextAreaElement;
         SmilesDrawer.parse(input.value, function (tree: any) {
             smilesDrawer.draw(tree, 'drawArea', 'light', false);
@@ -59,6 +73,14 @@ class MainPage extends React.Component<any, State> {
     }
 
     buildBlocks() {
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        if (smilesInput?.value === undefined || smilesInput?.value === "") {
+            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+            return;
+        }
+        if (!smilesDrawer) {
+            this.initializeSmilesDrawer();
+        }
         console.log(smilesDrawer.buildBlockSmiles());
     }
 
@@ -68,7 +90,7 @@ class MainPage extends React.Component<any, State> {
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
-        let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getIdentifier(search)) as HTMLInputElement | null;
+        let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let finder: IFinder = ServerEnumHelper.getFinder(database);
         let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
         if (response.length === 0) {
@@ -116,6 +138,25 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    canonical() {
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        if (smilesInput?.value === undefined || smilesInput?.value === "") {
+            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+        } else {
+            smilesInput.value = Canonical.getCanonicalSmiles(smilesInput.value);
+            this.drawSmiles();
+        }
+    }
+
+    unique() {
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        if (smilesInput?.value === undefined || smilesInput?.value === "") {
+            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+        } else {
+            // TODO request to backend
+        }
+    }
+
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage}>
@@ -130,11 +171,11 @@ class MainPage extends React.Component<any, State> {
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getServerOptions()}/>
+                                     options={ServerEnumHelper.getOptions()}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
-                                     options={SearchEnumHelper.getSearchOptions()}/>
+                                     options={SearchEnumHelper.getOptions()}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
                         <input id="name" name="name" className={styles.main}/>
@@ -154,8 +195,8 @@ class MainPage extends React.Component<any, State> {
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
                             <button onClick={this.show}>Show original</button>
-                            <button>Cannonical SMILES</button>
-                            <button>Unique SMILES</button>
+                            <button onClick={this.canonical}>Cannonical SMILES</button>
+                            <button onClick={this.unique}>Unique SMILES</button>
                             <button onClick={this.buildBlocks}>Build Blocks</button>
                             <button>Save</button>
                         </div>

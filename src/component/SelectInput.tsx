@@ -4,7 +4,6 @@ export class SelectOption {
     public key: string;
     public label: string;
 
-    constructor(key: string, pubChem: string)
     constructor(key: string, label?:string) {
         this.key = key;
         this.label = label === undefined ? key : label;

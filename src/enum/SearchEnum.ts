@@ -8,18 +8,19 @@ export enum SearchEnum {
 
 export class SearchEnumHelper {
 
-    static getSearchOptions() {
+    static getOptions() {
         return [
-            new SelectOption(SearchEnum.NAME.toString(), 'Name'),
-            new SelectOption(SearchEnum.SMILES.toString(), 'SMILES'),
-            new SelectOption(SearchEnum.FORMULA.toString(), 'Molecular Formula'),
-            new SelectOption(SearchEnum.MASS.toString(), 'Monoisotopic Mass'),
-            new SelectOption(SearchEnum.IDENTIFIER.toString(), 'Identifier'),
+            new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
+            new SelectOption(SearchEnum.SMILES.toString(), this.getName(SearchEnum.SMILES)),
+            new SelectOption(SearchEnum.FORMULA.toString(), this.getName(SearchEnum.FORMULA)),
+            new SelectOption(SearchEnum.MASS.toString(), this.getName(SearchEnum.MASS)),
+            new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
         ]
     }
 
-    static getIdentifier(value: SearchEnum) {
+    static getName(value: SearchEnum) {
         switch (value) {
+            default:
             case SearchEnum.NAME:
                 return 'name';
             case SearchEnum.IDENTIFIER:

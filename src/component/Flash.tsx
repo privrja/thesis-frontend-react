@@ -20,7 +20,7 @@ class Flash extends React.Component<Props, State> {
         textPending: 'Pending ...'
     };
 
-    public customText = '';
+    private customText = '';
 
     constructor(props: Props) {
         super(props);

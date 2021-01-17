@@ -33,7 +33,7 @@ interface Values {
 }
 
 const visibilityOptions = [
-    new SelectOption('PRIVATE', "PubChem"), new SelectOption('PUBLIC', "PubChem")
+    new SelectOption('PRIVATE'), new SelectOption('PUBLIC')
 ];
 
 class ContainerPage extends React.Component<any, State> {
