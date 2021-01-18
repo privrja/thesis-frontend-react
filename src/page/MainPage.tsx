@@ -16,8 +16,9 @@ import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
-const DRAW_AREA = 'drawArea';
+const ELEMENT_CANVAS = 'drawArea';
 const ELEMENT_SMILES = 'smiles';
+const ELEMENT_LARGE_CANVAS = 'popupLargeSmiles';
 const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 
 interface State {
@@ -45,7 +46,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     componentDidMount(): void {
-        this.initializeSmilesDrawer();
+        this.initializeSmilesDrawers();
     }
 
     componentDidUpdate() {
@@ -55,8 +56,8 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
-    initializeSmilesDrawer() {
-        const area = document.getElementById(DRAW_AREA);
+    initializeSmilesDrawers() {
+        const area = document.getElementById(ELEMENT_CANVAS);
         smilesDrawer = new SmilesDrawer.Drawer({
             width: area!.clientWidth,
             height: area!.clientHeight,
@@ -66,31 +67,36 @@ class MainPage extends React.Component<any, State> {
             offsetY: area!.offsetTop,
             themes: OPTION_THEMES,
         });
-
-        const large = document.getElementById('popupLargeSmiles');
+        const large = document.getElementById(ELEMENT_LARGE_CANVAS);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
             width: large!.clientWidth,
             height: large!.clientHeight,
             compactDrawing: false,
         });
-
     }
 
     drawSmiles() {
         let input = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
         SmilesDrawer.parse(input.value, function (tree: any) {
-            smilesDrawer.draw(tree, DRAW_AREA, 'light', false);
+            smilesDrawer.draw(tree, ELEMENT_CANVAS);
         });
     }
 
+    /**
+     * Handle mouse click on canvas to choose decays points
+     * @param event
+     */
     handle(event: React.MouseEvent) {
-        const drawArea = document.getElementById(DRAW_AREA);
+        const drawArea = document.getElementById(ELEMENT_CANVAS);
         const smiles = document.getElementById(ELEMENT_SMILES);
         if (drawArea && (smiles as HTMLTextAreaElement).value) {
             smilesDrawer.handleMouseClick(event);
         }
     }
 
+    /**
+     * Build blocks from structure and show them
+     */
     buildBlocks() {
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
@@ -100,6 +106,9 @@ class MainPage extends React.Component<any, State> {
         console.log(smilesDrawer.buildBlockSmiles());
     }
 
+    /**
+     * Find structures on third party databases, by data in form
+     */
     async find() {
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
@@ -121,6 +130,11 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    /**
+     * Choose one among more results from findings
+     * @param molecule chosen one
+     * @param search by which parameter was searched
+     */
     select(molecule: SingleStructure, search?: number) {
         this.flashRef.current!.deactivate();
         if (search === undefined) {
@@ -144,10 +158,18 @@ class MainPage extends React.Component<any, State> {
         document.location.href = '#home';
     }
 
+    /**
+     * Open new tab, with structure on original third party service
+     * @param database
+     * @param identifier
+     */
     show(database: ServerEnum, identifier: string) {
         window.open(ServerEnumHelper.getLink(database, identifier), '_blank');
     }
 
+    /**
+     * Convert Isomeric SMILES to canonical
+     */
     canonical() {
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
@@ -158,6 +180,9 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    /**
+     * Convert SMILES to Unique SMILES
+     */
     unique() {
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
@@ -167,6 +192,10 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    /**
+     * Show popup with large result
+     * @param smiles
+     */
     showLargeSmiles(smiles: string) {
         this.popupRef.current!.activate();
         SmilesDrawer.parse(smiles, function (tree: any) {
