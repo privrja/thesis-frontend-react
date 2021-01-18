@@ -26,7 +26,7 @@ interface PDBResponse {
     pdbx_chem_comp_descriptor: Program[];
 }
 
-class NorineFinder implements IFinder {
+class PDBFinder implements IFinder {
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
         return fetch(ENDPOINT_URI + 'core/chemcomp/' + id, {
@@ -59,7 +59,7 @@ class NorineFinder implements IFinder {
     }
 
     /**
-     * Can be done with download all from Norine and then find in it
+     * Not supported by PDB
      * @param formula
      */
     findByFormula(formula: string): Promise<SingleStructure[]> {
@@ -67,33 +67,29 @@ class NorineFinder implements IFinder {
     }
 
     /**
-     * Not supported by Norine
+     * Not supported by PDB
+     * @param ids
      */
     findByIdentifiers(ids: []): Promise<SingleStructure[]> {
         return Sleep.sleep(0).then(() => []);
     }
 
     /**
-     * Not supported by Norine
-     * Can be done with download all from Norine and then find in it
+     * Not supported by PDB
+     * @param smiles
      */
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
         return Sleep.sleep(0).then(() => []);
     }
 
     /**
-     * Not supported by Norine
-     * Can be done with download all from Norine and then find in it
+     * Not supported by PDB
      * @param mass
      */
     findByMass(mass: number): Promise<SingleStructure[]> {
         return Sleep.sleep(0).then(() => []);
     }
 
-    private async jsonListResult(response: Response): Promise<SingleStructure[]> {
-        throw new Error();
-    }
-
 }
 
-export default NorineFinder;
+export default PDBFinder;
