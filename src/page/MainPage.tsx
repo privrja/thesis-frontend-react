@@ -142,16 +142,16 @@ class MainPage extends React.Component<any, State> {
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
-        smilesInput!.value = molecule.smiles;
+        smilesInput!.value = molecule.smiles ?? '';
         let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
-        formulaInput!.value = molecule.formula;
+        formulaInput!.value = molecule.formula ?? '';
         let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-        massInput!.value = molecule.mass.toString();
+        massInput!.value = (molecule.mass ?? '').toString();
         let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-        identifierInput!.value = molecule.identifier.toString();
+        identifierInput!.value = molecule.identifier.toString() ?? '';
         let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
         if (search !== SearchEnum.NAME) {
-            nameInput!.value = molecule.structureName.toString();
+            nameInput!.value = molecule.structureName ?? '';
         }
         this.drawSmiles();
         this.setState({results: [], molecule: molecule});

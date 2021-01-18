@@ -1,6 +1,7 @@
 import {SelectOption} from "../component/SelectInput";
 import PubChemFinder from "../finder/PubChemFinder";
 import IFinder from "../finder/IFinder";
+import NorineFinder from "../finder/NorineFinder";
 
 export enum ServerEnum {
     PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI
@@ -25,7 +26,7 @@ export class ServerEnumHelper {
             case ServerEnum.CHEMSPIDER:
                 break;
             case ServerEnum.NORINE:
-                break;
+                return new NorineFinder();
             case ServerEnum.PDB:
                 break;
             case ServerEnum.CHEBI:
