@@ -1,20 +1,13 @@
-$primaryAColor: #0B61A4;
-$primaryBColor: #66A3D2;
-$primaryCColor: #3F92D2;
-$secondaryAColor: #FFAA00;
-$secondaryBColor: #FFD073;
-$secondaryCColor: #FFBF40;
-$tertiaryAColor: #FF7400;
-$tertiaryBColor: #FFB273;
-$tertiaryCColor: #FF9640;
-$backgroundAColor: #FFFFFF;
-$backgroundBColor: #E0E0E0;
+$primaryAColor: #FFFFFF;
+$secondaryAColor: #66A3D2;
+$secondaryBColor: rgba(102, 163, 210, 0.3);
+$tertiallyCColor: #E0E0E0;
 
 $colorFlashOk: #72A337;
 $colorFlashBad: #F20915;
 $colorFlashPending: #FF7400;
 
-$fontHeaderColor: #FFFFFF;
+$fontColor: #000000;
 $fontSize: 1.6vh;
 $fontSizeHeader: 2vh;
 
@@ -23,7 +16,6 @@ html {
 }
 
 body {
-  background-color: $backgroundBColor;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -37,8 +29,8 @@ code {
 // ---------------------------- Header ----------------------------
 
 header {
-  background-color: $primaryBColor;
-  color: $fontHeaderColor;
+  background-color: $secondaryAColor;
+  color: $fontColor;
   font-size: $fontSizeHeader;
   padding: 1rem;
   margin: 0;
@@ -51,7 +43,6 @@ header {
 }
 
 .headerTile {
-  background-color: $primaryAColor;
   width: 9.5rem;
   padding: 1rem;
   display: inline-block;
@@ -60,11 +51,11 @@ header {
 }
 
 .headerTile:hover {
-  background-color: $primaryCColor;
+  background-color: $primaryAColor;
 }
 
 .headerRef {
-  color: $fontHeaderColor;
+  color: $fontColor;
   text-decoration: none;
   font-size: $fontSizeHeader;
 }
@@ -72,7 +63,7 @@ header {
 // ---------------------------- Footer ----------------------------
 
 footer {
-  background-color: $primaryBColor;
+  background-color: $secondaryAColor;
   position: fixed;
   width: 100%;
   height: 1.5vh;
@@ -88,7 +79,6 @@ footer {
   height: fit-content;
   min-height: 90vh;
   margin: auto;
-  background-color: $backgroundAColor;
   text-align: center;
   background-repeat: no-repeat;
   background-position: center;
@@ -98,7 +88,7 @@ section {
   margin-bottom: 4vh;
   padding-bottom: 2vh;
   height: fit-content;
-  background-color: $backgroundAColor;
+  background-color: $primaryAColor;
 }
 
 .pageLogin {
@@ -109,11 +99,6 @@ canvas {
   width: 100%;
   height: 100%;
   border: none;
-}
-
-.canvasSmall {
-  width: 10%;
-  height: 10%;
 }
 
 .drawerArea {
@@ -136,14 +121,14 @@ canvas {
 .results {
   padding: 1vh;
   display: inline-block;
-  border: 2px solid #000000;
+  border: 2px solid $fontColor;
   border-radius: 2vh;
   margin: 1vh;
-  background-color: $backgroundBColor;
+  background-color: $primaryAColor;
 }
 
 .results:hover {
-  background-color: $backgroundAColor;
+  background-color: $secondaryBColor;
 }
 
 .itemResults {
@@ -151,7 +136,7 @@ canvas {
 }
 
 .itemResults:hover {
-  background-color: $backgroundBColor;
+  background-color: $primaryAColor;
   border-radius: 4px;
 }
 
@@ -165,7 +150,7 @@ h1 {
   padding: 1vh;
   margin: 0;
   font-size: $fontSizeHeader;
-  color: $tertiaryCColor;
+  color: $fontColor;
   text-align: left;
 }
 
@@ -173,7 +158,7 @@ h2 {
   padding: 1vh;
   margin: 1vh 0;
   font-size: $fontSizeHeader;
-  color: $tertiaryBColor;
+  color: $fontColor;
   text-align: center;
 }
 
@@ -185,20 +170,21 @@ label {
 
 input {
   margin: 0 1vh;
+  font-size: 1.3vh;
 }
 
 button {
   padding: 0.2vh 1vh;
   margin: 1vh;
-  background-color: $primaryBColor;
-  color: $fontHeaderColor;
-  border: 1px solid $primaryAColor;
+  background-color: $secondaryAColor;
+  color: $fontColor;
+  border: 1px solid $fontColor;
   font-size: 1.3vh;
 }
 
 button:hover {
   cursor: pointer;
-  background-color: $secondaryCColor;
+  background-color: $primaryAColor;
 }
 
 /* Create button */
@@ -215,10 +201,12 @@ button:hover {
 select {
   margin: 0 1vh;
   padding: 0.2vh;
+  font-size: 1.3vh;
 }
 
 textarea {
   height: 16vh;
+  font-size: 1.3vh;
 }
 
 .main {
@@ -249,16 +237,16 @@ table {
 }
 
 thead tr {
-  background-color: $primaryCColor;
-  color: $fontHeaderColor;
+  background-color: $secondaryAColor;
+  color: $fontColor;
 }
 
 tbody tr {
-  background-color: $backgroundBColor;
+  background-color: $tertiallyCColor;
 }
 
 tbody tr:hover {
-  background-color: $primaryBColor;
+  background-color: $secondaryBColor;
 }
 
 td, th {
@@ -278,7 +266,7 @@ td, th {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: $fontHeaderColor;
+  color: $fontColor;
   font-size: $fontSizeHeader;
 }
 
@@ -307,7 +295,7 @@ td, th {
   transform: translate(-50%, -50%);
   padding: 1vh 2vh;
   border: 2px solid $colorFlashBad;
-  background-color: $backgroundAColor;
+  background-color: $primaryAColor;
   font-size: 3vh;
 }
 
@@ -320,5 +308,5 @@ td, th {
 }
 
 .popupNo {
-  background-color: $backgroundBColor;
+  background-color: $tertiallyCColor;
 }

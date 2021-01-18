@@ -39,6 +39,9 @@ class MainPage extends React.Component<any, State> {
     componentDidMount(): void {
         this.initializeSmilesDrawer();
     }
+    componentDidUpdate() {
+        SmilesDrawer.apply({width: 300, height: 300});
+    }
 
     initializeSmilesDrawer() {
         const area = document.getElementById('drawArea');
@@ -99,9 +102,8 @@ class MainPage extends React.Component<any, State> {
             this.flashRef.current!.activate(FlashType.OK);
             this.select(response[0], search);
         } else {
-            this.flashRef.current!.activate(FlashType.OK, 'Found more, choose');
+            this.flashRef.current!.activate(FlashType.OK, 'Found more, choose one');
             this.setState({results: response});
-            SmilesDrawer.apply({width: 300, height: 300});
             document.location.href = '#results';
         }
     }
@@ -159,10 +161,9 @@ class MainPage extends React.Component<any, State> {
 
     render() {
         return (
-            <section className={styles.page + ' ' + styles.mainPage}>
-                <section>
-                    <h1 id='home'>Home</h1>
 
+            <section className={styles.page + ' ' + styles.mainPage}>
+                <section id='home'>
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
                     </div>
@@ -205,8 +206,7 @@ class MainPage extends React.Component<any, State> {
                 </section>
 
                 {this.state.results.length > 1 ?
-                    <section>
-                        <h1 id='results'>Results</h1>
+                    <section id='results'>
                         {this.state.results.map(molecule => (
                             <section className={styles.results} title={molecule.structureName}>
                                 <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
