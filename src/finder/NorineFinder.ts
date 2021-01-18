@@ -66,26 +66,30 @@ class NorineFinder implements IFinder {
     }
 
     /**
+     * Not supported by Norine
      * Can be done with download all from Norine and then find in it
      * @param formula
      */
     findByFormula(formula: string): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
-    }
-
-    /**
-     * Not supported by Norine
-     */
-    findByIdentifiers(ids: []): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
     /**
      * Not supported by Norine
      * Can be done with download all from Norine and then find in it
+     * @param ids
+     */
+    findByIdentifiers(ids: []): Promise<SingleStructure[]> {
+        return Sleep.noSleepPromise();
+    }
+
+    /**
+     * Not supported by Norine
+     * Can be done with download all from Norine and then find in it
+     * @param smiles
      */
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
     /**
@@ -94,7 +98,7 @@ class NorineFinder implements IFinder {
      * @param mass
      */
     findByMass(mass: number): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
     private async jsonListResult(response: Response): Promise<SingleStructure[]> {

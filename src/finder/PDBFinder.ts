@@ -51,43 +51,23 @@ class PDBFinder implements IFinder {
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
-        return fetch(ENDPOINT_URI + 'name/json/' + name, {
-            method: 'GET'
-        }).then(async response => {
-            return response.status === 200 ? this.jsonListResult(response) : []
-        });
+        return Sleep.noSleepPromise();
     }
 
-    /**
-     * Not supported by PDB
-     * @param formula
-     */
     findByFormula(formula: string): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
-    /**
-     * Not supported by PDB
-     * @param ids
-     */
     findByIdentifiers(ids: []): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
-    /**
-     * Not supported by PDB
-     * @param smiles
-     */
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
-    /**
-     * Not supported by PDB
-     * @param mass
-     */
     findByMass(mass: number): Promise<SingleStructure[]> {
-        return Sleep.sleep(0).then(() => []);
+        return Sleep.noSleepPromise();
     }
 
 }
