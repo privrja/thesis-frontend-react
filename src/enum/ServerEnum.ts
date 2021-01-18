@@ -56,11 +56,11 @@ export class ServerEnumHelper {
             case ServerEnum.PUBCHEM:
                 return 'https://pubchem.ncbi.nlm.nih.gov/compound/' + identifier;
             case ServerEnum.CHEMSPIDER:
-                return "http://www.chemspider.com/Chemical-Structure." + identifier + ".html";
+                return "https://www.chemspider.com/Chemical-Structure." + identifier + ".html";
             case ServerEnum.NORINE:
                 return "https://bioinfo.lifl.fr/norine/result.jsp?ID=" + identifier;
             case ServerEnum.PDB:
-                return "http://www.rcsb.org/ligand/" + identifier;
+                return "https://www.rcsb.org/ligand/" + identifier;
             case ServerEnum.CHEBI:
                 return "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + identifier;
         }
