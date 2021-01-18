@@ -52,18 +52,34 @@ export class ServerEnumHelper {
 
     static getLink(database: ServerEnum, identifier: string) {
         switch (database) {
+            default:
             case ServerEnum.PUBCHEM:
                 return 'https://pubchem.ncbi.nlm.nih.gov/compound/' + identifier;
             case ServerEnum.CHEMSPIDER:
-                break;
+                return "http://www.chemspider.com/Chemical-Structure." + identifier + ".html";
             case ServerEnum.NORINE:
-                break;
+                return "https://bioinfo.lifl.fr/norine/result.jsp?ID=" + identifier;
             case ServerEnum.PDB:
-                break;
+                return "http://www.rcsb.org/ligand/" + identifier;
             case ServerEnum.CHEBI:
-                break;
-            default:
-                return '';
+                return "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + identifier;
         }
     }
+
+    static getFullId(database: ServerEnum, identifier: string) {
+        switch(database) {
+            default:
+            case ServerEnum.PUBCHEM:
+                return 'CID: ' + identifier;
+            case ServerEnum.CHEMSPIDER:
+                return 'CSID: ' + identifier;
+            case ServerEnum.NORINE:
+                return identifier;
+            case ServerEnum.PDB:
+                return 'PDB: ' + identifier;
+            case ServerEnum.CHEBI:
+                return 'ChEBI: '
+        }
+    }
+
 }

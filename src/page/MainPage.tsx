@@ -4,15 +4,21 @@ import styles from "../main.module.scss";
 import * as SmilesDrawer from 'smiles-drawer';
 import {OPTION_DRAW_DECAY_POINTS, OPTION_THEMES} from "../constant/SmilesDrawerConstants";
 import {SelectInput} from "../component/SelectInput";
-import {ServerEnumHelper} from "../enum/ServerEnum";
+import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
 import IFinder from "../finder/IFinder";
 import SingleStructure from "../finder/SingleStructure";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
+import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 
 let smilesDrawer: SmilesDrawer.Drawer;
+let largeSmilesDrawer: SmilesDrawer.Drawer;
+
+const DRAW_AREA = 'drawArea';
+const ELEMENT_SMILES = 'smiles';
+const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 
 interface State {
     results: SingleStructure[];
@@ -22,29 +28,35 @@ interface State {
 class MainPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
+    popupRef: React.RefObject<PopupSmilesDrawer>;
 
     constructor(props: any, context: any) {
         super(props, context);
 
-
         this.flashRef = React.createRef();
+        this.popupRef = React.createRef();
         this.find = this.find.bind(this);
         this.show = this.show.bind(this);
         this.canonical = this.canonical.bind(this);
         this.unique = this.unique.bind(this);
         this.buildBlocks = this.buildBlocks.bind(this);
+        this.showLargeSmiles = this.showLargeSmiles.bind(this);
         this.state = {results: []};
     }
 
     componentDidMount(): void {
         this.initializeSmilesDrawer();
     }
+
     componentDidUpdate() {
-        SmilesDrawer.apply({width: 300, height: 300});
+        let small = document.getElementsByClassName(styles.canvasSmall);
+        if (small.length > 1) {
+            SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight});
+        }
     }
 
     initializeSmilesDrawer() {
-        const area = document.getElementById('drawArea');
+        const area = document.getElementById(DRAW_AREA);
         smilesDrawer = new SmilesDrawer.Drawer({
             width: area!.clientWidth,
             height: area!.clientHeight,
@@ -55,34 +67,35 @@ class MainPage extends React.Component<any, State> {
             themes: OPTION_THEMES,
         });
 
+        const large = document.getElementById('popupLargeSmiles');
+        largeSmilesDrawer = new SmilesDrawer.Drawer({
+            width: large!.clientWidth,
+            height: large!.clientHeight,
+            compactDrawing: false,
+        });
+
     }
 
     drawSmiles() {
-        if (!smilesDrawer) {
-            this.initializeSmilesDrawer();
-        }
-        let input = document.getElementById('smiles') as HTMLTextAreaElement;
+        let input = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
         SmilesDrawer.parse(input.value, function (tree: any) {
-            smilesDrawer.draw(tree, 'drawArea', 'light', false);
+            smilesDrawer.draw(tree, DRAW_AREA, 'light', false);
         });
     }
 
     handle(event: React.MouseEvent) {
-        const drawArea = document.getElementById('drawArea');
-        const smiles = document.getElementById('smiles');
+        const drawArea = document.getElementById(DRAW_AREA);
+        const smiles = document.getElementById(ELEMENT_SMILES);
         if (drawArea && (smiles as HTMLTextAreaElement).value) {
             smilesDrawer.handleMouseClick(event);
         }
     }
 
     buildBlocks() {
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
             return;
-        }
-        if (!smilesDrawer) {
-            this.initializeSmilesDrawer();
         }
         console.log(smilesDrawer.buildBlockSmiles());
     }
@@ -102,7 +115,7 @@ class MainPage extends React.Component<any, State> {
             this.flashRef.current!.activate(FlashType.OK);
             this.select(response[0], search);
         } else {
-            this.flashRef.current!.activate(FlashType.OK, 'Found more, choose one');
+            this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
             this.setState({results: response});
             document.location.href = '#results';
         }
@@ -110,11 +123,11 @@ class MainPage extends React.Component<any, State> {
 
     select(molecule: SingleStructure, search?: number) {
         this.flashRef.current!.deactivate();
-        if(search === undefined) {
+        if (search === undefined) {
             let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         smilesInput!.value = molecule.smiles;
         let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
         formulaInput!.value = molecule.formula;
@@ -131,19 +144,14 @@ class MainPage extends React.Component<any, State> {
         document.location.href = '#home';
     }
 
-    show() {
-        this.flashRef.current!.deactivate();
-        if (this.state.molecule?.database !== undefined) {
-            window.open(ServerEnumHelper.getLink(this.state.molecule.database, this.state.molecule.identifier), '_blank');
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to show');
-        }
+    show(database: ServerEnum, identifier: string) {
+        window.open(ServerEnumHelper.getLink(database, identifier), '_blank');
     }
 
     canonical() {
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
             smilesInput.value = Canonical.getCanonicalSmiles(smilesInput.value);
             this.drawSmiles();
@@ -151,18 +159,25 @@ class MainPage extends React.Component<any, State> {
     }
 
     unique() {
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById('smiles') as HTMLTextAreaElement | null;
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing to convert');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
             // TODO request to backend
         }
     }
 
+    showLargeSmiles(smiles: string) {
+        this.popupRef.current!.activate();
+        SmilesDrawer.parse(smiles, function (tree: any) {
+            largeSmilesDrawer.draw(tree, 'popupLargeSmiles', 'light', false);
+        });
+    }
+
     render() {
         return (
-
             <section className={styles.page + ' ' + styles.mainPage}>
+                <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
                 <section id='home'>
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
@@ -195,14 +210,13 @@ class MainPage extends React.Component<any, State> {
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
-                            <button onClick={this.show}>Show original</button>
+                            <button>Edit</button>
                             <button onClick={this.canonical}>Cannonical SMILES</button>
                             <button onClick={this.unique}>Unique SMILES</button>
                             <button onClick={this.buildBlocks}>Build Blocks</button>
                             <button>Save</button>
                         </div>
                     </div>
-
                 </section>
 
                 {this.state.results.length > 1 ?
@@ -210,10 +224,15 @@ class MainPage extends React.Component<any, State> {
                         {this.state.results.map(molecule => (
                             <section className={styles.results} title={molecule.structureName}>
                                 <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
-                                        data-smiles={molecule.smiles}/>
+                                        data-smiles={molecule.smiles}
+                                        onClick={() => this.showLargeSmiles(molecule.smiles)}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
                                 <div className={styles.itemResults}>{molecule.mass}</div>
-                                <div className={styles.itemResults + ' ' + styles.cursorPointer} onClick={() => this.select(molecule)}>Select</div>
+                                <div className={styles.itemResults + ' ' + styles.cursorPointer}
+                                     onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
+                                <div className={styles.itemResults + ' ' + styles.cursorPointer}
+                                     onClick={() => this.select(molecule)}>Select
+                                </div>
                             </section>
                         ))}
                     </section>

@@ -310,3 +310,29 @@ td, th {
 .popupNo {
   background-color: $tertiallyCColor;
 }
+
+.popupLarge {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1vh 2vh;
+  width: 90%;
+  height: 90%;
+  border: 2px solid $colorFlashBad;
+  background-color: $primaryAColor;
+  font-size: 3vh;
+  cursor: pointer;
+}
+
+#popupLargeSmiles {
+  width: 100%;
+  height: 100%;
+}
+
+.canvasSmall {
+  width: 12vw;
+  height: 25vh;
+  cursor: pointer;
+}
+
