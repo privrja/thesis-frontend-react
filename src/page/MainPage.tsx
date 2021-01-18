@@ -146,9 +146,9 @@ class MainPage extends React.Component<any, State> {
         let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
         formulaInput!.value = molecule.formula ?? '';
         let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-        massInput!.value = (molecule.mass ?? '').toString();
+        massInput!.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
         let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-        identifierInput!.value = molecule.identifier.toString() ?? '';
+        identifierInput!.value = molecule.identifier ?? '';
         let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
         if (search !== SearchEnum.NAME) {
             nameInput!.value = molecule.structureName ?? '';
