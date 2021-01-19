@@ -44,7 +44,6 @@ class LoginPage extends React.Component<any> {
                     this.flashRef.current!.activate(FlashType.BAD);
                 }
             })
-            .then(response => console.log(response));
     }
 
     render() {
@@ -80,6 +79,8 @@ class LoginPage extends React.Component<any> {
                             <button type="submit">Login</button>
                         </Form>
                     </Formik>
+
+                    <a href='/register'>Don't have an account? Register here.</a>
 
                 </section>
             </section>
