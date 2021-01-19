@@ -26,7 +26,7 @@ interface PDBResponse {
     pdbx_chem_comp_descriptor: Program[];
 }
 
-class PDBFinder implements IFinder {
+class PdbFinder implements IFinder {
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
         return fetch(ENDPOINT_URI + 'core/chemcomp/' + id, {
@@ -72,4 +72,4 @@ class PDBFinder implements IFinder {
 
 }
 
-export default PDBFinder;
+export default PdbFinder;
