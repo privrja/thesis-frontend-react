@@ -24,6 +24,7 @@ class LoginPage extends React.Component<any> {
 
     login(values: Values) {
         this.flashRef.current!.activate(FlashType.PENDING);
+        values.name = values.name.trim();
         fetch(ENDPOINT, {
             method: "GET",
             headers: {'x-auth-token': values.name + ':' + values.password},

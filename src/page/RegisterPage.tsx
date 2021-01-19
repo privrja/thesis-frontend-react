@@ -37,6 +37,7 @@ class RegisterPage extends React.Component<any> {
     }
 
     register(values: Values) {
+        values.name = values.name.trim();
         let check = this.checkEmpty(values.name, 'Name is empty');
         check = check && this.checkEmpty(values.password, 'Password is empty');
         check = check && this.checkEmpty(values.password2, 'Password is empty');
