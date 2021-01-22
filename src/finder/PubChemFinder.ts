@@ -100,7 +100,6 @@ class PubChemFinder implements IFinder {
         return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?list_return=listkey', {
             method: 'GET'
         }).then(async response => {
-            console.log(response);
             if (response.status === 200) {
                 let json = await response.json() as ListKeyResponseJson;
                 return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?listkey=' + json.IdentifierList.ListKey + '&listkey_start=' + 0 + '&listkey_count=200', {

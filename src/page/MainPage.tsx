@@ -223,19 +223,19 @@ class MainPage extends React.Component<any, State> {
                                      options={SearchEnumHelper.getOptions()}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main}/>
+                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}/>
+                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
-                        <input id="formula" className={styles.main} name="formula"/>
+                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main}/>
+                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
-                        <input id="identifier" name="identifier" className={styles.main}/>
+                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
