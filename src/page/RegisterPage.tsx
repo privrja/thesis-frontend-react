@@ -21,7 +21,7 @@ class RegisterPage extends React.Component<any> {
     }
 
     checkEmpty(value: string, message: string) {
-        if (value === null|| value === undefined || value === '') {
+        if (value === null || value === undefined || value === '') {
             this.flashRef.current!.activate(FlashType.BAD, message);
             return false;
         }
@@ -33,7 +33,7 @@ class RegisterPage extends React.Component<any> {
             this.flashRef.current!.activate(FlashType.BAD, message);
             return false;
         }
-        return  true;
+        return true;
     }
 
     register(values: Values) {
@@ -50,7 +50,9 @@ class RegisterPage extends React.Component<any> {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
                 } else {
-                    response.json().then(data => {this.flashRef.current!.activate(FlashType.BAD, data.message)})
+                    response.json().then(data => {
+                        this.flashRef.current!.activate(FlashType.BAD, data.message)
+                    })
                 }
             });
         }
@@ -94,6 +96,10 @@ class RegisterPage extends React.Component<any> {
 
                             <label htmlFor="password">Password check:</label>
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
+
+                            <label htmlFor="conditions">
+                                <Field id="conditions" name="conditions" type="checkbox"/>
+                                I'm agree with <a href="/condition" target="_blank">terms and conditions</a></label>
 
 
                             <button type="submit">Register</button>

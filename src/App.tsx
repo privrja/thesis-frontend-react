@@ -9,6 +9,7 @@ import ContainerPage from "./page/ContainerPage";
 import LogoutPage from "./page/LogoutPage";
 import ContainerDetailPage from "./page/ContainerDetailPage";
 import RegisterPage from "./page/RegisterPage";
+import ConditionsPage from "./page/ConditionsPage";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
                 <Route path='/register/' component={RegisterPage}/>
                 <Route path='/container/:id' component={ContainerDetailPage} />
                 <Route path='/container/' component={ContainerPage}/>
+                <Route path='/condition/' component={ConditionsPage}/>
             </Router>
 
             <Footer/>
