@@ -191,10 +191,10 @@ class MainPage extends React.Component<any, State> {
         } else {
             fetch(ENDPOINT + 'smiles/unique', {
                 method: 'POST',
-                body: JSON.stringify({smiles: smilesInput.value})
+                body: JSON.stringify([{smiles: smilesInput.value}])
             }).then(response => {
                 if (response.status === 200) {
-                    response.json().then(data => smilesInput!.value = data.smiles)
+                    response.json().then(data => smilesInput!.value = data[0].unique ?? data[0].smiles)
                 } else {
 
                 }
