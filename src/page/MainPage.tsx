@@ -12,6 +12,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
+import {ENDPOINT} from "../constant/ApiConstants";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -188,7 +189,16 @@ class MainPage extends React.Component<any, State> {
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
-            // TODO request to backend
+            fetch(ENDPOINT + 'smiles/unique', {
+                method: 'POST',
+                body: JSON.stringify({smiles: smilesInput.value})
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => smilesInput!.value = data.smiles)
+                } else {
+
+                }
+            });
         }
     }
 
