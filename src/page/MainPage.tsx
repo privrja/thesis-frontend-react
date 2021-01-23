@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as Parallel from 'async-parallel';
 import styles from "../main.module.scss";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
@@ -13,6 +14,7 @@ import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 import {ENDPOINT} from "../constant/ApiConstants";
+import PubChemFinder from "../finder/PubChemFinder";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -25,6 +27,15 @@ const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 interface State {
     results: SingleStructure[];
     molecule?: SingleStructure;
+    blocks: BlockStructure[];
+}
+
+interface BlockStructure {
+    id: number;
+    smiles: string;
+    unique: string | null;
+    sameAs: number | null;
+    block: SingleStructure | null;
 }
 
 class MainPage extends React.Component<any, State> {
@@ -43,7 +54,7 @@ class MainPage extends React.Component<any, State> {
         this.unique = this.unique.bind(this);
         this.buildBlocks = this.buildBlocks.bind(this);
         this.showLargeSmiles = this.showLargeSmiles.bind(this);
-        this.state = {results: []};
+        this.state = {results: [], blocks: []};
     }
 
     componentDidMount(): void {
@@ -53,7 +64,7 @@ class MainPage extends React.Component<any, State> {
     componentDidUpdate() {
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 1) {
-            SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight});
+            SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
         }
     }
 
@@ -104,13 +115,61 @@ class MainPage extends React.Component<any, State> {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
             return;
         }
-        console.log(smilesDrawer.buildBlockSmiles());
+        let blockStructure = smilesDrawer.buildBlockSmiles();
+        console.log(blockStructure);
+        fetch(ENDPOINT + 'smiles/unique', {
+            method: 'POST',
+            body: JSON.stringify(blockStructure.blockSmiles.map((e: any) => {
+                return {smiles: e}
+            }))
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                        this.setState({results: [], blocks: data});
+                        let finder = new PubChemFinder();
+                        console.log(data);
+                        let result = Parallel.map(data, async (item: any) => {
+                            if (item.sameAs === null) {
+                                return {
+                                    id: item.id,
+                                    smiles: item.smiles,
+                                    unique: item.unique,
+                                    sameAs: null,
+                                    block: await finder.findBySmiles(item.smiles).then(data => data[0])
+                                } as BlockStructure;
+                            } else {
+                                return {
+                                    id: item.id,
+                                    smiles: item.smiles,
+                                    unique: item.unique,
+                                    sameAs: item.sameAs,
+                                    block: null
+                                } as BlockStructure;
+                            }
+                        }, 2);
+                        console.log(result);
+                        result.then(data => data.forEach(e => {
+                            if (e.sameAs !== null) {
+                                e.block = data[e.sameAs].block
+                            }
+                        }));
+                        console.log(result);
+                        result.then(data => console.log(data));
+                        result.then(data => this.setState({results: [], blocks: data}));
+                        console.log(this.state);
+                    }
+                );
+            }
+        });
+
     }
+
 
     /**
      * Find structures on third party databases, by data in form
      */
     async find() {
+        this.setState({results: [], blocks: []});
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
@@ -195,8 +254,6 @@ class MainPage extends React.Component<any, State> {
             }).then(response => {
                 if (response.status === 200) {
                     response.json().then(data => smilesInput!.value = data[0].unique ?? data[0].smiles)
-                } else {
-
                 }
             });
         }
@@ -233,19 +290,40 @@ class MainPage extends React.Component<any, State> {
                                      options={SearchEnumHelper.getOptions()}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
+                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                this.find()
+                            }
+                        }}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
+                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
+                                  onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                          this.find()
+                                      }
+                                  }}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
-                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
+                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                this.find()
+                            }
+                        }}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
+                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                this.find()
+                            }
+                        }}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
-                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => {if(e.key === 'Enter') {this.find()}}}/>
+                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                this.find()
+                            }
+                        }}/>
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
@@ -278,6 +356,26 @@ class MainPage extends React.Component<any, State> {
                     :
                     <section/>
                 }
+
+
+                {this.state.blocks.length > 1 ?
+                    <section id='results'>
+                        {this.state.blocks.map(block => (
+                            <section>
+                                <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall} data-smiles={block.unique} onClick={() => this.showLargeSmiles(block.unique ?? '')} />
+                                <div>{block.unique}</div>
+                                <div>{block.block?.formula}</div>
+                                <div>{block.block?.structureName}</div>
+                                <div>{block.block?.identifier}</div>
+                                <div>{block.block?.mass}</div>
+                            </section>
+                        ))}
+                    </section>
+                    :
+                    <section/>
+                }
+
+
             </section>
         )
     }
