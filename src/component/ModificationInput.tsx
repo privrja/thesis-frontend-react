@@ -53,14 +53,14 @@ class ModificationInput extends React.Component<Props, State> {
 
     private static setupInput(elemId: string, value: string) {
         let elem = document.getElementById(elemId) as HTMLInputElement;
-        elem!.value = value;
-        elem!.disabled = true;
+        elem.value = value;
+        elem.disabled = true;
     }
 
     private static unDisableInput(elemId: string) {
         let elem = document.getElementById(elemId) as HTMLInputElement;
-        elem!.value = '';
-        elem!.disabled = false;
+        elem.value = '';
+        elem.disabled = false;
     }
 
     activate() {

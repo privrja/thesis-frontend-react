@@ -29,7 +29,7 @@ class ModificationComponent extends React.Component<Props, any> {
     componentDidMount(): void {
         let txtType = document.getElementById('sel-sequence-type') as HTMLSelectElement;
         let typeEnum = SequenceEnumHelper.getValue(this.props.sequenceType ?? SequenceEnumHelper.getName(SequenceEnum.OTHER));
-        txtType!.value = typeEnum.toString();
+        txtType.value = typeEnum.toString();
         this.disable(typeEnum);
     }
 

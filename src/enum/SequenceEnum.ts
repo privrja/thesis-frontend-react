@@ -20,7 +20,6 @@ export class SequenceEnumHelper {
 
     static getName(value: SequenceEnum) {
         switch (value) {
-            default:
             case SequenceEnum.LINEAR:
                 return 'linear';
             case SequenceEnum.CYCLIC:
@@ -34,13 +33,13 @@ export class SequenceEnumHelper {
             case SequenceEnum.CYCLIC_POLYKETIDE:
                 return 'cyclic-polyketide';
             case SequenceEnum.OTHER:
+            default:
                 return 'other';
         }
     }
 
     static getValue(value: string) {
         switch(value) {
-            default:
             case 'linear':
                 return SequenceEnum.LINEAR;
             case 'cyclic':
@@ -54,6 +53,7 @@ export class SequenceEnumHelper {
             case 'cyclic-polyketide':
                 return SequenceEnum.CYCLIC_POLYKETIDE;
             case 'other':
+            default:
                 return SequenceEnum.OTHER;
         }
     }
