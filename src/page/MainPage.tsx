@@ -13,8 +13,11 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
+import FetchHelper from "../helper/FetchHelper";
+import Modification from "../structure/Modification";
+import ModificationComponent from "../component/ModificationComponent";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -23,11 +26,20 @@ const ELEMENT_CANVAS = 'drawArea';
 const ELEMENT_SMILES = 'smiles';
 const ELEMENT_LARGE_CANVAS = 'popupLargeSmiles';
 const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
+const SMILES_UNIQUE = 'smiles/unique';
 
 interface State {
     results: SingleStructure[];
     molecule?: SingleStructure;
     blocks: BlockStructure[];
+    sequence?: SequenceStructure;
+    selectedContainer?: number;
+    modifications?: Modification[];
+}
+
+interface SequenceStructure {
+    sequenceType: string;
+    sequence: string;
 }
 
 interface BlockStructure {
@@ -110,31 +122,46 @@ class MainPage extends React.Component<any, State> {
      * Build blocks from structure and show them
      */
     buildBlocks() {
+        this.flashRef.current!.activate(FlashType.PENDING);
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
             return;
         }
-        let blockStructure = smilesDrawer.buildBlockSmiles();
-        console.log(blockStructure);
-        fetch(ENDPOINT + 'smiles/unique', {
+        let blockStructures = smilesDrawer.buildBlockSmiles();
+        let sequence = {
+            sequence: blockStructures.sequence,
+            sequenceType: blockStructures.sequenceType
+        } as SequenceStructure;
+        fetch(ENDPOINT + SMILES_UNIQUE, {
             method: 'POST',
-            body: JSON.stringify(blockStructure.blockSmiles.map((e: any) => {
+            body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
                 return {smiles: e}
             }))
         }).then(response => {
             if (response.status === 200) {
-                response.json().then(data => {
-                        this.setState({results: [], blocks: data});
+                response.json().then(async data => {
+                        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
+                        if (selectedContainer) {
+                            this.setState({
+                                results: [],
+                                blocks: data,
+                                sequence: sequence,
+                                selectedContainer: parseInt(selectedContainer)
+                            });
+                        } else {
+                            this.setState({results: [], blocks: data, sequence: sequence});
+                        }
+                        document.location.href = '#results';
                         let finder = new PubChemFinder();
-                        console.log(data);
-                        let result = Parallel.map(data, async (item: any) => {
+                        Parallel.map(data, async (item: any) => {
                             if (item.sameAs === null) {
                                 return {
                                     id: item.id,
                                     smiles: item.smiles,
                                     unique: item.unique,
                                     sameAs: null,
+                                    // TODO check when not found
                                     block: await finder.findBySmiles(item.smiles).then(data => data[0])
                                 } as BlockStructure;
                             } else {
@@ -146,19 +173,41 @@ class MainPage extends React.Component<any, State> {
                                     block: null
                                 } as BlockStructure;
                             }
-                        }, 2);
-                        console.log(result);
-                        result.then(data => data.forEach(e => {
-                            if (e.sameAs !== null) {
-                                e.block = data[e.sameAs].block
+                        }, 2).then(async data => {
+                            data.forEach(e => {
+                                if (e.sameAs !== null) {
+                                    e.block = data[e.sameAs].block
+                                }
+                            });
+                            return data;
+                        }).then(data => {
+                            this.setState({results: [], blocks: data})
+                        });
+
+                        let token = localStorage.getItem(TOKEN);
+                        if (this.state.selectedContainer) {
+                            if (token) {
+                                await FetchHelper.fetchModification(this.state.selectedContainer, {
+                                    method: 'GET',
+                                    headers: {'x-auth-token': token}
+                                }, (response: any) => {
+                                    response.then((data: Modification[]) => {
+                                        this.setState({modifications: data})
+                                    })
+                                });
+                            } else {
+                                await FetchHelper.fetchModification(this.state.selectedContainer, {method: 'GET'}, (response: any) => {
+                                    response.then((data: Modification[]) => {
+                                        this.setState({modifications: data})
+                                    });
+                                });
                             }
-                        }));
-                        console.log(result);
-                        result.then(data => console.log(data));
-                        result.then(data => this.setState({results: [], blocks: data}));
-                        console.log(this.state);
+                        }
+                        this.flashRef.current!.activate(FlashType.OK, 'Done');
                     }
                 );
+            } else {
+                response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
             }
         });
 
@@ -248,7 +297,7 @@ class MainPage extends React.Component<any, State> {
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
-            fetch(ENDPOINT + 'smiles/unique', {
+            fetch(ENDPOINT + SMILES_UNIQUE, {
                 method: 'POST',
                 body: JSON.stringify([{smiles: smilesInput.value}])
             }).then(response => {
@@ -266,7 +315,7 @@ class MainPage extends React.Component<any, State> {
     showLargeSmiles(smiles: string) {
         this.popupRef.current!.activate();
         SmilesDrawer.parse(smiles, function (tree: any) {
-            largeSmilesDrawer.draw(tree, 'popupLargeSmiles', 'light', false);
+            largeSmilesDrawer.draw(tree, 'popupLargeSmiles');
         });
     }
 
@@ -357,12 +406,16 @@ class MainPage extends React.Component<any, State> {
                     <section/>
                 }
 
-
                 {this.state.blocks.length > 1 ?
                     <section id='results'>
+
+                        <ModificationComponent blockLength={this.state.blocks.length} sequenceType={this.state.sequence?.sequenceType} sequence={this.state.sequence?.sequence} modifications={this.state.modifications}/>
+
                         {this.state.blocks.map(block => (
                             <section>
-                                <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall} data-smiles={block.unique} onClick={() => this.showLargeSmiles(block.unique ?? '')} />
+                                <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall}
+                                        data-smiles={block.unique}
+                                        onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
                                 <div>{block.unique}</div>
                                 <div>{block.block?.formula}</div>
                                 <div>{block.block?.structureName}</div>

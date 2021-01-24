@@ -144,6 +144,10 @@ canvas {
   cursor: pointer;
 }
 
+.divLeft {
+  text-align: left;
+}
+
 // ---------------------------- H ----------------------------
 
 h1 {
@@ -160,6 +164,14 @@ h2 {
   font-size: $fontSizeHeader;
   color: $fontColor;
   text-align: center;
+}
+
+h3, h4 {
+  padding: 1vh;
+  margin: 1vh 0;
+  font-size: $fontSizeHeader;
+  color: $fontColor;
+  text-align: left;
 }
 
 // ---------------------------- Forms ----------------------------
