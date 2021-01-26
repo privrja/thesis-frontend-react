@@ -15,6 +15,7 @@ interface Props {
 interface State {
     isVisible: boolean;
     isDisabled: boolean;
+    title: string;
 }
 
 const MODIFICATION = '-modification';
@@ -32,7 +33,7 @@ class ModificationInput extends React.Component<Props, State> {
         this.deactivate = this.deactivate.bind(this);
         this.disable = this.disable.bind(this);
         this.unDisable = this.unDisable.bind(this);
-        this.state = {isVisible: false, isDisabled: false};
+        this.state = {isVisible: false, isDisabled: false, title: props.title};
     }
 
     select(): void {
@@ -49,6 +50,15 @@ class ModificationInput extends React.Component<Props, State> {
                 ModificationInput.unDisableInput('txt-' + this.props.type + MASS);
             }
         }
+    }
+
+    changeTitle(title: string) {
+        console.log(title);
+        this.setState({title: title});
+    }
+
+    defaultTitle() {
+        this.changeTitle(this.props.title);
     }
 
     private static setupInput(elemId: string, value: string) {
@@ -84,7 +94,7 @@ class ModificationInput extends React.Component<Props, State> {
             !this.state.isDisabled ?
 
                 <div className="div-modification">
-                    <h4>{this.props.title} {this.state.isVisible ?
+                    <h4>{this.state.title} {this.state.isVisible ?
                         <FontAwesomeIcon icon={faMinus} onClick={this.deactivate} className={styles.cursorPointer}/> :
                         <FontAwesomeIcon icon={faPlus} onClick={this.activate} className={styles.cursorPointer}/>}</h4>
 

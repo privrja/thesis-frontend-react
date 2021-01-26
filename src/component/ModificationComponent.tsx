@@ -34,9 +34,14 @@ class ModificationComponent extends React.Component<Props, any> {
     }
 
     private disable(value: SequenceEnum) {
+        this.nModificationRef.current!.defaultTitle();
+        this.cModificationRef.current!.defaultTitle();
         switch (value) {
-            case SequenceEnum.LINEAR:
             case SequenceEnum.LINEAR_POLYKETIDE:
+                this.nModificationRef.current!.changeTitle('Left modification');
+                this.cModificationRef.current!.changeTitle('Right modification');
+            // eslint-disable-next-line no-fallthrough
+            case SequenceEnum.LINEAR:
                 this.nModificationRef.current!.unDisable();
                 this.cModificationRef.current!.unDisable();
                 this.bModificationRef.current!.disable();
