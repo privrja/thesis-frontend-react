@@ -227,6 +227,10 @@ button:hover {
   background-color: $colorFlashBad;
 }
 
+.update {
+  background-color: $colorFlashPending;
+}
+
 /* Select with options */
 select {
   margin: 0 1vh;

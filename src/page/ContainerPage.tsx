@@ -7,6 +7,7 @@ import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
 import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
+import TextInput from "../component/TextInput";
 
 interface Container {
     id: number,
@@ -25,6 +26,7 @@ interface State {
     containers: Array<Container>;
     freeContainers: Array<FreeContainer>;
     selectedContainer?: number;
+    editable?: number;
 }
 
 interface Values {
@@ -48,6 +50,9 @@ class ContainerPage extends React.Component<any, State> {
         this.popupRef = React.createRef();
         this.popup = this.popup.bind(this);
         this.delete = this.delete.bind(this);
+        this.edit = this.edit.bind(this);
+        this.editEnd = this.editEnd.bind(this);
+        this.update = this.update.bind(this);
 
         let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
         if (selectedContainer) {
@@ -143,6 +148,21 @@ class ContainerPage extends React.Component<any, State> {
         }
     }
 
+    edit(containerId: number) {
+        this.setState({editable: containerId});
+    }
+
+    editEnd() {
+        this.setState({editable: undefined});
+    }
+
+    update() {
+
+
+
+        this.editEnd();
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -200,16 +220,25 @@ class ContainerPage extends React.Component<any, State> {
                         {this.state.containers.map(container => (
                             <tr key={container.id}>
                                 <td>{container.id}</td>
-                                <td>{container.containerName}</td>
-                                <td>{container.visibility}</td>
+                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                    <TextInput value={container.containerName} name={'txt-edit-containerName'} />: container.containerName}</td>
+                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                    <SelectInput id='sel-edit-visibility' name='sel-edit-visibility'
+                                                 options={visibilityOptions}/> : container.visibility}</td>
                                 <td>{container.mode}</td>
                                 <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
+
+                                    {this.state.editable === container.id ? <button className={styles.update} onClick={this.update}>Update</button> : <div/>}
+                                    {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
-                                    <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
+                                    <button
+                                        onClick={() => window.location.href = '/container/' + container.id}>Collaborators
+                                    </button>
                                     <button>Clone</button>
                                     <button>Export</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}
