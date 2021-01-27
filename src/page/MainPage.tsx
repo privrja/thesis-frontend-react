@@ -409,20 +409,41 @@ class MainPage extends React.Component<any, State> {
                 {this.state.blocks.length > 1 ?
                     <section id='results'>
 
-                        <ModificationComponent blockLength={this.state.blocks.length} sequenceType={this.state.sequence?.sequenceType} sequence={this.state.sequence?.sequence} modifications={this.state.modifications}/>
+                        <ModificationComponent blockLength={this.state.blocks.length}
+                                               sequenceType={this.state.sequence?.sequenceType}
+                                               sequence={this.state.sequence?.sequence}
+                                               modifications={this.state.modifications}/>
 
-                        {this.state.blocks.map(block => (
-                            <section>
-                                <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall}
-                                        data-smiles={block.unique}
-                                        onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
-                                <div>{block.unique}</div>
-                                <div>{block.block?.formula}</div>
-                                <div>{block.block?.structureName}</div>
-                                <div>{block.block?.identifier}</div>
-                                <div>{block.block?.mass}</div>
-                            </section>
-                        ))}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th/>
+                                    <th>Acronym</th>
+                                    <th>SMILES</th>
+                                    <th>Name</th>
+                                    <th>Formula</th>
+                                    <th>Mass</th>
+                                    <th>Identifier</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {this.state.blocks.map(block => (
+                                <tr>
+                                    <td>
+                                        <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall}
+                                                data-smiles={block.unique}
+                                                onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
+                                    </td>
+                                    <td className={styles.tdMin}>{block.id}</td>
+                                    <td className={styles.tdMin}>{block.unique}</td>
+                                    <td className={styles.tdMin}>{block.block?.structureName}</td>
+                                    <td className={styles.tdMin}>{block.block?.formula}</td>
+                                    <td className={styles.tdMin}>{block.block?.mass}</td>
+                                    <td className={styles.tdMin}>{block.block?.identifier}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
                     </section>
                     :
                     <section/>

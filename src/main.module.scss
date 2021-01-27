@@ -148,6 +148,24 @@ canvas {
   text-align: left;
 }
 
+.block {
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.blockInfo {
+  display: inline-block;
+  vertical-align: inherit;
+  height: 25vh;
+  padding: 0 1vw 0 1vw;
+}
+
+.divModification {
+  margin: 4vh 0 4vh 0;
+}
+
 // ---------------------------- H ----------------------------
 
 h1 {
@@ -263,6 +281,10 @@ tbody tr:hover {
 
 td, th {
   padding: 0.5vw 3vh;
+}
+
+.tdMin {
+  min-width: 6vw;
 }
 
 // ---------------------------- Flash ----------------------------

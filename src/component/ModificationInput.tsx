@@ -53,7 +53,6 @@ class ModificationInput extends React.Component<Props, State> {
     }
 
     changeTitle(title: string) {
-        console.log(title);
         this.setState({title: title});
     }
 
@@ -93,7 +92,7 @@ class ModificationInput extends React.Component<Props, State> {
         return (
             !this.state.isDisabled ?
 
-                <div className="div-modification">
+                <div className={styles.divModification}>
                     <h4>{this.state.title} {this.state.isVisible ?
                         <FontAwesomeIcon icon={faMinus} onClick={this.deactivate} className={styles.cursorPointer}/> :
                         <FontAwesomeIcon icon={faPlus} onClick={this.activate} className={styles.cursorPointer}/>}</h4>
