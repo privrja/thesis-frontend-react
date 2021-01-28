@@ -156,11 +156,31 @@ class ContainerPage extends React.Component<any, State> {
         this.setState({editable: undefined});
     }
 
-    update() {
+    update(containerId: number) {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            let name = document.getElementById('txt-edit-containerName') as HTMLInputElement;
+            let visibility = document.getElementById('sel-edit-visibility') as HTMLSelectElement;
 
-
-
-        this.editEnd();
+            fetch(ENDPOINT + 'container/' + containerId, {
+                method: 'PUT',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({containerName: name.value, visibility: visibility.value})
+            }).then(response => {
+                if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK, 'Updated');
+                } else {
+                    response.json().then(data => {
+                        this.flashRef.current!.activate(FlashType.BAD, data.message);
+                    });
+                }
+            });
+            this.editEnd();
+            this.containers();
+            this.freeContainers();
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, 'You\'re not logged');
+        }
     }
 
     render() {
@@ -221,7 +241,7 @@ class ContainerPage extends React.Component<any, State> {
                             <tr key={container.id}>
                                 <td>{container.id}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <TextInput value={container.containerName} name={'txt-edit-containerName'} />: container.containerName}</td>
+                                    <TextInput value={container.containerName} name='txt-edit-containerName' id='txt-edit-containerName'/>: container.containerName}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
                                     <SelectInput id='sel-edit-visibility' name='sel-edit-visibility'
                                                  options={visibilityOptions}/> : container.visibility}</td>
@@ -229,7 +249,7 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
 
-                                    {this.state.editable === container.id ? <button className={styles.update} onClick={this.update}>Update</button> : <div/>}
+                                    {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
                                     <button
