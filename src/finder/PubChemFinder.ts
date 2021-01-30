@@ -10,6 +10,19 @@ const FORMAT_JSON = 'json';
 const CID_CONSTANT = 'cid/';
 const CIDS_CONSTANT = '/cids/';
 
+interface NameResponse {
+    InformationList: InformationList;
+}
+
+interface InformationList {
+    Information: Information[]
+}
+
+interface Information {
+    CID: number
+    Synonym: String[]
+}
+
 interface ListResponseJson {
     IdentifierList: {
         CID: number[]
@@ -117,6 +130,19 @@ class PubChemFinder implements IFinder {
      */
     findByMass(mass: number): Promise<SingleStructure[]> {
         return Sleep.sleep(0).then(() => []);
+    }
+
+    findName(id: string, defaultName: string) {
+        return fetch(ENDPOINT_URI + 'cid/' + id + '/synonyms/' + FORMAT_JSON, {
+            method: 'GET',
+        }).then(async response => {
+            if(response.status === 200) {
+                let json = await response.json() as NameResponse;
+                return json.InformationList.Information[0].Synonym[0];
+            } else {
+                return defaultName;
+            }
+        });
     }
 
     private async jsonListResult(response: Response): Promise<SingleStructure[]> {

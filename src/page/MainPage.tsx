@@ -138,9 +138,9 @@ class MainPage extends React.Component<any, State> {
             body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
                 return {smiles: e}
             }))
-        }).then(response => {
-            if (response.status === 200) {
-                response.json().then(async data => {
+        }).then(responseUnique => {
+            if (responseUnique.status === 200) {
+                responseUnique.json().then(async data => {
                         let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
                         if (selectedContainer) {
                             this.setState({
@@ -181,8 +181,41 @@ class MainPage extends React.Component<any, State> {
                             });
                             return data;
                         }).then(data => {
-                            this.setState({results: [], blocks: data})
-                        });
+                            this.setState({results: [], blocks: data});
+                            return data;
+                        }).then(data => {
+                                Parallel.map(data, async (item: BlockStructure) => {
+                                    if (item.sameAs === null && item.block) {
+                                        return {
+                                            id: item.id,
+                                            smiles: item.smiles,
+                                            unique: item.unique,
+                                            sameAs: null,
+                                            block: {
+                                                identifier: item.block.identifier,
+                                                database: item.block.database,
+                                                structureName: await finder.findName(item.block.identifier, item.block.structureName),
+                                                smiles: item.block.smiles,
+                                                formula: item.block.formula,
+                                                mass: item.block.mass
+                                            }
+                                        } as BlockStructure;
+                                    } else {
+                                        return item;
+                                    }
+                                }, 2).then(async data => {
+                                    data.forEach(e => {
+                                        if (e.sameAs !== null) {
+                                            e.block = data[e.sameAs].block
+                                        }
+                                    });
+                                    return data;
+                                }).then(data => {
+                                    this.setState({results: [], blocks: data});
+                                    return data;
+                                });
+                            }
+                        );
 
                         let token = localStorage.getItem(TOKEN);
                         if (this.state.selectedContainer) {
@@ -207,7 +240,7 @@ class MainPage extends React.Component<any, State> {
                     }
                 );
             } else {
-                response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
+                responseUnique.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
             }
         });
 
@@ -416,15 +449,15 @@ class MainPage extends React.Component<any, State> {
 
                         <table>
                             <thead>
-                                <tr>
-                                    <th/>
-                                    <th>Acronym</th>
-                                    <th>SMILES</th>
-                                    <th>Name</th>
-                                    <th>Formula</th>
-                                    <th>Mass</th>
-                                    <th>Identifier</th>
-                                </tr>
+                            <tr>
+                                <th/>
+                                <th>Acronym</th>
+                                <th>SMILES</th>
+                                <th>Name</th>
+                                <th>Formula</th>
+                                <th>Mass</th>
+                                <th>Identifier</th>
+                            </tr>
                             </thead>
                             <tbody>
                             {this.state.blocks.map(block => (
