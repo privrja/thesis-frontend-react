@@ -146,6 +146,7 @@ canvas {
 
 .divLeft {
   text-align: left;
+  margin: 4vh 0 4vh 0;
 }
 
 .block {
@@ -227,6 +228,7 @@ button:hover {
   background-color: $colorFlashBad;
 }
 
+/* Update button */
 .update {
   background-color: $colorFlashPending;
 }

@@ -441,12 +441,10 @@ class MainPage extends React.Component<any, State> {
 
                 {this.state.blocks.length > 1 ?
                     <section id='results'>
-
                         <ModificationComponent blockLength={this.state.blocks.length}
                                                sequenceType={this.state.sequence?.sequenceType}
                                                sequence={this.state.sequence?.sequence}
                                                modifications={this.state.modifications}/>
-
                         <table>
                             <thead>
                             <tr>
@@ -481,8 +479,6 @@ class MainPage extends React.Component<any, State> {
                     :
                     <section/>
                 }
-
-
             </section>
         )
     }
