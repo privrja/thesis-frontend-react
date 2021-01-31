@@ -18,6 +18,7 @@ import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
 import ModificationComponent from "../component/ModificationComponent";
+import TextInput from "../component/TextInput";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -35,6 +36,8 @@ interface State {
     sequence?: SequenceStructure;
     selectedContainer?: number;
     modifications?: Modification[];
+    editable?: number;
+    editSame: boolean;
 }
 
 interface SequenceStructure {
@@ -44,6 +47,7 @@ interface SequenceStructure {
 
 interface BlockStructure {
     id: number;
+    acronym: string;
     smiles: string;
     unique: string | null;
     sameAs: number | null;
@@ -57,7 +61,6 @@ class MainPage extends React.Component<any, State> {
 
     constructor(props: any, context: any) {
         super(props, context);
-
         this.flashRef = React.createRef();
         this.popupRef = React.createRef();
         this.find = this.find.bind(this);
@@ -66,7 +69,10 @@ class MainPage extends React.Component<any, State> {
         this.unique = this.unique.bind(this);
         this.buildBlocks = this.buildBlocks.bind(this);
         this.showLargeSmiles = this.showLargeSmiles.bind(this);
-        this.state = {results: [], blocks: []};
+        this.edit = this.edit.bind(this);
+        this.editEnd = this.editEnd.bind(this);
+        this.update = this.update.bind(this);
+        this.state = {results: [], blocks: [], editSame: true};
     }
 
     componentDidMount(): void {
@@ -158,15 +164,16 @@ class MainPage extends React.Component<any, State> {
                             if (item.sameAs === null) {
                                 return {
                                     id: item.id,
+                                    acronym: item.id.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
                                     sameAs: null,
-                                    // TODO check when not found
                                     block: await finder.findBySmiles(item.smiles).then(data => data[0])
                                 } as BlockStructure;
                             } else {
                                 return {
                                     id: item.id,
+                                    acronym: item.sameAs.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
                                     sameAs: item.sameAs,
@@ -181,13 +188,24 @@ class MainPage extends React.Component<any, State> {
                             });
                             return data;
                         }).then(data => {
-                            this.setState({results: [], blocks: data});
+                            let sequence = this.state.sequence;
+                                data.forEach((block: BlockStructure) => {
+                                        if (block.sameAs !== null) {
+                                            if (sequence) {
+                                                console.log(sequence.sequence, block.acronym, this.state.blocks[block.sameAs].acronym);
+                                                sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
+                                            }
+                                        }
+                                    }
+                                );
+                            this.setState({results: [], blocks: data, sequence: sequence});
                             return data;
                         }).then(data => {
                                 Parallel.map(data, async (item: BlockStructure) => {
                                     if (item.sameAs === null && item.block) {
                                         return {
                                             id: item.id,
+                                            acronym: item.id.toString(),
                                             smiles: item.smiles,
                                             unique: item.unique,
                                             sameAs: null,
@@ -212,6 +230,7 @@ class MainPage extends React.Component<any, State> {
                                     return data;
                                 }).then(data => {
                                     this.setState({results: [], blocks: data});
+                                    this.flashRef.current!.activate(FlashType.OK, 'Done');
                                     return data;
                                 });
                             }
@@ -236,14 +255,12 @@ class MainPage extends React.Component<any, State> {
                                 });
                             }
                         }
-                        this.flashRef.current!.activate(FlashType.OK, 'Done');
                     }
                 );
             } else {
                 responseUnique.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
             }
         });
-
     }
 
 
@@ -277,7 +294,7 @@ class MainPage extends React.Component<any, State> {
      * @param molecule chosen one
      * @param search by which parameter was searched
      */
-    select(molecule: SingleStructure, search?: number) {
+    select(molecule: SingleStructure, search ?: number) {
         this.flashRef.current!.deactivate();
         if (search === undefined) {
             let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
@@ -350,6 +367,45 @@ class MainPage extends React.Component<any, State> {
         SmilesDrawer.parse(smiles, function (tree: any) {
             largeSmilesDrawer.draw(tree, 'popupLargeSmiles');
         });
+    }
+
+    edit(blockId: number) {
+        this.setState({editable: blockId});
+    }
+
+    editEnd() {
+        this.setState({editable: undefined});
+    }
+
+    replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
+        if (sequence === "") {
+            return sequence;
+        }
+        return sequence.replaceAll('[' + lastAcronym + ']', '[' + newAcronym + ']');
+    }
+
+    update(blockId: number) {
+        let acronym = document.getElementById('txt-edit-acronym') as HTMLInputElement;
+        let smiles = document.getElementById('txt-edit-smiles') as HTMLInputElement;
+
+        let sequence = this.state.sequence;
+        let blocks = this.state.blocks;
+        if (sequence) {
+            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
+        }
+        if (this.state.editSame) {
+            let blocksCopy = [...blocks];
+            let sameBlocks = blocksCopy.filter(block => block.sameAs === blockId || block.id === blockId);
+            sameBlocks.forEach(block => {
+                blocks[block.id].acronym = acronym.value;
+                blocks[block.id].smiles = smiles.value;
+            });
+        } else {
+            blocks[blockId].acronym = acronym.value;
+            blocks[blockId].smiles = smiles.value;
+        }
+        this.setState({blocks: blocks, sequence: sequence});
+        this.editEnd();
     }
 
     render() {
@@ -455,6 +511,7 @@ class MainPage extends React.Component<any, State> {
                                 <th>Formula</th>
                                 <th>Mass</th>
                                 <th>Identifier</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -465,12 +522,30 @@ class MainPage extends React.Component<any, State> {
                                                 data-smiles={block.unique}
                                                 onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
                                     </td>
-                                    <td className={styles.tdMin}>{block.id}</td>
-                                    <td className={styles.tdMin}>{block.unique}</td>
+                                    <td onClick={() => this.edit(block.id)}
+                                        className={styles.tdMin}>{this.state.editable === block.id ?
+                                        <TextInput value={block.acronym} name='txt-edit-acronym'
+                                                   id='txt-edit-acronym'/> : block.acronym}</td>
+                                    <td onClick={() => this.edit(block.id)}
+                                        className={styles.tdMin}>{this.state.editable === block.id ?
+                                        <TextInput value={block.unique ?? ''} name='txt-edit-smiles'
+                                                   id='txt-edit-smiles'/> : block.unique}</td>
                                     <td className={styles.tdMin}>{block.block?.structureName}</td>
                                     <td className={styles.tdMin}>{block.block?.formula}</td>
                                     <td className={styles.tdMin}>{block.block?.mass}</td>
-                                    <td className={styles.tdMin}>{block.block?.identifier}</td>
+                                    <td className={styles.tdMin}>{block.block?.identifier ?
+                                        <a href={ServerEnumHelper.getLink(ServerEnum.PUBCHEM, block.block?.identifier)}
+                                           target='_blank' rel="noopener noreferrer">CID: {block.block.identifier}</a> :
+                                        <div/>}</td>
+                                    <td className={styles.tdMin}>
+                                        {this.state.editable === block.id ? <button className={styles.update}
+                                                                                    onClick={() => this.update(block.id)}>Update</button> :
+                                            <div/>}
+                                        {this.state.editable === block.id ?
+                                            <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                            <div/>}
+                                        <button>Editor</button>
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>

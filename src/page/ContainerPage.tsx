@@ -248,7 +248,6 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.mode}</td>
                                 <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
-
                                     {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => this.selectContainer(container.id)}>Select</button>
