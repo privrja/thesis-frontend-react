@@ -20,7 +20,7 @@ interface InformationList {
 
 interface Information {
     CID: number
-    Synonym: String[]
+    Synonym: string[]
 }
 
 interface ListResponseJson {
