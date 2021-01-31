@@ -138,7 +138,7 @@ class PubChemFinder implements IFinder {
         }).then(async response => {
             if(response.status === 200) {
                 let json = await response.json() as NameResponse;
-                return json.InformationList.Information[0].Synonym[0] as string;
+                return json.InformationList.Information[0].Synonym[0];
             } else {
                 return defaultName;
             }
