@@ -19,6 +19,7 @@ import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
 import ModificationComponent from "../component/ModificationComponent";
 import TextInput from "../component/TextInput";
+import NameHelper from "../helper/NameHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -189,30 +190,31 @@ class MainPage extends React.Component<any, State> {
                             return data;
                         }).then(data => {
                             let sequence = this.state.sequence;
-                                data.forEach((block: BlockStructure) => {
-                                        if (block.sameAs !== null) {
-                                            if (sequence) {
-                                                console.log(sequence.sequence, block.acronym, this.state.blocks[block.sameAs].acronym);
-                                                sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
-                                            }
+                            data.forEach((block: BlockStructure) => {
+                                    if (block.sameAs !== null) {
+                                        if (sequence) {
+                                            console.log(sequence.sequence, block.acronym, this.state.blocks[block.sameAs].acronym);
+                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
                                         }
                                     }
-                                );
+                                }
+                            );
                             this.setState({results: [], blocks: data, sequence: sequence});
                             return data;
                         }).then(data => {
                                 Parallel.map(data, async (item: BlockStructure) => {
                                     if (item.sameAs === null && item.block) {
+                                        let name = await finder.findName(item.block.identifier, item.block.structureName);
                                         return {
                                             id: item.id,
-                                            acronym: item.id.toString(),
+                                            acronym: NameHelper.acronymFromName(name),
                                             smiles: item.smiles,
                                             unique: item.unique,
                                             sameAs: null,
                                             block: {
                                                 identifier: item.block.identifier,
                                                 database: item.block.database,
-                                                structureName: await finder.findName(item.block.identifier, item.block.structureName),
+                                                structureName: name,
                                                 smiles: item.block.smiles,
                                                 formula: item.block.formula,
                                                 mass: item.block.mass
@@ -222,14 +224,21 @@ class MainPage extends React.Component<any, State> {
                                         return item;
                                     }
                                 }, 2).then(async data => {
+                                    if (this.state.sequence) {
+                                        sequence = this.state.sequence;
+                                    }
                                     data.forEach(e => {
                                         if (e.sameAs !== null) {
-                                            e.block = data[e.sameAs].block
+                                            e.block = data[e.sameAs].block;
+                                            e.acronym = data[e.sameAs].acronym;
+                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
+                                        } else {
+                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', e.id.toString(), e.acronym);
                                         }
                                     });
                                     return data;
                                 }).then(data => {
-                                    this.setState({results: [], blocks: data});
+                                    this.setState({results: [], blocks: data, sequence: sequence});
                                     this.flashRef.current!.activate(FlashType.OK, 'Done');
                                     return data;
                                 });

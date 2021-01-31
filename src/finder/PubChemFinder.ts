@@ -132,13 +132,13 @@ class PubChemFinder implements IFinder {
         return Sleep.sleep(0).then(() => []);
     }
 
-    findName(id: string, defaultName: string) {
+    findName(id: string, defaultName: string): Promise<string> {
         return fetch(ENDPOINT_URI + 'cid/' + id + '/synonyms/' + FORMAT_JSON, {
             method: 'GET',
         }).then(async response => {
             if(response.status === 200) {
                 let json = await response.json() as NameResponse;
-                return json.InformationList.Information[0].Synonym[0];
+                return json.InformationList.Information[0].Synonym[0] as string;
             } else {
                 return defaultName;
             }
