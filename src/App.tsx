@@ -10,6 +10,7 @@ import LogoutPage from "./page/LogoutPage";
 import ContainerDetailPage from "./page/ContainerDetailPage";
 import RegisterPage from "./page/RegisterPage";
 import ConditionsPage from "./page/ConditionsPage";
+import BlockPage from "./page/BlockPage";
 
 function App() {
 
@@ -22,8 +23,9 @@ function App() {
                 <Route path='/login/' component={LoginPage}/>
                 <Route path='/logout/' component={LogoutPage}/>
                 <Route path='/register/' component={RegisterPage}/>
-                <Route path='/container/:id' component={ContainerDetailPage} />
-                <Route path='/container/' component={ContainerPage}/>
+                <Route path='/container/:id/block/' exact component={BlockPage}/>
+                <Route path='/container/:id' exact component={ContainerDetailPage} />
+                <Route path='/container/' exact component={ContainerPage}/>
                 <Route path='/condition/' component={ConditionsPage}/>
             </Router>
 

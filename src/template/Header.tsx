@@ -1,7 +1,7 @@
 import * as React from "react";
 import HeaderTile from "./HeaderTile";
 import styles from "../main.module.scss"
-import {TOKEN} from "../constant/ApiConstants";
+import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 
 class Header extends React.Component {
 
@@ -12,12 +12,11 @@ class Header extends React.Component {
                     <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
                     <HeaderTile text={'Containers'} url={'/container'}/>
                     <HeaderTile text={'Sequences'} url={'/sequence'}/>
-                    <HeaderTile text={'Blocks'} url={'/block'}/>
+                    <HeaderTile text={'Blocks'} url={'/container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '1') + '/block'}/>
                     <HeaderTile text={'Modifications'} url={'/modification'}/>
                     <HeaderTile text={'Import'} url={'/import'}/>
                     <HeaderTile text={'Settings'} url={'/setup'}/>
-                    {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={'/logout'}/> :
-                        <HeaderTile text={'Login'} url={'/login'}/>}
+                    {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={'/logout'}/> : <HeaderTile text={'Login'} url={'/login'}/>}
                 </div>
             </header>
         )

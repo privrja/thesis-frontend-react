@@ -193,7 +193,6 @@ class MainPage extends React.Component<any, State> {
                             data.forEach((block: BlockStructure) => {
                                     if (block.sameAs !== null) {
                                         if (sequence) {
-                                            console.log(sequence.sequence, block.acronym, this.state.blocks[block.sameAs].acronym);
                                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
                                         }
                                     }

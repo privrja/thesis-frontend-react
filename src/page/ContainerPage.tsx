@@ -1,13 +1,14 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
 import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
+import ListComponent, {ListState} from "../component/ListComponent";
 
 interface Container {
     id: number,
@@ -22,11 +23,9 @@ interface FreeContainer {
     visibility: string
 }
 
-interface State {
+interface State extends ListState{
     containers: Array<Container>;
     freeContainers: Array<FreeContainer>;
-    selectedContainer?: number;
-    editable?: number;
 }
 
 interface Values {
@@ -38,44 +37,22 @@ const visibilityOptions = [
     new SelectOption('PRIVATE'), new SelectOption('PUBLIC')
 ];
 
-class ContainerPage extends React.Component<any, State> {
-
-    flashRef: React.RefObject<Flash>;
-    popupRef: React.RefObject<PopupYesNo>;
+class ContainerPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
-
-        this.flashRef = React.createRef();
-        this.popupRef = React.createRef();
-        this.popup = this.popup.bind(this);
-        this.delete = this.delete.bind(this);
-        this.edit = this.edit.bind(this);
-        this.editEnd = this.editEnd.bind(this);
-        this.update = this.update.bind(this);
-
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (selectedContainer) {
-            this.state = {containers: [], freeContainers: [], selectedContainer: parseInt(selectedContainer)};
-        } else {
-            this.state = {containers: [], freeContainers: []};
-        }
+        this.state = {containers: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
     }
 
     componentDidMount(): void {
-        this.containers();
+        this.list();
         this.freeContainers();
     }
 
-    popup(key: number) {
-        this.popupRef.current!.key = key;
-        this.popupRef.current!.activate();
-    }
-
-    containers() {
+    list() {
         const token = localStorage.getItem(TOKEN);
         if (token) {
-            fetch(ENDPOINT + 'container', {
+            fetch(ENDPOINT + CONTAINER, {
                 method: 'GET',
                 headers: {'x-auth-token': token}
             })
@@ -103,7 +80,7 @@ class ContainerPage extends React.Component<any, State> {
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
     }
 
-    containerCreate(values: Values) {
+    create(values: Values): void {
         const token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(ENDPOINT + 'container', {
@@ -113,7 +90,7 @@ class ContainerPage extends React.Component<any, State> {
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
-                    this.containers();
+                    this.list();
                     this.freeContainers();
                 } else {
                     response.json().then(data => {
@@ -139,21 +116,13 @@ class ContainerPage extends React.Component<any, State> {
                     });
                 } else {
                     this.flashRef.current!.activate(FlashType.OK);
-                    this.containers();
+                    this.list();
                     this.freeContainers();
                 }
             })
         } else {
             this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
         }
-    }
-
-    edit(containerId: number) {
-        this.setState({editable: containerId});
-    }
-
-    editEnd() {
-        this.setState({editable: undefined});
     }
 
     update(containerId: number) {
@@ -176,7 +145,7 @@ class ContainerPage extends React.Component<any, State> {
                 }
             });
             this.editEnd();
-            this.containers();
+            this.list();
             this.freeContainers();
         } else {
             this.flashRef.current!.activate(FlashType.BAD, 'You\'re not logged');
@@ -204,7 +173,7 @@ class ContainerPage extends React.Component<any, State> {
                                     {setSubmitting}: FormikHelpers<Values>
                                 ) => {
                                     setTimeout(() => {
-                                        this.containerCreate(values);
+                                        this.create(values);
                                         setSubmitting(false);
                                     }, 500);
                                 }}
@@ -250,10 +219,11 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>
                                     {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
-                                    <button onClick={() => this.selectContainer(container.id)}>Select</button>
+                                    <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
                                     <button
                                         onClick={() => window.location.href = '/container/' + container.id}>Collaborators
                                     </button>
+                                    <button>Go on</button>
                                     <button>Clone</button>
                                     <button>Export</button>
                                     <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
@@ -282,7 +252,7 @@ class ContainerPage extends React.Component<any, State> {
                                 <td>{container.containerName}</td>
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>
-                                    <button onClick={() => this.selectContainer(container.id)}>Select</button>
+                                    <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
                                     <button>Clone</button>
                                     <button>Export</button>
                                 </td>
