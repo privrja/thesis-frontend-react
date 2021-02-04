@@ -77,19 +77,14 @@ class ModificationComponent extends React.Component<Props, any> {
             <div id="div-sequence">
                 <div id="div-top-sequence" className={styles.divLeft}>
                     <h3>Sequence - {this.props.blockLength} blocks</h3>
-
                     <label htmlFor="sel-sequence-type">Type</label>
                     <SelectInput id='sel-sequence-type' name='sel-sequence-type' options={SequenceEnumHelper.getOptions()} onChange={this.updateModifications} />
-
                     <label htmlFor="txt-sequence">Sequence</label>
                     <input type="text" id="txt-sequence" name="sequence" size={60} value={this.props.sequence}/>
                 </div>
-                <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
-                                   ref={this.nModificationRef}/>
-                <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications}
-                                   ref={this.cModificationRef}/>
-                <ModificationInput type='b' title='Branch-terminal modification'
-                                   modifications={this.props.modifications} ref={this.bModificationRef}/>
+                <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications} ref={this.nModificationRef}/>
+                <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications} ref={this.cModificationRef}/>
+                <ModificationInput type='b' title='Branch-terminal modification' modifications={this.props.modifications} ref={this.bModificationRef}/>
             </div>
         );
     }

@@ -1,11 +1,13 @@
 import * as React from "react";
 import Flash from "./Flash";
 import PopupYesNo from "./PopupYesNo";
-import {SELECTED_CONTAINER} from "../constant/ApiConstants";
+import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import FlashType from "./FlashType";
 
 export interface ListState {
     selectedContainer: number;
     editable?: number;
+    list: any[];
 }
 
 abstract class ListComponent<P extends any, S extends ListState> extends React.Component<any, S> {
@@ -22,6 +24,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.edit = this.edit.bind(this);
         this.editEnd = this.editEnd.bind(this);
         this.update = this.update.bind(this);
+        this.listResponse = this.listResponse.bind(this);
     }
 
     componentDidMount(): void {
@@ -51,6 +54,18 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     editEnd(): void {
         this.setState({editable: undefined});
     }
+
+    protected listResponse(response: Response) {
+        if (response.status === 200) {
+            response.json().then(response => this.setState({list: response}));
+        } else {
+            if (response.status === 401) {
+                localStorage.removeItem(TOKEN);
+            }
+            response.json().then(response => this.flashRef.current!.activate(FlashType.BAD, response.message));
+        }
+    }
+
 
     abstract list(): void;
     abstract create(values: any): void;

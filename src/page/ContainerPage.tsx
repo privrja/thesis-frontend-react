@@ -24,9 +24,9 @@ interface FreeContainer {
     visibility: string
 }
 
-interface State extends ListState{
-    containers: Array<Container>;
-    freeContainers: Array<FreeContainer>;
+interface State extends ListState {
+    list: Container[];
+    freeContainers: FreeContainer[];
 }
 
 interface Values {
@@ -45,7 +45,7 @@ class ContainerPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
-        this.state = {containers: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
+        this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
     }
 
     componentDidMount(): void {
@@ -67,7 +67,7 @@ class ContainerPage extends ListComponent<any, State> {
                     return response;
                 })
                 .then(response => response.status === 200 ? response.json() : [])
-                .then(response => this.setState({containers: response}));
+                .then(response => this.setState({list: response}));
         }
     }
 
@@ -210,7 +210,7 @@ class ContainerPage extends ListComponent<any, State> {
                         </tr>
                         </thead>
                         <tbody>
-                        {this.state.containers.map(container => (
+                        {this.state.list.map(container => (
                             <tr key={container.id}>
                                 <td>{container.id}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?

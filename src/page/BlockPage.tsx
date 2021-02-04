@@ -12,7 +12,7 @@ import {ServerEnumHelper} from "../enum/ServerEnum";
 import {SelectInput} from "../component/SelectInput";
 
 interface State extends ListState {
-    blocks: Block[];
+    list: Block[];
 }
 
 interface Block {
@@ -28,10 +28,6 @@ interface Block {
     identifier: string;
 }
 
-interface Values {
-
-}
-
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
 const TXT_EDIT_ACRONYM = 'txt-edit-acronym';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -45,8 +41,8 @@ class BlockPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
-        this.blockResponse = this.blockResponse.bind(this);
-        this.state = {blocks: [], selectedContainer: this.props.match.params.id};
+        this.listResponse = this.listResponse.bind(this);
+        this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
     list() {
@@ -55,22 +51,11 @@ class BlockPage extends ListComponent<any, State> {
             fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
                 method: 'GET',
                 headers: {'x-auth-token': token}
-            }).then(this.blockResponse);
+            }).then(this.listResponse);
         } else {
             fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
                 method: 'GET',
-            }).then(this.blockResponse);
-        }
-    }
-
-    private blockResponse(response: Response) {
-        if (response.status === 200) {
-            response.json().then(response => this.setState({blocks: response}));
-        } else {
-            if (response.status === 401) {
-                localStorage.removeItem(TOKEN);
-            }
-            response.json().then(response => this.flashRef.current!.activate(FlashType.BAD, response.message));
+            }).then(this.listResponse);
         }
     }
 
@@ -96,7 +81,7 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     find(key: number) {
-        return this.state.blocks.find(block => block.id === key);
+        return this.state.list.find(block => block.id === key);
     }
 
     getEndpoint(blockId: number) {
@@ -153,7 +138,7 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : <div/>
                     }
 
-                    {this.state.blocks.length > 1 ?
+                    {this.state.list.length > 1 ?
                         <table>
                             <thead>
                             <tr>
@@ -169,7 +154,7 @@ class BlockPage extends ListComponent<any, State> {
                             </tr>
                             </thead>
                             <tbody>
-                            {this.state.blocks.map(block => (
+                            {this.state.list.map(block => (
                                 <tr key={block.id}>
                                     <td>{block.id}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?<TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>
