@@ -12,21 +12,14 @@ interface State {
 
 class TextInput extends React.Component<Props, State> {
 
-
     constructor(props: Props) {
         super(props);
         this.state = {value: props.value};
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event: any) {
         this.setState({value: event.target.value});
-    }
-
-    handleSubmit(event: any) {
-        alert('A name was submitted: ' + this.state.value);
-        event.preventDefault();
     }
 
     render() {

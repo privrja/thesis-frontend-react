@@ -16,6 +16,10 @@ class NameHelper {
         }
     }
 
+    static booleanValue(value: boolean) {
+        return value ? 'Yes' : 'No';
+    }
+
 }
 
 export default NameHelper;

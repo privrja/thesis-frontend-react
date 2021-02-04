@@ -12,8 +12,8 @@ class Header extends React.Component {
                     <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
                     <HeaderTile text={'Containers'} url={'/container'}/>
                     <HeaderTile text={'Sequences'} url={'/sequence'}/>
-                    <HeaderTile text={'Blocks'} url={'/container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '1') + '/block'}/>
-                    <HeaderTile text={'Modifications'} url={'/modification'}/>
+                    <HeaderTile text={'Blocks'} url={'/container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/block'}/>
+                    <HeaderTile text={'Modifications'} url={'/container/'+ (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/modification'}/>
                     <HeaderTile text={'Import'} url={'/import'}/>
                     <HeaderTile text={'Settings'} url={'/setup'}/>
                     {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={'/logout'}/> : <HeaderTile text={'Login'} url={'/login'}/>}
