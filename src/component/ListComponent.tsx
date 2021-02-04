@@ -54,8 +54,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     abstract list(): void;
     abstract create(values: any): void;
-    abstract delete(key: string): void;
-    abstract update(containerId: number): void;
+    abstract delete(key: number): void;
+    abstract update(key: number): void;
 
 }
 

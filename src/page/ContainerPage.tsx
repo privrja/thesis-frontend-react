@@ -9,6 +9,7 @@ import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 
 interface Container {
     id: number,
@@ -36,6 +37,9 @@ interface Values {
 const visibilityOptions = [
     new SelectOption('PRIVATE'), new SelectOption('PUBLIC')
 ];
+
+const SEL_EDIT_VISIBILITY = 'sel-edit-visibility';
+const TXT_EDIT_CONTAINER_NAME = 'txt-edit-containerName';
 
 class ContainerPage extends ListComponent<any, State> {
 
@@ -99,11 +103,11 @@ class ContainerPage extends ListComponent<any, State> {
                 }
             });
         } else {
-            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
     }
 
-    delete(key: string) {
+    delete(key: number) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(ENDPOINT + 'container/' + key, {
@@ -121,17 +125,17 @@ class ContainerPage extends ListComponent<any, State> {
                 }
             })
         } else {
-            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
     }
 
-    update(containerId: number) {
+    update(key: number) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            let name = document.getElementById('txt-edit-containerName') as HTMLInputElement;
-            let visibility = document.getElementById('sel-edit-visibility') as HTMLSelectElement;
+            let name = document.getElementById(TXT_EDIT_CONTAINER_NAME) as HTMLInputElement;
+            let visibility = document.getElementById(SEL_EDIT_VISIBILITY) as HTMLSelectElement;
 
-            fetch(ENDPOINT + 'container/' + containerId, {
+            fetch(ENDPOINT + 'container/' + key, {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify({containerName: name.value, visibility: visibility.value})
@@ -148,7 +152,7 @@ class ContainerPage extends ListComponent<any, State> {
             this.list();
             this.freeContainers();
         } else {
-            this.flashRef.current!.activate(FlashType.BAD, 'You\'re not logged');
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
     }
 
@@ -210,24 +214,20 @@ class ContainerPage extends ListComponent<any, State> {
                             <tr key={container.id}>
                                 <td>{container.id}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <TextInput value={container.containerName} name='txt-edit-containerName' id='txt-edit-containerName'/>: container.containerName}</td>
+                                    <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME} id={TXT_EDIT_CONTAINER_NAME}/>: container.containerName}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <SelectInput id='sel-edit-visibility' name='sel-edit-visibility'
-                                                 options={visibilityOptions}/> : container.visibility}</td>
+                                    <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY} options={visibilityOptions} selected={container.visibility}/> : container.visibility}</td>
                                 <td>{container.mode}</td>
                                 <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
                                     {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
-                                    <button
-                                        onClick={() => window.location.href = '/container/' + container.id}>Collaborators
-                                    </button>
+                                    <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
                                     <button>Go on</button>
                                     <button>Clone</button>
                                     <button>Export</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
-                                    </button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
                                 </td>
                             </tr>
                         ))}
