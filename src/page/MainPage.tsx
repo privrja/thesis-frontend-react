@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as Parallel from 'async-parallel';
 import styles from "../main.module.scss";
+import Helmet from "react-helmet";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
 import {OPTION_DRAW_DECAY_POINTS, OPTION_THEMES} from "../constant/SmilesDrawerConstants";
@@ -20,6 +21,8 @@ import Modification from "../structure/Modification";
 import ModificationComponent from "../component/ModificationComponent";
 import TextInput from "../component/TextInput";
 import NameHelper from "../helper/NameHelper";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import {SequenceEnum} from "../enum/SequenceEnum";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -29,6 +32,7 @@ const ELEMENT_SMILES = 'smiles';
 const ELEMENT_LARGE_CANVAS = 'popupLargeSmiles';
 const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 const SMILES_UNIQUE = 'smiles/unique';
+const PAGE_TITLE = 'Home';
 
 interface State {
     results: SingleStructure[];
@@ -39,6 +43,7 @@ interface State {
     modifications?: Modification[];
     editable?: number;
     editSame: boolean;
+    title: string;
 }
 
 interface SequenceStructure {
@@ -73,7 +78,8 @@ class MainPage extends React.Component<any, State> {
         this.edit = this.edit.bind(this);
         this.editEnd = this.editEnd.bind(this);
         this.update = this.update.bind(this);
-        this.state = {results: [], blocks: [], editSame: true};
+        this.save = this.save.bind(this);
+        this.state = {results: [], blocks: [], editSame: true, title: PAGE_TITLE};
     }
 
     componentDidMount(): void {
@@ -125,11 +131,81 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    getModification(type: string) {
+        let mod = document.getElementById('sel-' + type +'-modification') as HTMLSelectElement;
+        if (!mod) {
+            return null;
+        }
+        if (mod.value === 'nothing') {
+            let modName = document.getElementById('txt-' + type + '-modification') as HTMLInputElement;
+            let modFormula = document.getElementById('txt-' + type + '-formula') as HTMLInputElement;
+            let modMass = document.getElementById('txt-' + type + '-mass') as HTMLInputElement;
+            let nTerminal = document.getElementById('chk-' + type + '-nterminal') as HTMLInputElement;
+            let cTerminal = document.getElementById('chk-' + type +'-cterminal') as HTMLInputElement;
+            if (modName.value && modFormula) {
+                return {
+                    modificationName: modName.value,
+                    formula: modFormula.value,
+                    mass: modMass.value,
+                    nTerminal: nTerminal.checked,
+                    cTerminal: cTerminal.checked
+                };
+            }
+        } else {
+            return {databaseId: mod.value};
+        }
+    }
+
+    save() {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            let modifications :any[] = [];
+            switch (Number(this.state.sequence?.sequenceType) as SequenceEnum) {
+                case SequenceEnum.LINEAR:
+                case SequenceEnum.LINEAR_POLYKETIDE:
+                    modifications = modifications.concat(this.getModification('n')).concat(this.getModification('c')).filter(e => e);
+                    break;
+                default:
+                case SequenceEnum.BRANCHED:
+                case SequenceEnum.OTHER:
+                    modifications = modifications.concat(this.getModification('n')).concat(this.getModification('c')).concat(this.getModification('b')).filter(e => e);
+                    break;
+                case SequenceEnum.BRANCH_CYCLIC:
+                    modifications = modifications.concat(this.getModification('b')).filter(e => e);
+                    break;
+                case SequenceEnum.CYCLIC:
+                case SequenceEnum.CYCLIC_POLYKETIDE:
+                    break;
+            }
+            let sequence = {
+                sequenceName: this.state.molecule?.structureName,
+                formula: this.state.molecule?.formula,
+                mass: this.state.molecule?.mass,
+                smiles: this.state.molecule?.smiles,
+                source: this.state.molecule?.database,
+                identifier: this.state.molecule?.identifier,
+                sequence: this.state.sequence?.sequence,
+                sequenceType: this.state.sequence?.sequenceType,
+                modifications: modifications,
+                blocks: this.state.blocks
+            };
+            console.log(sequence);
+            fetch(ENDPOINT + 'sequence', {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify(sequence)
+            }).then();
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
+    }
+
     /**
      * Build blocks from structure and show them
      */
     buildBlocks() {
         this.flashRef.current!.activate(FlashType.PENDING);
+        this.setState({title: 'Loading - Home'});
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
@@ -237,7 +313,7 @@ class MainPage extends React.Component<any, State> {
                                     });
                                     return data;
                                 }).then(data => {
-                                    this.setState({results: [], blocks: data, sequence: sequence});
+                                    this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
                                     this.flashRef.current!.activate(FlashType.OK, 'Done');
                                     return data;
                                 });
@@ -319,6 +395,8 @@ class MainPage extends React.Component<any, State> {
         let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
         if (search !== SearchEnum.NAME) {
             nameInput!.value = molecule.structureName ?? '';
+        } else {
+            molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
         this.drawSmiles();
         this.setState({results: [], molecule: molecule});
@@ -419,6 +497,9 @@ class MainPage extends React.Component<any, State> {
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage}>
+                <Helmet>
+                    <title>{this.state.title}</title>
+                </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
                 <section id='home'>
                     <div className={styles.drawerArea}>
@@ -477,7 +558,7 @@ class MainPage extends React.Component<any, State> {
                             <button onClick={this.canonical}>Cannonical SMILES</button>
                             <button onClick={this.unique}>Unique SMILES</button>
                             <button onClick={this.buildBlocks}>Build Blocks</button>
-                            <button>Save</button>
+                            <button onClick={this.save}>Save</button>
                         </div>
                     </div>
                 </section>

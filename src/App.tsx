@@ -1,6 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import './main.module.scss';
+import Helmet from "react-helmet";
 import Header from "./template/Header";
 import Footer from "./template/Footer";
 import MainPage from "./page/MainPage";
@@ -18,6 +19,9 @@ function App() {
     return (
         <div>
             <Header/>
+            <Helmet>
+                <title>MassSpecBlocks</title>
+            </Helmet>
 
             <Router>
                 <Route exact path='/' component={MainPage}/>
