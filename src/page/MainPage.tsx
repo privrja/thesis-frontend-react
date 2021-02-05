@@ -39,7 +39,7 @@ interface State {
     molecule?: SingleStructure;
     blocks: BlockStructure[];
     sequence?: SequenceStructure;
-    selectedContainer?: number;
+    selectedContainer: number;
     modifications?: Modification[];
     editable?: number;
     editSame: boolean;
@@ -79,7 +79,22 @@ class MainPage extends React.Component<any, State> {
         this.editEnd = this.editEnd.bind(this);
         this.update = this.update.bind(this);
         this.save = this.save.bind(this);
-        this.state = {results: [], blocks: [], editSame: true, title: PAGE_TITLE};
+        this.state = {
+            results: [],
+            blocks: [],
+            editSame: true,
+            title: PAGE_TITLE,
+            selectedContainer: this.getSelectedContainer()
+        };
+    }
+
+    getSelectedContainer(): number {
+        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
+        if (!selectedContainer) {
+            selectedContainer = '4';
+            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
+        }
+        return parseInt(selectedContainer);
     }
 
     componentDidMount(): void {
@@ -132,7 +147,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     getModification(type: string) {
-        let mod = document.getElementById('sel-' + type +'-modification') as HTMLSelectElement;
+        let mod = document.getElementById('sel-' + type + '-modification') as HTMLSelectElement;
         if (!mod) {
             return null;
         }
@@ -141,7 +156,7 @@ class MainPage extends React.Component<any, State> {
             let modFormula = document.getElementById('txt-' + type + '-formula') as HTMLInputElement;
             let modMass = document.getElementById('txt-' + type + '-mass') as HTMLInputElement;
             let nTerminal = document.getElementById('chk-' + type + '-nterminal') as HTMLInputElement;
-            let cTerminal = document.getElementById('chk-' + type +'-cterminal') as HTMLInputElement;
+            let cTerminal = document.getElementById('chk-' + type + '-cterminal') as HTMLInputElement;
             if (modName.value && modFormula) {
                 return {
                     modificationName: modName.value,
@@ -159,7 +174,7 @@ class MainPage extends React.Component<any, State> {
     save() {
         const token = localStorage.getItem(TOKEN);
         if (token) {
-            let modifications :any[] = [];
+            let modifications: any[] = [];
             switch (Number(this.state.sequence?.sequenceType) as SequenceEnum) {
                 case SequenceEnum.LINEAR:
                 case SequenceEnum.LINEAR_POLYKETIDE:
@@ -190,7 +205,7 @@ class MainPage extends React.Component<any, State> {
                 blocks: this.state.blocks
             };
             console.log(sequence);
-            fetch(ENDPOINT + 'sequence', {
+            fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(sequence)
@@ -216,7 +231,7 @@ class MainPage extends React.Component<any, State> {
             sequence: blockStructures.sequence,
             sequenceType: blockStructures.sequenceType
         } as SequenceStructure;
-        fetch(ENDPOINT + SMILES_UNIQUE, {
+        fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles', {
             method: 'POST',
             body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
                 return {smiles: e}
@@ -224,24 +239,14 @@ class MainPage extends React.Component<any, State> {
         }).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
-                        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-                        if (selectedContainer) {
-                            this.setState({
-                                results: [],
-                                blocks: data,
-                                sequence: sequence,
-                                selectedContainer: parseInt(selectedContainer)
-                            });
-                        } else {
-                            this.setState({results: [], blocks: data, sequence: sequence});
-                        }
+                        this.setState({results: [], blocks: data, sequence: sequence});
                         document.location.href = '#results';
                         let finder = new PubChemFinder();
                         Parallel.map(data, async (item: any) => {
-                            if (item.sameAs === null) {
+                            if (item.sameAs === null && item.block === null) {
                                 return {
                                     id: item.id,
-                                    acronym: item.id.toString(),
+                                    acronym: item.id?.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
                                     sameAs: null,
@@ -250,11 +255,11 @@ class MainPage extends React.Component<any, State> {
                             } else {
                                 return {
                                     id: item.id,
-                                    acronym: item.sameAs.toString(),
+                                    acronym: item.acronym ?? item.sameAs?.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
                                     sameAs: item.sameAs,
-                                    block: null
+                                    block: item.block
                                 } as BlockStructure;
                             }
                         }, 2).then(async data => {
@@ -278,7 +283,7 @@ class MainPage extends React.Component<any, State> {
                             return data;
                         }).then(data => {
                                 Parallel.map(data, async (item: BlockStructure) => {
-                                    if (item.sameAs === null && item.block) {
+                                    if (item.sameAs === null && item.block && !item.acronym) {
                                         let name = await finder.findName(item.block.identifier, item.block.structureName);
                                         return {
                                             id: item.id,
@@ -599,6 +604,7 @@ class MainPage extends React.Component<any, State> {
                                 <th>Name</th>
                                 <th>Formula</th>
                                 <th>Mass</th>
+                                <th>Losses</th>
                                 <th>Identifier</th>
                                 <th>Actions</th>
                             </tr>
@@ -622,6 +628,7 @@ class MainPage extends React.Component<any, State> {
                                     <td className={styles.tdMin}>{block.block?.structureName}</td>
                                     <td className={styles.tdMin}>{block.block?.formula}</td>
                                     <td className={styles.tdMin}>{block.block?.mass}</td>
+                                    <td className={styles.tdMin}>{block.block?.losses}</td>
                                     <td className={styles.tdMin}>{block.block?.identifier ?
                                         <a href={ServerEnumHelper.getLink(ServerEnum.PUBCHEM, block.block?.identifier)}
                                            target='_blank' rel="noopener noreferrer">CID: {block.block.identifier}</a> :

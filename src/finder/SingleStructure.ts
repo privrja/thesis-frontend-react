@@ -7,6 +7,7 @@ class SingleStructure {
     public structureName: string;
     public smiles: string;
     public formula: string;
+    public losses?: string;
     public mass: number;
 
     constructor(identifier: string, database: ServerEnum, structureName: string, smiles: string, formula: string, mass: number) {
