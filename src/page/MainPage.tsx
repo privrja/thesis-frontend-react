@@ -283,7 +283,7 @@ class MainPage extends React.Component<any, State> {
                             return data;
                         }).then(data => {
                                 Parallel.map(data, async (item: BlockStructure) => {
-                                    if (item.sameAs === null && item.block && !item.acronym) {
+                                    if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
                                         let name = await finder.findName(item.block.identifier, item.block.structureName);
                                         return {
                                             id: item.id,
