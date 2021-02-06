@@ -1,5 +1,5 @@
 import ListComponent, {ListState} from "../component/ListComponent";
-import {ENDPOINT} from "../constant/ApiConstants";
+import {CONTAINER, ENDPOINT} from "../constant/ApiConstants";
 import PopupYesNo from "../component/PopupYesNo";
 import Flash from "../component/Flash";
 import styles from "../main.module.scss";
@@ -29,18 +29,26 @@ class Collaborator extends ListComponent<Props, State> {
         this.state = {list: [], container: {containerName: '', visibility: ''}, selectedContainer: this.getSelectedContainer()};
     }
 
-    create(values: any): void {
+    findName(key: number): string {
+        return this.find(key).user;
     }
 
-    delete(key: number): void {
+    getEndpoint(): string {
+        return ENDPOINT + CONTAINER + '/' + this.props.containerId;
     }
 
     list(): void {
-        this.defaultListTransformation(ENDPOINT + 'container/' + this.props.containerId,
-                response => this.setState({container: {containerName: response.containerName, visibility: response.visibility}, list: response.collaborators}));
+        this.defaultListTransformation(this.getEndpoint(),
+            response => this.setState({container: {containerName: response.containerName, visibility: response.visibility}, list: response.collaborators}));
+    }
+
+    create(values: any): void {
     }
 
     update(key: number): void {
+    }
+
+    delete(key: number): void {
     }
 
     containerH() {
@@ -51,7 +59,7 @@ class Collaborator extends ListComponent<Props, State> {
         return (
             <section>
                 <h1>Container {this.state.container ? this.containerH() : ''}</h1>
-                <PopupYesNo label={"Realy want to remove user from container?"} onYes={this.delete} ref={this.popupRef}/>
+                <PopupYesNo label={"Really want to remove user from container?"} onYes={this.delete} ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                 {this.state.container ? <h2 id='collaborators'>Collaborators</h2> : ''}
                 {this.state.container ?

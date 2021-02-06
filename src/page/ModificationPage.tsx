@@ -1,13 +1,11 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, ENDPOINT, SMODIFICATION, TOKEN} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
-import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
-import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import Modification from "../structure/Modification";
 import NameHelper from "../helper/NameHelper";
 import CheckInput from "../component/CheckInput";
@@ -40,110 +38,38 @@ class ModificationPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
-        this.find = this.find.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
-    list() {
-        const token = localStorage.getItem(TOKEN);
-        if (token !== null) {
-            fetch(this.getEndpoint(), {
-                method: 'GET',
-                headers: {'x-auth-token': token}
-            }).then(this.listResponse);
-        } else {
-            fetch(this.getEndpoint(), {
-                method: 'GET',
-            }).then(this.listResponse);
-        }
-    }
-
-    delete(key: number) {
-        const token = localStorage.getItem(TOKEN);
-        if (token !== null) {
-            fetch(this.getEndpointWithId(key), {
-                method: 'DELETE',
-                headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 204) {
-                    this.flashRef.current!.activate(FlashType.OK, 'Modification ' + this.find(key)?.modificationName + ' deleted');
-                    this.list();
-                } else {
-                    response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message);
-                    });
-                }
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD);
-        }
-    }
-
-    find(key: number) {
-        return this.state.list.find(modification => modification.id === key);
-    }
-
-    getEndpointWithId(blockId: number) {
-        return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/modification/' + blockId;
+    findName(key: number): string {
+        return this.find(key).modificationName;
     }
 
     getEndpoint() {
-        return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/modification';
-    }
-
-    update(key: number) {
-        let token = localStorage.getItem(TOKEN);
-        if (token) {
-            let modificationName = document.getElementById(TXT_EDIT_MODIFICATION_NAME) as HTMLInputElement;
-            let formula = document.getElementById(TXT_EDIT_FORMULA) as HTMLInputElement;
-            let mass = document.getElementById(TXT_EDIT_MASS) as HTMLInputElement;
-            let nTerminal = document.getElementById(TXT_EDIT_N_TERMINAL) as HTMLInputElement;
-            let cTerminal = document.getElementById(TXT_EDIT_C_TERMINAL) as HTMLInputElement;
-            fetch(this.getEndpointWithId(key), {
-                method: 'PUT',
-                headers: {'x-auth-token': token},
-                body: JSON.stringify({
-                    modificationName: modificationName.value,
-                    formula: formula.value,
-                    mass: mass.value,
-                    nTerminal: nTerminal.value,
-                    cTerminal: cTerminal.value
-                })
-            }).then(response => {
-                if (response.status === 204) {
-                    this.flashRef.current!.activate(FlashType.OK, 'Modification ' + modificationName.value + ' updated');
-                    this.list();
-                } else {
-                    response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message);
-                    });
-                }
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
-        }
-        this.editEnd();
+        return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SMODIFICATION;
     }
 
     create(values: Values): void {
-        console.log(values);
-        let token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(this.getEndpoint(), {
-                method: 'POST',
-                headers: {'x-auth-token': token},
-                body: JSON.stringify(values)
-            }).then(response => {
-                if (response.status !== 201) {
-                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
-                } else {
-                    this.flashRef.current!.activate(FlashType.OK);
-                    this.list();
-                }
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
-        }
+        this.defaultCreate(this.getEndpoint(), values);
+    }
+
+    delete(key: number) {
+        this.defaultDelete(this.getEndpointWithId(key), key);
+    }
+
+    update(key: number) {
+        let modificationName = document.getElementById(TXT_EDIT_MODIFICATION_NAME) as HTMLInputElement;
+        let formula = document.getElementById(TXT_EDIT_FORMULA) as HTMLInputElement;
+        let mass = document.getElementById(TXT_EDIT_MASS) as HTMLInputElement;
+        let nTerminal = document.getElementById(TXT_EDIT_N_TERMINAL) as HTMLInputElement;
+        let cTerminal = document.getElementById(TXT_EDIT_C_TERMINAL) as HTMLInputElement;
+        this.defaultUpdate(this.getEndpointWithId(key), key, {
+            modificationName: modificationName.value,
+            formula: formula.value,
+            mass: mass.value,
+            nTerminal: nTerminal.checked,
+            cTerminal: cTerminal.checked
+        });
     }
 
     render() {

@@ -45,30 +45,13 @@ class ContainerPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
+        this.freeContainers = this.freeContainers.bind(this);
         this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
     }
 
     componentDidMount(): void {
         this.list();
         this.freeContainers();
-    }
-
-    list() {
-        const token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(ENDPOINT + CONTAINER, {
-                method: 'GET',
-                headers: {'x-auth-token': token}
-            })
-                .then(response => {
-                    if (response.status === 401) {
-                        localStorage.removeItem(TOKEN);
-                    }
-                    return response;
-                })
-                .then(response => response.status === 200 ? response.json() : [])
-                .then(response => this.setState({list: response}));
-        }
     }
 
     freeContainers() {
@@ -85,32 +68,13 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     create(values: Values): void {
-        const token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(ENDPOINT + 'container', {
-                method: 'POST',
-                headers: {'x-auth-token': token, 'Content-Type': 'application/json'},
-                body: JSON.stringify({containerName: values.containerName, visibility: values.visibility})
-            }).then(response => {
-                if (response.status === 201) {
-                    this.flashRef.current!.activate(FlashType.OK);
-                    this.list();
-                    this.freeContainers();
-                } else {
-                    response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message);
-                    });
-                }
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
-        }
+        this.defaultCreate(this.getEndpoint(), {containerName: values.containerName, visibility: values.visibility}, this.freeContainers);
     }
 
     delete(key: number) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            fetch(ENDPOINT + 'container/' + key, {
+            fetch(this.getEndpointWithId(key), {
                 method: 'DELETE',
                 headers: {'x-auth-token': token},
             }).then(response => {
@@ -135,7 +99,7 @@ class ContainerPage extends ListComponent<any, State> {
             let name = document.getElementById(TXT_EDIT_CONTAINER_NAME) as HTMLInputElement;
             let visibility = document.getElementById(SEL_EDIT_VISIBILITY) as HTMLSelectElement;
 
-            fetch(ENDPOINT + 'container/' + key, {
+            fetch(this.getEndpointWithId(key), {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify({containerName: name.value, visibility: visibility.value})
@@ -154,6 +118,14 @@ class ContainerPage extends ListComponent<any, State> {
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
+    }
+
+    findName(key: number): string {
+        return this.find(key).containerName;
+    }
+
+    getEndpoint(): string {
+        return ENDPOINT + CONTAINER;
     }
 
     render() {
@@ -223,7 +195,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
-                                    <button onClick={() => window.location.href = '/container/' + container.id}>Collaborators</button>
+                                    <button onClick={() => window.location.href = '/container/' + container.id}>Details</button>
                                     <button>Go on</button>
                                     <button>Clone</button>
                                     <button>Export</button>

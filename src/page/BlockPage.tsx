@@ -1,7 +1,7 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {SBLOCK, CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
@@ -41,51 +41,19 @@ class BlockPage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
-        this.listResponse = this.listResponse.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
-    list() {
-        const token = localStorage.getItem(TOKEN);
-        if (token !== null) {
-            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
-                method: 'GET',
-                headers: {'x-auth-token': token}
-            }).then(this.listResponse);
-        } else {
-            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
-                method: 'GET',
-            }).then(this.listResponse);
-        }
+    findName(key: number): string {
+        return this.find(key).acronym;
     }
 
-    delete(key: number) {
-        const token = localStorage.getItem(TOKEN);
-        if (token !== null) {
-            fetch(this.getEndpoint(key), {
-                method: 'DELETE',
-                headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 204) {
-                    this.flashRef.current!.activate(FlashType.OK, 'Block ' + this.find(key)?.acronym + ' deleted');
-                    this.list();
-                } else {
-                    response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message);
-                    });
-                }
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, '')
-        }
+    getEndpoint() {
+        return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SBLOCK;
     }
 
-    find(key: number) {
-        return this.state.list.find(block => block.id === key);
-    }
-
-    getEndpoint(blockId: number) {
-        return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block/' + blockId;
+    create(): void {
+        // TODO
     }
 
     update(key: number) {
@@ -99,13 +67,13 @@ class BlockPage extends ListComponent<any, State> {
             let smiles = document.getElementById(TXT_EDIT_SMILES) as HTMLInputElement;
             let source = document.getElementById(SEL_EDIT_SOURCE) as HTMLSelectElement;
             let identifier = document.getElementById(TXT_EDIT_IDENTIFIER) as HTMLInputElement;
-            fetch(this.getEndpoint(key), {
+            fetch(this.getEndpointWithId(key), {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify({blockName: name.value, acronym: acronym.value, formula: formula.value, mass: mass.value, losses: losses.value, smiles: smiles.value, source: source.value, identifier: identifier.value})
             }).then(response => {
                 if (response.status === 204) {
-                    this.flashRef.current!.activate(FlashType.OK, 'Block ' + acronym.value + ' updated');
+                    this.flashRef.current!.activate(FlashType.OK, 'Block ' + this.findName(key) + ' updated');
                     this.list();
                 } else {
                     response.json().then(data => {
@@ -117,10 +85,6 @@ class BlockPage extends ListComponent<any, State> {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
         this.editEnd();
-    }
-
-    create(): void {
-        // TODO
     }
 
     render() {
