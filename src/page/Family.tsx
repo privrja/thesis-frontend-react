@@ -32,7 +32,7 @@ class Family extends ListComponent<Props, ListState> {
     }
 
     update(key: number): void {
-        let family  = document.getElementById('txt-exit-' + this.props.type + '-family-name') as HTMLInputElement;
+        let family  = document.getElementById('txt-edit-' + this.props.type + '-family-name') as HTMLInputElement;
         this.defaultUpdate(this.getEndpointWithId(key), key, {family: family.value});
     }
 
