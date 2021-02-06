@@ -3,6 +3,7 @@ import Flash from "./Flash";
 import PopupYesNo from "./PopupYesNo";
 import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
+import {ERROR_NOT_FOUND} from "../constant/FlashConstants";
 
 export interface ListState {
     selectedContainer: number;
@@ -10,7 +11,7 @@ export interface ListState {
     list: any[];
 }
 
-abstract class ListComponent<P extends any, S extends ListState> extends React.Component<any, S> {
+abstract class ListComponent<P extends any, S extends ListState> extends React.Component<P, S> {
 
     flashRef: React.RefObject<Flash>;
     popupRef: React.RefObject<PopupYesNo>;
@@ -66,6 +67,27 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         }
     }
 
+    defaultList(endpoint: string) {
+        this.defaultListTransformation(endpoint, response => this.setState({list: response}));
+    }
+
+    defaultListTransformation(endpoint: string, transformationCallback: (e: any) => void) {
+        const token = localStorage.getItem(TOKEN);
+        fetch(endpoint, token ? {
+            method: 'GET',
+            headers: {'x-auth-token': token}
+        } : {
+            method: 'GET'
+        })
+            .then(response => {
+                if (response.status === 404) {
+                    this.flashRef.current!.activate(FlashType.BAD, ERROR_NOT_FOUND);
+                }
+                return response;
+            })
+            .then(response => response.status === 200 ? response.json() : null)
+            .then(transformationCallback);
+    }
 
     abstract list(): void;
     abstract create(values: any): void;
