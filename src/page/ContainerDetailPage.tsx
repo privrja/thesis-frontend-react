@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../main.module.scss";
 import Collaborator from "./Collaborator";
-import Family from "./AbstractFamily";
+import Family from "./Family";
 
 class ContainerDetailPage extends React.Component<any, any> {
     render() {
