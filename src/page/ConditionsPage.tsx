@@ -25,6 +25,7 @@ class ConditionsPage extends React.Component<any> {
                     <p>MassSpecBlock use modified smilesDrawer [https://github.com/privrja/smilesDrawer] originally
                         developed by Jean-Louis Reymond Research Group at the University of Bern, main author Daniel
                         Probst.
+                        Use JSME editor originally developed by B. Bienfait and P. Ertl. JSME Molecule Editor [https://jsme-editor.github.io/].
                         Use React for frontend (MIT License), Symfony for backend (MIT License), Mysql free version.
                         MassSpecBlocks is based on Building Blocks Database Generator of Natural Compounds (Bbdgnc)
                         [https://github.com/privrja/bbdgnc].</p>

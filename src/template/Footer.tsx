@@ -4,7 +4,7 @@ class Footer extends React.Component {
 
     render() {
         return (
-            <footer>@2020 - 2020 Jan Přívratský</footer>
+            <footer>@2020 - 2020 Jan Přívratský | <a href={'/reference'}>References</a></footer>
         )
     }
 

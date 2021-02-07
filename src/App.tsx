@@ -14,6 +14,7 @@ import ConditionsPage from "./page/ConditionsPage";
 import BlockPage from "./page/BlockPage";
 import ModificationPage from "./page/ModificationPage";
 import EditorPage from "./page/EditorPage";
+import ReferencePage from "./page/ReferencePage";
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
                 <Route path='/container/:id' exact component={ContainerDetailPage} />
                 <Route path='/container/' exact component={ContainerPage}/>
                 <Route path='/condition/' component={ConditionsPage}/>
+                <Route path='/reference/' component={ReferencePage}/>
             </Router>
 
             <Footer/>
