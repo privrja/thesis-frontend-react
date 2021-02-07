@@ -44,7 +44,7 @@ class Family extends ListComponent<Props, ListState> {
 
                 <h2>Create new Block Family</h2>
                 <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'} placeholder={'New Family Name'}/>
-                <button onClick={this.create}>Create new Family</button>
+                <button onClick={this.create} className={styles.create}>Create new Family</button>
 
                 { this.state.list.length > 0 ? <h2 id={this.props.type + 'Families'}>{this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1)} Families</h2> : '' }
                 {this.state.list.length > 0 ?
