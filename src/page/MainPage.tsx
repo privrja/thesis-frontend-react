@@ -22,7 +22,7 @@ import ModificationComponent from "../component/ModificationComponent";
 import TextInput from "../component/TextInput";
 import NameHelper from "../helper/NameHelper";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
-import {SequenceEnum} from "../enum/SequenceEnum";
+import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import PopupEditor from "../component/PopupEditor";
 
 let smilesDrawer: SmilesDrawer.Drawer;
@@ -55,6 +55,7 @@ interface SequenceStructure {
 
 interface BlockStructure {
     id: number;
+    databaseId: number | null;
     acronym: string;
     smiles: string;
     unique: string | null;
@@ -206,6 +207,8 @@ class MainPage extends React.Component<any, State> {
                 case SequenceEnum.CYCLIC_POLYKETIDE:
                     break;
             }
+            let txtSequence = document.getElementById('txt-sequence') as HTMLInputElement;
+            let selSequence = document.getElementById('sel-sequence-type') as HTMLSelectElement;
             let sequence = {
                 sequenceName: this.state.molecule?.structureName,
                 formula: this.state.molecule?.formula,
@@ -213,10 +216,22 @@ class MainPage extends React.Component<any, State> {
                 smiles: this.state.molecule?.smiles,
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
-                sequence: this.state.sequence?.sequence,
-                sequenceType: this.state.sequence?.sequenceType,
+                sequence: txtSequence.value,
+                sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
                 modifications: modifications,
-                blocks: this.state.blocks
+                blocks: this.state.blocks.map(block => {
+                    return {
+                        databaseId: block.databaseId,
+                        sameAs: block.sameAs,
+                        acronym: block.acronym,
+                        blockName: block.block?.structureName,
+                        smiles: block.unique,
+                        formula: block.block?.formula,
+                        mass: block.block?.mass,
+                        losses: block.block?.losses,
+                        source: block.block?.database,
+                        identifier: block.block?.identifier
+                    }})
             };
             console.log(sequence);
             fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence', {
@@ -260,6 +275,7 @@ class MainPage extends React.Component<any, State> {
                             if (item.sameAs === null && item.block === null) {
                                 return {
                                     id: item.id,
+                                    databaseId: null,
                                     acronym: item.id?.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
@@ -269,6 +285,7 @@ class MainPage extends React.Component<any, State> {
                             } else {
                                 return {
                                     id: item.id,
+                                    databaseId: item.block.databaseId,
                                     acronym: item.acronym ?? item.sameAs?.toString(),
                                     smiles: item.smiles,
                                     unique: item.unique,
@@ -301,6 +318,7 @@ class MainPage extends React.Component<any, State> {
                                         let name = await finder.findName(item.block.identifier, item.block.structureName);
                                         return {
                                             id: item.id,
+                                            databaseId: null,
                                             acronym: NameHelper.acronymFromName(name),
                                             smiles: item.smiles,
                                             unique: item.unique,

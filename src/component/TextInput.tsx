@@ -3,7 +3,8 @@ import * as React from "react";
 interface Props {
     name: string;
     id: string;
-    value: string
+    value: string;
+    size?: number;
 }
 
 interface State {
@@ -23,7 +24,7 @@ class TextInput extends React.Component<Props, State> {
     }
 
     render() {
-        return <input type="text" id={this.props.id} name={this.props.name} value={this.state.value} onChange={this.handleChange}/>
+        return <input type="text" id={this.props.id} name={this.props.name} value={this.state.value} onChange={this.handleChange} size={this.props.size}/>
     }
 }
 

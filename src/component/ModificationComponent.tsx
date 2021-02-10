@@ -4,6 +4,7 @@ import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import ModificationInput from "./ModificationInput";
 import * as React from "react";
 import Modification from "../structure/Modification";
+import TextInput from "./TextInput";
 
 interface Props {
     blockLength: number;
@@ -80,7 +81,7 @@ class ModificationComponent extends React.Component<Props, any> {
                     <label htmlFor="sel-sequence-type">Type</label>
                     <SelectInput id='sel-sequence-type' name='sel-sequence-type' options={SequenceEnumHelper.getOptions()} onChange={this.updateModifications} />
                     <label htmlFor="txt-sequence">Sequence</label>
-                    <input type="text" id="txt-sequence" name="sequence" size={60} value={this.props.sequence}/>
+                    <TextInput id="txt-sequence" name="sequence" size={60} value={this.props.sequence ?? ''}/>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications} ref={this.nModificationRef}/>
                 <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications} ref={this.cModificationRef}/>
