@@ -81,7 +81,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
                 localStorage.removeItem(TOKEN);
             }
             return response;
-        }).then(response => (response.status === 200) ? response.json().then(transformationCallback) : response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)));
+        }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
     }
 
     defaultCreate(endpoint: string, body: any, successCallback: () => void = () => {}) {

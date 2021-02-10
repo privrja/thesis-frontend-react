@@ -640,7 +640,8 @@ class MainPage extends React.Component<any, State> {
                                         {this.state.editable === block.id ?
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
-                                        <button>Editor</button>
+                                        <button className={styles.update}>Editor</button>
+                                        <button className={styles.delete} onClick={() => this.setState({blocks: this.state.blocks.filter(e => e.id !== block.id)})}>Remove</button>
                                     </td>
                                 </tr>
                             ))}

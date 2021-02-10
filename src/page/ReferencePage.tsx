@@ -19,6 +19,10 @@ class ReferencePage extends React.Component<any, any> {
                         DOI: <a href={'https://doi.org/10.1186/1758-2946-5-24'}>https://doi.org/10.1186/1758-2946-5-24</a><br/>
                         I used version of react component on github <a href={'https://github.com/douglasconnect/jsme-react'}>version</a>
                     </p>
+
+                    <h3>Bbdgnc</h3>
+                    <p>Bbdgnc is first version of this application developed for my bachelor's thesis. <br/>
+                        Github: <a href={'https://github.com/privrja/bbdgnc'}>version</a></p>
                 </section>
             </section>
         );
