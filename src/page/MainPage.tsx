@@ -23,6 +23,7 @@ import TextInput from "../component/TextInput";
 import NameHelper from "../helper/NameHelper";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import {SequenceEnum} from "../enum/SequenceEnum";
+import PopupEditor from "../component/PopupEditor";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -44,6 +45,7 @@ interface State {
     editable?: number;
     editSame: boolean;
     title: string;
+    editorBlockId?: number;
 }
 
 interface SequenceStructure {
@@ -60,15 +62,26 @@ interface BlockStructure {
     block: SingleStructure | null;
 }
 
+const TXT_EDIT_BLOCK_NAME = 'txt-edit-name';
+const TXT_EDIT_BLOCK_SMILES = 'txt-edit-smiles';
+const TXT_EDIT_BLOCK_ACRONYM = 'txt-edit-acronym';
+const TXT_EDIT_BLOCK_FORMULA = 'txt-edit-formula';
+const TXT_EDIT_BLOCK_MASS = 'txt-edit-mass';
+const TXT_EDIT_BLOCK_LOSSES = 'txt-edit-losses';
+const SEL_EDIT_SOURCE = 'sel-edit-source';
+const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
+
 class MainPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
     popupRef: React.RefObject<PopupSmilesDrawer>;
+    popupEditorRef: React.RefObject<PopupEditor>;
 
     constructor(props: any, context: any) {
         super(props, context);
         this.flashRef = React.createRef();
         this.popupRef = React.createRef();
+        this.popupEditorRef = React.createRef();
         this.find = this.find.bind(this);
         this.show = this.show.bind(this);
         this.canonical = this.canonical.bind(this);
@@ -79,12 +92,13 @@ class MainPage extends React.Component<any, State> {
         this.editEnd = this.editEnd.bind(this);
         this.update = this.update.bind(this);
         this.save = this.save.bind(this);
+        this.editorClose = this.editorClose.bind(this);
         this.state = {
             results: [],
             blocks: [],
             editSame: true,
             title: PAGE_TITLE,
-            selectedContainer: this.getSelectedContainer()
+            selectedContainer: this.getSelectedContainer(),
         };
     }
 
@@ -279,7 +293,7 @@ class MainPage extends React.Component<any, State> {
                                     }
                                 }
                             );
-                            this.setState({results: [], blocks: data, sequence: sequence});
+                            this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
                             return data;
                         }).then(data => {
                                 Parallel.map(data, async (item: BlockStructure) => {
@@ -476,8 +490,14 @@ class MainPage extends React.Component<any, State> {
     }
 
     update(blockId: number) {
-        let acronym = document.getElementById('txt-edit-acronym') as HTMLInputElement;
-        let smiles = document.getElementById('txt-edit-smiles') as HTMLInputElement;
+        let acronym = document.getElementById(TXT_EDIT_BLOCK_ACRONYM) as HTMLInputElement;
+        let smiles = document.getElementById(TXT_EDIT_BLOCK_SMILES) as HTMLInputElement;
+        let name = document.getElementById(TXT_EDIT_BLOCK_NAME) as HTMLInputElement;
+        let formula = document.getElementById(TXT_EDIT_BLOCK_FORMULA) as HTMLInputElement;
+        let mass = document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement;
+        let losses = document.getElementById(TXT_EDIT_BLOCK_LOSSES) as HTMLInputElement;
+        let source = document.getElementById(SEL_EDIT_SOURCE) as HTMLSelectElement;
+        let identifier = document.getElementById(TXT_EDIT_IDENTIFIER) as HTMLInputElement;
 
         let sequence = this.state.sequence;
         let blocks = this.state.blocks;
@@ -490,13 +510,45 @@ class MainPage extends React.Component<any, State> {
             sameBlocks.forEach(block => {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
+                blocks[block.id].block!.structureName = name.value;
+                blocks[block.id].block!.formula = formula.value;
+                blocks[block.id].block!.mass = Number(mass.value);
+                blocks[block.id].block!.losses = losses.value;
+                blocks[block.id].block!.database = Number(source.value);
+                blocks[block.id].block!.identifier = identifier.value;
             });
         } else {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
+            blocks[blockId].block!.structureName = name.value;
+            blocks[blockId].block!.formula = formula.value;
+            blocks[blockId].block!.mass = Number(mass.value);
+            blocks[blockId].block!.losses = losses.value;
+            blocks[blockId].block!.database = Number(source.value);
+            blocks[blockId].block!.identifier = identifier.value;
         }
         this.setState({blocks: blocks, sequence: sequence});
         this.editEnd();
+    }
+
+    editorClose(smiles: string) {
+        if (this.state.editorBlockId) {
+            let blocks = this.state.blocks;
+            let blocksCopy = [...blocks];
+            if (this.state.editSame) {
+                let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
+                sameBlocks.forEach(block => {
+                    blocks[block.id].smiles = smiles;
+                    blocks[block.id].unique = smiles;
+                    blocks[block.id].block!.formula = '';
+                    blocks[block.id].block!.mass = undefined;
+                });
+            } else {
+                blocks[this.state.editorBlockId].smiles = smiles;
+                blocks[this.state.editorBlockId].unique = smiles;
+            }
+            this.setState({blocks: blocks});
+        }
     }
 
     render() {
@@ -506,6 +558,8 @@ class MainPage extends React.Component<any, State> {
                     <title>{this.state.title}</title>
                 </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
+                <PopupEditor id={'popupEditor'} className={styles.popupLargeEditor} ref={this.popupEditorRef}
+                             onClose={this.editorClose}/>
                 <section id='home'>
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
@@ -619,20 +673,39 @@ class MainPage extends React.Component<any, State> {
                                     </td>
                                     <td onClick={() => this.edit(block.id)}
                                         className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.acronym} name='txt-edit-acronym'
-                                                   id='txt-edit-acronym'/> : block.acronym}</td>
+                                        <TextInput value={block.acronym} name={TXT_EDIT_BLOCK_ACRONYM}
+                                                   id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
                                     <td onClick={() => this.edit(block.id)}
                                         className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.unique ?? ''} name='txt-edit-smiles'
-                                                   id='txt-edit-smiles'/> : block.unique}</td>
-                                    <td className={styles.tdMin}>{block.block?.structureName}</td>
-                                    <td className={styles.tdMin}>{block.block?.formula}</td>
-                                    <td className={styles.tdMin}>{block.block?.mass}</td>
-                                    <td className={styles.tdMin}>{block.block?.losses}</td>
-                                    <td className={styles.tdMin}>{block.block?.identifier ?
-                                        <a href={ServerEnumHelper.getLink(ServerEnum.PUBCHEM, block.block?.identifier)}
-                                           target='_blank' rel="noopener noreferrer">CID: {block.block.identifier}</a> :
-                                        <div/>}</td>
+                                        <TextInput value={block.unique ?? ''} name={TXT_EDIT_BLOCK_SMILES}
+                                                   id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
+                                    <td className={styles.tdMin}
+                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
+                                                   value={block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
+                                    <td className={styles.tdMin}
+                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
+                                                   value={block.block?.formula ?? ''}/> : block.block?.formula}</td>
+                                    <td className={styles.tdMin}
+                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
+                                                   value={block.block?.mass?.toString() ?? ''}/> : block.block?.mass}</td>
+                                    <td className={styles.tdMin}
+                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
+                                                   value={block.block?.losses ?? ''}/> : block.block?.losses}</td>
+                                    <td className={styles.tdMin}>
+                                        {this.state.editable === block.id
+                                            ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
+                                                                options={ServerEnumHelper.getOptions()}
+                                                                selected={block.block?.database.toString()}/><TextInput
+                                                value={block.block?.identifier ?? ''} id={TXT_EDIT_IDENTIFIER}
+                                                name={TXT_EDIT_IDENTIFIER}/></div>
+                                            :
+                                            <a href={ServerEnumHelper.getLink(Number(block.block?.database), block.block?.identifier ?? '')}
+                                               target={'_blank'}
+                                               rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(Number(block.block?.database), block.block?.identifier ?? '')}</a>}</td>
                                     <td className={styles.tdMin}>
                                         {this.state.editable === block.id ? <button className={styles.update}
                                                                                     onClick={() => this.update(block.id)}>Update</button> :
@@ -640,8 +713,14 @@ class MainPage extends React.Component<any, State> {
                                         {this.state.editable === block.id ?
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
-                                        <button className={styles.update}>Editor</button>
-                                        <button className={styles.delete} onClick={() => this.setState({blocks: this.state.blocks.filter(e => e.id !== block.id)})}>Remove</button>
+                                        <button className={styles.update} onClick={() => {
+                                            this.setState({editorBlockId: block.id});
+                                            this.popupEditorRef.current!.activate(block.unique ?? '');
+                                        }}>Editor
+                                        </button>
+                                        <button className={styles.delete}
+                                                onClick={() => this.setState({blocks: this.state.blocks.filter(e => e.id !== block.id)})}>Remove
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
