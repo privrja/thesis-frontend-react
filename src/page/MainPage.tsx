@@ -189,19 +189,22 @@ class MainPage extends React.Component<any, State> {
     save() {
         const token = localStorage.getItem(TOKEN);
         if (token) {
-            let modifications: any[] = [];
+            let nModification, cModification, bModification;
             switch (Number(this.state.sequence?.sequenceType) as SequenceEnum) {
                 case SequenceEnum.LINEAR:
                 case SequenceEnum.LINEAR_POLYKETIDE:
-                    modifications = modifications.concat(this.getModification('n')).concat(this.getModification('c')).filter(e => e);
+                    nModification = this.getModification('n');
+                    cModification = this.getModification('c');
                     break;
                 default:
                 case SequenceEnum.BRANCHED:
                 case SequenceEnum.OTHER:
-                    modifications = modifications.concat(this.getModification('n')).concat(this.getModification('c')).concat(this.getModification('b')).filter(e => e);
+                    nModification = this.getModification('n');
+                    cModification = this.getModification('c');
+                    bModification = this.getModification('b');
                     break;
                 case SequenceEnum.BRANCH_CYCLIC:
-                    modifications = modifications.concat(this.getModification('b')).filter(e => e);
+                    bModification = this.getModification('b');
                     break;
                 case SequenceEnum.CYCLIC:
                 case SequenceEnum.CYCLIC_POLYKETIDE:
@@ -218,7 +221,9 @@ class MainPage extends React.Component<any, State> {
                 identifier: this.state.molecule?.identifier,
                 sequence: txtSequence.value,
                 sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
-                modifications: modifications,
+                nModification: nModification,
+                cModification: cModification,
+                bModification: bModification,
                 blocks: this.state.blocks.map(block => {
                     return {
                         databaseId: block.databaseId,
@@ -231,14 +236,24 @@ class MainPage extends React.Component<any, State> {
                         losses: block.block?.losses,
                         source: block.block?.database,
                         identifier: block.block?.identifier
-                    }})
+                    }
+                })
             };
-            console.log(sequence);
             fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(sequence)
-            }).then();
+            }).then(response => {
+                if (response.status === 201) {
+                    this.flashRef.current!.activate(FlashType.OK, 'Sequence created');
+                } else {
+                    if (response.status === 401) {
+                        localStorage.removeItem(TOKEN);
+                    }
+                    this.flashRef.current!.activate(FlashType.BAD);
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
+                }
+            });
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
@@ -283,15 +298,27 @@ class MainPage extends React.Component<any, State> {
                                     block: await finder.findBySmiles(item.smiles).then(data => data[0])
                                 } as BlockStructure;
                             } else {
-                                return {
-                                    id: item.id,
-                                    databaseId: item.block.databaseId,
-                                    acronym: item.acronym ?? item.sameAs?.toString(),
-                                    smiles: item.smiles,
-                                    unique: item.unique,
-                                    sameAs: item.sameAs,
-                                    block: item.block
-                                } as BlockStructure;
+                                if (item.block === null) {
+                                    return {
+                                        id: item.id,
+                                        databaseId: null,
+                                        acronym: item.acronym ?? item.sameAs?.toString(),
+                                        smiles: item.smiles,
+                                        unique: item.unique,
+                                        sameAs: item.sameAs,
+                                        block: item.block
+                                    } as BlockStructure;
+                                } else {
+                                    return {
+                                        id: item.id,
+                                        databaseId: item.block?.databaseId,
+                                        acronym: item.acronym ?? item.sameAs?.toString(),
+                                        smiles: item.smiles,
+                                        unique: item.unique,
+                                        sameAs: item.sameAs,
+                                        block: item.block
+                                    } as BlockStructure;
+                                }
                             }
                         }, 2).then(async data => {
                             data.forEach(e => {

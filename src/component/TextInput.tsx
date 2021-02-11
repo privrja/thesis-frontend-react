@@ -19,6 +19,12 @@ class TextInput extends React.Component<Props, State> {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.value !== this.props.value) {
+            this.setState({value: this.props.value});
+        }
+    }
+
     handleChange(event: any) {
         this.setState({value: event.target.value});
     }
