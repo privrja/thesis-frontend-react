@@ -6,14 +6,9 @@ import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
-import Modification from "../structure/Modification";
 import NameHelper from "../helper/NameHelper";
 import CheckInput from "../component/CheckInput";
 import {Field, Form, Formik, FormikHelpers} from "formik";
-
-interface State extends ListState {
-    list: Modification[];
-}
 
 const TXT_EDIT_MODIFICATION_NAME = 'txt-edit-modificationName';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -34,7 +29,7 @@ interface Values {
     cTerminal: boolean;
 }
 
-class ModificationPage extends ListComponent<any, State> {
+class ModificationPage extends ListComponent<any, ListState> {
 
     constructor(props: any) {
         super(props);
@@ -77,7 +72,7 @@ class ModificationPage extends ListComponent<any, State> {
             <section className={styles.page}>
                 <section className={styles.pageTable}>
                     <h1>Modifications</h1>
-                    <PopupYesNo label={"Realy want to delete modification?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupYesNo label={"Really want to delete modification?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
@@ -126,7 +121,7 @@ class ModificationPage extends ListComponent<any, State> {
                         </div> : <div/>
                     }
 
-                    {this.state.list.length > 1 ?
+                    {this.state.list.length > 0 ?
                         <table>
                             <thead>
                             <tr>

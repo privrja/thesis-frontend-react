@@ -12,3 +12,4 @@ export const CONTAINER = 'container';
 export const SFAMILY = '/family';
 export const SMODIFICATION = '/modification';
 export const SBLOCK = '/block';
+export const SSEQUENCE = '/sequence';

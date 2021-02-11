@@ -140,7 +140,7 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : <div/>
                     }
 
-                    {this.state.list.length > 1 ?
+                    {this.state.list.length > 0 ?
                         <table>
                             <thead>
                             <tr>

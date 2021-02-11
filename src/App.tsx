@@ -15,6 +15,7 @@ import BlockPage from "./page/BlockPage";
 import ModificationPage from "./page/ModificationPage";
 import EditorPage from "./page/EditorPage";
 import ReferencePage from "./page/ReferencePage";
+import SequencePage from "./page/SequencePage";
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
                 <Route path='/register/' component={RegisterPage}/>
                 <Route path='/container/:id/modification/' exact component={ModificationPage}/>
                 <Route path='/container/:id/block/' exact component={BlockPage}/>
+                <Route path='/container/:id/sequence/' exact component={SequencePage}/>
                 <Route path='/smiles/:smiles' exact component={EditorPage}/>
                 <Route path='/smiles/' exact component={EditorPage}/>
                 <Route path='/container/:id' exact component={ContainerDetailPage} />

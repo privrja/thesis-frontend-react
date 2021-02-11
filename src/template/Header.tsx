@@ -11,7 +11,7 @@ class Header extends React.Component {
                 <div className={styles.headerContainer}>
                     <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
                     <HeaderTile text={'Containers'} url={'/container'}/>
-                    <HeaderTile text={'Sequences'} url={'/sequence'}/>
+                    <HeaderTile text={'Sequences'} url={'/container/' + localStorage.getItem(SELECTED_CONTAINER ?? '4') + '/sequence'}/>
                     <HeaderTile text={'Blocks'} url={'/container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/block'}/>
                     <HeaderTile text={'Modifications'} url={'/container/'+ (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/modification'}/>
                     <HeaderTile text={'Import'} url={'/import'}/>

@@ -689,7 +689,7 @@ class MainPage extends React.Component<any, State> {
                     <section/>
                 }
 
-                {this.state.blocks.length > 1 ?
+                {this.state.blocks.length > 0 ?
                     <section id='results'>
                         <ModificationComponent blockLength={this.state.blocks.length}
                                                sequenceType={this.state.sequence?.sequenceType}
