@@ -15,6 +15,7 @@ class Family extends ListComponent<Props, ListState> {
 
     constructor(props: Props) {
         super(props);
+        this.getName = this.getName.bind(this);
         this.state = {list: [], selectedContainer: this.getSelectedContainer()};
     }
 
@@ -36,17 +37,21 @@ class Family extends ListComponent<Props, ListState> {
         this.defaultUpdate(this.getEndpointWithId(key), key, {family: family.value});
     }
 
+    getName() {
+       return this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1);
+    }
+
     render() {
         return (
             <section>
                 <PopupYesNo label={"Really want to remove family from container?"} onYes={this.delete} ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
-                <h2>Create new Block Family</h2>
+                <h2>Create new {this.getName()} Family</h2>
                 <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'} placeholder={'New Family Name'}/>
                 <button onClick={this.create} className={styles.create}>Create new Family</button>
 
-                { this.state.list.length > 0 ? <h2 id={this.props.type + 'Families'}>{this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1)} Families</h2> : '' }
+                { this.state.list.length > 0 ? <h2 id={this.props.type + 'Families'}>{this.getName()} Families</h2> : '' }
                 {this.state.list.length > 0 ?
                     <table>
                         <thead>

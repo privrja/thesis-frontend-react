@@ -340,7 +340,7 @@ class MainPage extends React.Component<any, State> {
                             this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
                             return data;
                         }).then(data => {
-                            let nameHelper = new NameHelper();
+                                let nameHelper = new NameHelper();
                                 Parallel.map(data, async (item: BlockStructure) => {
                                     if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
                                         let name = await finder.findName(item.block.identifier, item.block.structureName);
