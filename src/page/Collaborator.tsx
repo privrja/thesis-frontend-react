@@ -1,11 +1,14 @@
 import ListComponent, {ListState} from "../component/ListComponent";
-import {CONTAINER, ENDPOINT} from "../constant/ApiConstants";
+import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import PopupYesNo from "../component/PopupYesNo";
 import Flash from "../component/Flash";
 import styles from "../main.module.scss";
 import React from "react";
 import {SelectInput} from "../component/SelectInput";
-import {PermissionEnumHelper} from "../enum/PermissionEnum";
+import {PermissionEnum, PermissionEnumHelper} from "../enum/PermissionEnum";
+import Creatable from "react-select/creatable";
+import FlashType from "../component/FlashType";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 
 const SEL_EDIT_MODE = 'sel-edit-mode';
 
@@ -16,17 +19,30 @@ interface Container {
 
 interface State extends ListState {
     container: Container;
+    users: any[];
+    userId?: number;
 }
 
 interface Props {
     containerId: number;
 }
 
+const CRE_USER_ID = 'cre-user';
+
+const SEL_NEW_MODE = 'sel-new-mode';
+
 class Collaborator extends ListComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {list: [], container: {containerName: '', visibility: ''}, selectedContainer: this.getSelectedContainer()};
+        this.users = this.users.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.state = {
+            list: [],
+            container: {containerName: '', visibility: ''},
+            selectedContainer: this.getSelectedContainer(),
+            users: [],
+        };
     }
 
     findName(key: number): string {
@@ -39,28 +55,94 @@ class Collaborator extends ListComponent<Props, State> {
 
     list(): void {
         this.defaultListTransformation(this.getEndpoint(),
-            response => this.setState({container: {containerName: response.containerName, visibility: response.visibility}, list: response.collaborators}));
+            response => this.setState({
+                container: {
+                    containerName: response.containerName,
+                    visibility: response.visibility
+                }, list: response.collaborators
+            }));
     }
 
-    create(values: any): void {
+    componentDidMount(): void {
+        super.componentDidMount();
+        this.users();
+    }
+
+    create(): void {
+        let mode = document.getElementById(SEL_NEW_MODE) as HTMLSelectElement;
+        if (isNaN(Number(this.state.userId))) {
+            this.flashRef.current!.activate(FlashType.BAD, 'User is empty or not exist');
+        } else if (!mode.value) {
+            this.flashRef.current!.activate(FlashType.BAD, 'Mode have bad format or is empty');
+        } else {
+            let token = localStorage.getItem(TOKEN);
+            if (token) {
+                fetch(this.getEndpoint() + '/collaborator/' + this.state.userId, {
+                    method: 'POST',
+                    headers: {'x-auth-token': token},
+                    body: JSON.stringify({mode: mode.value}),
+                }).then(response => {
+                    if (response.status === 201) {
+                        this.flashRef.current!.activate(FlashType.OK);
+                        this.list();
+                    } else {
+                        this.badResponse(response);
+                    }
+                });
+            } else {
+                this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+            }
+        }
     }
 
     update(key: number): void {
     }
 
     delete(key: number): void {
+        this.defaultDelete(this.getEndpoint() + '/collaborator/' + key, key);
     }
 
     containerH() {
         return this.state.container.containerName + ' - ' + this.state.container.visibility;
     }
 
+    users() {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'user', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => this.setState({users: data}));
+                } else if (response.status === 401) {
+                    localStorage.removeItem(TOKEN);
+                }
+            })
+        }
+    }
+
+    handleInputChange(newValue: any) {
+        this.setState({userId: Number(newValue.value)});
+    }
+
     render() {
         return (
             <section>
                 <h1>Container {this.state.container ? this.containerH() : ''}</h1>
-                <PopupYesNo label={"Really want to remove user from container?"} onYes={this.delete} ref={this.popupRef}/>
+                <PopupYesNo label={"Really want to remove user from container?"} onYes={this.delete}
+                            ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+
+                {localStorage.getItem(TOKEN) !== null ?
+                    <div>
+                        <h2>Add new user to container</h2>
+                        <Creatable className={styles.creatable} id={CRE_USER_ID} options={this.state.users} onChange={this.handleInputChange}/>
+                        <label htmlFor={SEL_NEW_MODE}>Mode</label>
+                        <SelectInput id={SEL_NEW_MODE} name={SEL_NEW_MODE} options={PermissionEnumHelper.getOptions()} selected={PermissionEnumHelper.getName(PermissionEnum.RW)} />
+                        <button type="submit" className={styles.create} onClick={this.create}>Add new user</button>
+                    </div> : ''}
+
                 {this.state.container ? <h2 id='collaborators'>Collaborators</h2> : ''}
                 {this.state.container ?
                     <table>
@@ -76,11 +158,19 @@ class Collaborator extends ListComponent<Props, State> {
                             <tr>
                                 <td>{collaborator.nick}</td>
                                 <td onClick={() => this.edit(collaborator.id)}>{this.state.editable === collaborator.id ?
-                                    <SelectInput id={SEL_EDIT_MODE} name={SEL_EDIT_MODE} options={PermissionEnumHelper.getOptions()}/> : collaborator.mode}</td>
+                                    <SelectInput id={SEL_EDIT_MODE} name={SEL_EDIT_MODE}
+                                                 options={PermissionEnumHelper.getOptions()}
+                                                 selected={collaborator.mode}/> : collaborator.mode}</td>
                                 <td>
-                                    {this.state.editable === collaborator.id ? <button className={styles.update} onClick={() => this.update(collaborator.id)}>Update</button> : <div/>}
-                                    {this.state.editable === collaborator.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
-                                    <button className={styles.delete} onClick={() => this.popup(collaborator.id)}>Delete</button>
+                                    {this.state.editable === collaborator.id ? <button className={styles.update}
+                                                                                       onClick={() => this.update(collaborator.id)}>Update</button> :
+                                        <div/>}
+                                    {this.state.editable === collaborator.id ?
+                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                        <div/>}
+                                    <button className={styles.delete}
+                                            onClick={() => this.popup(collaborator.id)}>Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}

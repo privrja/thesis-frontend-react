@@ -72,25 +72,7 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     delete(key: number) {
-        let token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(this.getEndpointWithId(key), {
-                method: 'DELETE',
-                headers: {'x-auth-token': token},
-            }).then(response => {
-                if (response.status !== 204) {
-                    response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message);
-                    });
-                } else {
-                    this.flashRef.current!.activate(FlashType.OK);
-                    this.list();
-                    this.freeContainers();
-                }
-            })
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
-        }
+        this.defaultDelete(this.getEndpointWithId(key), key, this.list);
     }
 
     update(key: number) {

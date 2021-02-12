@@ -253,6 +253,7 @@ class MainPage extends React.Component<any, State> {
                     this.flashRef.current!.activate(FlashType.BAD);
                     response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
                 }
+                document.location.href = '#main';
             });
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
@@ -599,7 +600,7 @@ class MainPage extends React.Component<any, State> {
 
     render() {
         return (
-            <section className={styles.page + ' ' + styles.mainPage}>
+            <section className={styles.page + ' ' + styles.mainPage} id={'main'}>
                 <Helmet>
                     <title>{this.state.title}</title>
                 </Helmet>

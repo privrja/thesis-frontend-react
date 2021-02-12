@@ -1,7 +1,7 @@
 import {SelectOption} from "../component/SelectInput";
 
 export enum PermissionEnum {
-    R, RW, RWA
+    R, RW, RWM
 }
 
 export class PermissionEnumHelper {
@@ -10,7 +10,7 @@ export class PermissionEnumHelper {
         return [
             new SelectOption(PermissionEnumHelper.getName(PermissionEnum.R), PermissionEnumHelper.getName(PermissionEnum.R)),
             new SelectOption(PermissionEnumHelper.getName(PermissionEnum.RW), PermissionEnumHelper.getName(PermissionEnum.RW)),
-            new SelectOption(PermissionEnumHelper.getName(PermissionEnum.RWA), PermissionEnumHelper.getName(PermissionEnum.RWA)),
+            new SelectOption(PermissionEnumHelper.getName(PermissionEnum.RWM), PermissionEnumHelper.getName(PermissionEnum.RWM)),
         ];
     }
 
@@ -21,8 +21,8 @@ export class PermissionEnumHelper {
                 return 'R';
             case PermissionEnum.RW:
                 return 'RW';
-            case PermissionEnum.RWA:
-                return 'RWA';
+            case PermissionEnum.RWM:
+                return 'RWM';
         }
     }
 

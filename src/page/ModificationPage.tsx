@@ -48,10 +48,6 @@ class ModificationPage extends ListComponent<any, ListState> {
         this.defaultCreate(this.getEndpoint(), values);
     }
 
-    delete(key: number) {
-        this.defaultDelete(this.getEndpointWithId(key), key);
-    }
-
     update(key: number) {
         let modificationName = document.getElementById(TXT_EDIT_MODIFICATION_NAME) as HTMLInputElement;
         let formula = document.getElementById(TXT_EDIT_FORMULA) as HTMLInputElement;
@@ -118,7 +114,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                                 </Form>
                             </Formik>
 
-                        </div> : <div/>
+                        </div> : ''
                     }
 
                     {this.state.list.length > 0 ?
@@ -170,7 +166,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                             ))}
                             </tbody>
                         </table>
-                        : <div/>
+                        : ''
                     }
                 </section>
             </section>

@@ -108,7 +108,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     defaultUpdate(endpoint: string, key: number, body: any, successCallback: () => void = () => {}) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            fetch(this.getEndpointWithId(key), {
+            fetch(endpoint, {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(body)
@@ -129,8 +129,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     defaultDelete(endpoint: string, key: number, successCallback: () => void = () => {}) {
         const token = localStorage.getItem(TOKEN);
-        if (token !== null) {
-            fetch(this.getEndpointWithId(key), {
+        if (token) {
+            fetch(endpoint, {
                 method: 'DELETE',
                 headers: {'x-auth-token': token}
             }).then(response => {
@@ -143,11 +143,12 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
                 }
             });
         } else {
-            this.flashRef.current!.activate(FlashType.BAD, '')
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED)
         }
     }
 
     protected badResponse(response: any) {
+        this.flashRef.current!.activate(FlashType.BAD, '');
         if (response.status === 401) {
             localStorage.removeItem(TOKEN);
         }
