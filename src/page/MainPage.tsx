@@ -95,6 +95,7 @@ class MainPage extends React.Component<any, State> {
         this.update = this.update.bind(this);
         this.save = this.save.bind(this);
         this.editorClose = this.editorClose.bind(this);
+        this.blockFinder = this.blockFinder.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -226,7 +227,9 @@ class MainPage extends React.Component<any, State> {
                 nModification: nModification,
                 cModification: cModification,
                 bModification: bModification,
-                family: this.state.family.map(family => { return family.value}),
+                family: this.state.family.map(family => {
+                    return family.value
+                }),
                 blocks: this.state.blocks.map(block => {
                     return {
                         databaseId: block.databaseId,
@@ -263,6 +266,131 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    async blockFinder(data: any[], sequence: SequenceStructure) {
+        document.location.href = '#results';
+        let finder = new PubChemFinder();
+        Parallel.map(data, async (item: any) => {
+            if (item.sameAs === null && item.block === null) {
+                return {
+                    id: item.id,
+                    databaseId: null,
+                    acronym: item.id?.toString(),
+                    smiles: item.smiles,
+                    unique: item.unique,
+                    sameAs: null,
+                    block: await finder.findBySmiles(item.smiles).then(data => data[0])
+                } as BlockStructure;
+            } else {
+                if (item.block === null) {
+                    return {
+                        id: item.id,
+                        databaseId: null,
+                        acronym: item.acronym ?? item.sameAs?.toString(),
+                        smiles: item.smiles,
+                        unique: item.unique,
+                        sameAs: item.sameAs,
+                        block: item.block
+                    } as BlockStructure;
+                } else {
+                    return {
+                        id: item.id,
+                        databaseId: item.block?.databaseId,
+                        acronym: item.acronym ?? item.sameAs?.toString(),
+                        smiles: item.smiles,
+                        unique: item.unique,
+                        sameAs: item.sameAs,
+                        block: item.block
+                    } as BlockStructure;
+                }
+            }
+        }, 2).then(async data => {
+            data.forEach(e => {
+                console.log(e.sameAs);
+                if (e.sameAs) {
+                    e.block = data[e.sameAs].block
+                }
+            });
+            return data;
+        }).then(data => {
+            let sequence = this.state.sequence;
+            data.forEach((block: BlockStructure) => {
+                    if (block.sameAs !== null) {
+                        if (sequence) {
+                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
+                        }
+                    }
+                }
+            );
+            this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
+            return data;
+        }).then(data => {
+                let nameHelper = new NameHelper();
+                Parallel.map(data, async (item: BlockStructure) => {
+                    if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
+                        let name = await finder.findName(item.block.identifier, item.block.structureName);
+                        return {
+                            id: item.id,
+                            databaseId: null,
+                            acronym: await nameHelper.acronymFromName(name),
+                            smiles: item.smiles,
+                            unique: item.unique,
+                            sameAs: null,
+                            block: {
+                                identifier: item.block.identifier,
+                                database: item.block.database,
+                                structureName: name,
+                                smiles: item.block.smiles,
+                                formula: item.block.formula,
+                                mass: item.block.mass
+                            }
+                        } as BlockStructure;
+                    } else {
+                        return item;
+                    }
+                }, 2).then(async data => {
+                    if (this.state.sequence) {
+                        sequence = this.state.sequence;
+                    }
+                    data.forEach(e => {
+                        if (e.sameAs !== null) {
+                            e.block = data[e.sameAs].block;
+                            e.acronym = data[e.sameAs].acronym;
+                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
+                        } else {
+                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', e.id.toString(), e.acronym);
+                        }
+                    });
+                    return data;
+                }).then(data => {
+                    this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
+                    this.flashRef.current!.activate(FlashType.OK, 'Done');
+                    return data;
+                });
+            }
+        );
+
+        let token = localStorage.getItem(TOKEN);
+        if (this.state.selectedContainer) {
+            if (token) {
+                await FetchHelper.fetchModification(this.state.selectedContainer, {
+                    method: 'GET',
+                    headers: {'x-auth-token': token}
+                }, (response: any) => {
+                    response.then((data: Modification[]) => {
+                        this.setState({modifications: data})
+                    })
+                });
+            } else {
+                await FetchHelper.fetchModification(this.state.selectedContainer, {method: 'GET'}, (response: any) => {
+                    response.then((data: Modification[]) => {
+                        this.setState({modifications: data})
+                    });
+                });
+            }
+        }
+
+    }
+
     /**
      * Build blocks from structure and show them
      */
@@ -275,6 +403,7 @@ class MainPage extends React.Component<any, State> {
             return;
         }
         let blockStructures = smilesDrawer.buildBlockSmiles();
+        console.log(blockStructures);
         let sequence = {
             sequence: blockStructures.sequence,
             sequenceType: blockStructures.sequenceType
@@ -288,134 +417,31 @@ class MainPage extends React.Component<any, State> {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
                         this.setState({results: [], blocks: data, sequence: sequence});
-                        document.location.href = '#results';
-                        let finder = new PubChemFinder();
-                        Parallel.map(data, async (item: any) => {
-                            if (item.sameAs === null && item.block === null) {
-                                return {
-                                    id: item.id,
-                                    databaseId: null,
-                                    acronym: item.id?.toString(),
-                                    smiles: item.smiles,
-                                    unique: item.unique,
-                                    sameAs: null,
-                                    block: await finder.findBySmiles(item.smiles).then(data => data[0])
-                                } as BlockStructure;
-                            } else {
-                                if (item.block === null) {
-                                    return {
-                                        id: item.id,
-                                        databaseId: null,
-                                        acronym: item.acronym ?? item.sameAs?.toString(),
-                                        smiles: item.smiles,
-                                        unique: item.unique,
-                                        sameAs: item.sameAs,
-                                        block: item.block
-                                    } as BlockStructure;
-                                } else {
-                                    return {
-                                        id: item.id,
-                                        databaseId: item.block?.databaseId,
-                                        acronym: item.acronym ?? item.sameAs?.toString(),
-                                        smiles: item.smiles,
-                                        unique: item.unique,
-                                        sameAs: item.sameAs,
-                                        block: item.block
-                                    } as BlockStructure;
-                                }
-                            }
-                        }, 2).then(async data => {
-                            data.forEach(e => {
-                                if (e.sameAs !== null) {
-                                    e.block = data[e.sameAs].block
-                                }
-                            });
-                            return data;
-                        }).then(data => {
-                            let sequence = this.state.sequence;
-                            data.forEach((block: BlockStructure) => {
-                                    if (block.sameAs !== null) {
-                                        if (sequence) {
-                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
-                                        }
-                                    }
-                                }
-                            );
-                            this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
-                            return data;
-                        }).then(data => {
-                                let nameHelper = new NameHelper();
-                                Parallel.map(data, async (item: BlockStructure) => {
-                                    if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
-                                        let name = await finder.findName(item.block.identifier, item.block.structureName);
-                                        return {
-                                            id: item.id,
-                                            databaseId: null,
-                                            acronym: await nameHelper.acronymFromName(name),
-                                            smiles: item.smiles,
-                                            unique: item.unique,
-                                            sameAs: null,
-                                            block: {
-                                                identifier: item.block.identifier,
-                                                database: item.block.database,
-                                                structureName: name,
-                                                smiles: item.block.smiles,
-                                                formula: item.block.formula,
-                                                mass: item.block.mass
-                                            }
-                                        } as BlockStructure;
-                                    } else {
-                                        return item;
-                                    }
-                                }, 2).then(async data => {
-                                    if (this.state.sequence) {
-                                        sequence = this.state.sequence;
-                                    }
-                                    data.forEach(e => {
-                                        if (e.sameAs !== null) {
-                                            e.block = data[e.sameAs].block;
-                                            e.acronym = data[e.sameAs].acronym;
-                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
-                                        } else {
-                                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', e.id.toString(), e.acronym);
-                                        }
-                                    });
-                                    return data;
-                                }).then(data => {
-                                    this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
-                                    this.flashRef.current!.activate(FlashType.OK, 'Done');
-                                    return data;
-                                });
-                            }
-                        );
-
-                        let token = localStorage.getItem(TOKEN);
-                        if (this.state.selectedContainer) {
-                            if (token) {
-                                await FetchHelper.fetchModification(this.state.selectedContainer, {
-                                    method: 'GET',
-                                    headers: {'x-auth-token': token}
-                                }, (response: any) => {
-                                    response.then((data: Modification[]) => {
-                                        this.setState({modifications: data})
-                                    })
-                                });
-                            } else {
-                                await FetchHelper.fetchModification(this.state.selectedContainer, {method: 'GET'}, (response: any) => {
-                                    response.then((data: Modification[]) => {
-                                        this.setState({modifications: data})
-                                    });
-                                });
-                            }
-                        }
+                        this.blockFinder(data, sequence);
                     }
                 );
-            } else {
-                responseUnique.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
             }
+        }).catch(() => {
+            this.transformSmiles(blockStructures.blockSmiles, sequence)
         });
     }
 
+    transformSmiles(smiles: string[], sequence: SequenceStructure) {
+        let data = [];
+        for (let index = 0; index < smiles.length; index++) {
+            data.push({
+                id: index,
+                databaseId: null,
+                acronym: index.toString(),
+                smiles: smiles[index],
+                unique: smiles[index],
+                sameAs: null,
+                block: null
+            } as BlockStructure);
+            this.setState({blocks: data});
+            this.blockFinder(data, sequence);
+        }
+    }
 
     /**
      * Find structures on third party databases, by data in form

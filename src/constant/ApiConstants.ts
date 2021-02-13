@@ -1,7 +1,7 @@
 
 /* API URIs */
 export const ENDPOINT = 'http://localhost:8000/rest/';
-export const URL_PREFIX = 'https://privrja.github.io/thesis-frontend-react/';
+export const URL_PREFIX = '/';
 
 export const TOKEN = 'token';
 export const SELECTED_CONTAINER = 'selectedContainer';
