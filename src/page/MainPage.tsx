@@ -46,6 +46,7 @@ interface State {
     editSame: boolean;
     title: string;
     editorBlockId?: number;
+    family: any[];
 }
 
 interface SequenceStructure {
@@ -100,6 +101,7 @@ class MainPage extends React.Component<any, State> {
             editSame: true,
             title: PAGE_TITLE,
             selectedContainer: this.getSelectedContainer(),
+            family: [],
         };
     }
 
@@ -224,6 +226,7 @@ class MainPage extends React.Component<any, State> {
                 nModification: nModification,
                 cModification: cModification,
                 bModification: bModification,
+                family: this.state.family.map(family => { return family.value}),
                 blocks: this.state.blocks.map(block => {
                     return {
                         databaseId: block.databaseId,
@@ -692,10 +695,12 @@ class MainPage extends React.Component<any, State> {
 
                 {this.state.blocks.length > 0 ?
                     <section id='results'>
-                        <ModificationComponent blockLength={this.state.blocks.length}
+                        <ModificationComponent containerId={this.state.selectedContainer}
+                                               blockLength={this.state.blocks.length}
                                                sequenceType={this.state.sequence?.sequenceType}
                                                sequence={this.state.sequence?.sequence}
-                                               modifications={this.state.modifications}/>
+                                               modifications={this.state.modifications}
+                                               onFamilyChange={(family: any[]) => this.setState({family: family})}/>
                         <table>
                             <thead>
                             <tr>

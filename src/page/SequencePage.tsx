@@ -28,8 +28,6 @@ class SequencePage extends ListComponent<any, ListState> {
                     <h1>Sequences</h1>
                     <PopupYesNo label={"Really want to delete sequence?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    {console.log(this.state.list)}
-
                     {this.state.list.length > 0 ?
                         <table>
                             <thead>
@@ -39,7 +37,10 @@ class SequencePage extends ListComponent<any, ListState> {
                                 <th>Type</th>
                                 <th>Formula</th>
                                 <th>Mass</th>
-                                <th>SMILES</th>
+                                <th>Family</th>
+                                <th>N</th>
+                                <th>C</th>
+                                <th>Branch</th>
                                 <th>Identifier</th>
                                 <th>Actions</th>
                             </tr>
@@ -52,7 +53,10 @@ class SequencePage extends ListComponent<any, ListState> {
                                     <td>{sequence.sequenceType}</td>
                                     <td>{sequence.formula}</td>
                                     <td>{sequence.mass}</td>
-                                    <td>{sequence.smiles}</td>
+                                    <td>{sequence.family}</td>
+                                    <td>{sequence.nModification}</td>
+                                    <td>{sequence.cModification}</td>
+                                    <td>{sequence.bModification}</td>
                                     <td>{sequence.identifier}</td>
                                     <td>
                                         {this.state.editable === sequence.id ? <button className={styles.update}

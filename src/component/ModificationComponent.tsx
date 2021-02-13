@@ -5,16 +5,22 @@ import ModificationInput from "./ModificationInput";
 import * as React from "react";
 import Modification from "../structure/Modification";
 import TextInput from "./TextInput";
+import Creatable from "react-select/creatable";
+import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
 
 interface Props {
+    containerId: number;
     blockLength: number;
     sequenceType?: string;
     sequence?: string;
     modifications?: Modification[];
+    onFamilyChange?: (family: any[]) => void;
 }
 
 interface State {
     sequence: string
+    familyOptions: any[];
+    family: any[];
 }
 
 class ModificationComponent extends React.Component<Props, State> {
@@ -28,15 +34,43 @@ class ModificationComponent extends React.Component<Props, State> {
         this.nModificationRef = React.createRef();
         this.cModificationRef = React.createRef();
         this.bModificationRef = React.createRef();
+        this.family = this.family.bind(this);
+        this.handleFamilyChange = this.handleFamilyChange.bind(this);
         this.updateModifications = this.updateModifications.bind(this);
-        this.state = {sequence: props.sequence ?? ''}
+        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: []}
     }
 
     componentDidMount(): void {
+        this.family();
         let txtType = document.getElementById('sel-sequence-type') as HTMLSelectElement;
         let typeEnum = SequenceEnumHelper.getValue(this.props.sequenceType ?? SequenceEnumHelper.getName(SequenceEnum.OTHER));
         txtType.value = typeEnum.toString();
         this.disable(typeEnum);
+    }
+
+    family() {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + CONTAINER + '/' + this.props.containerId + '/sequence/family', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => this.setState({
+                        familyOptions: data.map((family: any) => {
+                            return {value: family.id, label: family.family}
+                        })
+                    }));
+                }
+            });
+        }
+    }
+
+    handleFamilyChange(newValue: any) {
+        this.setState({family: newValue});
+        if (this.props.onFamilyChange) {
+            this.props.onFamilyChange(newValue);
+        }
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -94,6 +128,11 @@ class ModificationComponent extends React.Component<Props, State> {
                                  options={SequenceEnumHelper.getOptions()} onChange={this.updateModifications}/>
                     <label htmlFor="txt-sequence">Sequence</label>
                     <TextInput id="txt-sequence" name="sequence" size={60} value={this.state.sequence}/>
+                    <div className={styles.padding}>
+                        <label htmlFor={'cre-family'}>Family</label>
+                        <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions}
+                                   onChange={this.handleFamilyChange} isMulti={true}/>
+                    </div>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
                                    ref={this.nModificationRef}/>
