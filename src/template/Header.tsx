@@ -1,7 +1,7 @@
 import * as React from "react";
 import HeaderTile from "./HeaderTile";
 import styles from "../main.module.scss"
-import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {SELECTED_CONTAINER, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
 
 class Header extends React.Component {
 
@@ -9,14 +9,14 @@ class Header extends React.Component {
         return (
             <header>
                 <div className={styles.headerContainer}>
-                    <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
-                    <HeaderTile text={'Containers'} url={'/container'}/>
-                    <HeaderTile text={'Sequences'} url={'/container/' + localStorage.getItem(SELECTED_CONTAINER ?? '4') + '/sequence'}/>
-                    <HeaderTile text={'Blocks'} url={'/container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/block'}/>
-                    <HeaderTile text={'Modifications'} url={'/container/'+ (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/modification'}/>
-                    <HeaderTile text={'Import'} url={'/import'}/>
-                    <HeaderTile text={'Settings'} url={'/setup'}/>
-                    {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={'/logout'}/> : <HeaderTile text={'Login'} url={'/login'}/>}
+                    <HeaderTile text={'MassSpecBlocks'} url={URL_PREFIX}/>
+                    <HeaderTile text={'Containers'} url={URL_PREFIX + 'container'}/>
+                    <HeaderTile text={'Sequences'} url={URL_PREFIX + 'container/' + localStorage.getItem(SELECTED_CONTAINER ?? '4') + '/sequence'}/>
+                    <HeaderTile text={'Blocks'} url={URL_PREFIX + 'container/' + (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/block'}/>
+                    <HeaderTile text={'Modifications'} url={'/' + URL_PREFIX + 'container/'+ (localStorage.getItem(SELECTED_CONTAINER) ?? '4') + '/modification'}/>
+                    <HeaderTile text={'Import'} url={URL_PREFIX + 'import'}/>
+                    <HeaderTile text={'Settings'} url={URL_PREFIX + 'setup'}/>
+                    {localStorage.getItem(TOKEN) ? <HeaderTile text={'Logout'} url={URL_PREFIX + 'logout'}/> : <HeaderTile text={'Login'} url={URL_PREFIX + 'login'}/>}
                 </div>
             </header>
         )

@@ -1,7 +1,16 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {SBLOCK, CONTAINER, ENDPOINT, TOKEN, EDITOR_BACK, EDITOR_ITEM, EDITOR_SMILES} from "../constant/ApiConstants";
+import {
+    SBLOCK,
+    CONTAINER,
+    ENDPOINT,
+    TOKEN,
+    EDITOR_BACK,
+    EDITOR_ITEM,
+    EDITOR_SMILES,
+    URL_PREFIX
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import PopupYesNo from "../component/PopupYesNo";
@@ -120,9 +129,9 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     editor(key: number) {
-        localStorage.setItem(EDITOR_BACK, '/container/' + this.state.selectedContainer + '/block');
+        localStorage.setItem(EDITOR_BACK, URL_PREFIX + 'container/' + this.state.selectedContainer + '/block');
         localStorage.setItem(EDITOR_ITEM, key.toString());
-        document.location.href = '/smiles/' + this.find(key).smiles;
+        document.location.href = URL_PREFIX + 'smiles/' + this.find(key).smiles;
     }
 
     render() {

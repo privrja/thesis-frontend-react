@@ -16,6 +16,7 @@ import ModificationPage from "./page/ModificationPage";
 import EditorPage from "./page/EditorPage";
 import ReferencePage from "./page/ReferencePage";
 import SequencePage from "./page/SequencePage";
+import {URL_PREFIX} from "./constant/ApiConstants";
 
 function App() {
 
@@ -27,19 +28,19 @@ function App() {
             </Helmet>
 
             <Router>
-                <Route exact path='/' component={MainPage}/>
-                <Route path='/login/' component={LoginPage}/>
-                <Route path='/logout/' component={LogoutPage}/>
-                <Route path='/register/' component={RegisterPage}/>
-                <Route path='/container/:id/modification/' exact component={ModificationPage}/>
-                <Route path='/container/:id/block/' exact component={BlockPage}/>
-                <Route path='/container/:id/sequence/' exact component={SequencePage}/>
-                <Route path='/smiles/:smiles' exact component={EditorPage}/>
-                <Route path='/smiles/' exact component={EditorPage}/>
-                <Route path='/container/:id' exact component={ContainerDetailPage} />
-                <Route path='/container/' exact component={ContainerPage}/>
-                <Route path='/condition/' component={ConditionsPage}/>
-                <Route path='/reference/' component={ReferencePage}/>
+                <Route exact path={URL_PREFIX} component={MainPage}/>
+                <Route path={URL_PREFIX + '/login/'} component={LoginPage}/>
+                <Route path={URL_PREFIX + '/logout/'} component={LogoutPage}/>
+                <Route path={URL_PREFIX + '/register/'} component={RegisterPage}/>
+                <Route path={URL_PREFIX + '/container/:id/modification/'} exact component={ModificationPage}/>
+                <Route path={URL_PREFIX + '/container/:id/block/'} exact component={BlockPage}/>
+                <Route path={URL_PREFIX + '/container/:id/sequence/'} exact component={SequencePage}/>
+                <Route path={URL_PREFIX + '/smiles/:smiles'} exact component={EditorPage}/>
+                <Route path={URL_PREFIX + '/smiles/'} exact component={EditorPage}/>
+                <Route path={URL_PREFIX + '/container/:id'} exact component={ContainerDetailPage} />
+                <Route path={URL_PREFIX + '/container/'} exact component={ContainerPage}/>
+                <Route path={URL_PREFIX + '/condition/'} component={ConditionsPage}/>
+                <Route path={URL_PREFIX + '/reference/'} component={ReferencePage}/>
             </Router>
 
             <Footer/>

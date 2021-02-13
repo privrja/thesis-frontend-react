@@ -3,7 +3,7 @@ import styles from "../main.module.scss";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import FlashType from "../component/FlashType";
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
 
 interface Values {
     name: string;
@@ -99,15 +99,12 @@ class RegisterPage extends React.Component<any> {
 
                             <label htmlFor="conditions">
                                 <Field id="conditions" name="conditions" type="checkbox"/>
-                                I'm agree with <a href="/condition" target="_blank">terms and conditions</a></label>
-
-
+                                I'm agree with <a href={URL_PREFIX + 'condition'} target="_blank"
+                                                  rel={'noopener noreferrer'}>terms and conditions</a></label>
                             <button type="submit">Register</button>
                         </Form>
                     </Formik>
-
-                    <a href='/login'>Already have an account? Login here.</a>
-
+                    <a href={URL_PREFIX + 'login'}>Already have an account? Login here.</a>
                 </section>
             </section>
         );

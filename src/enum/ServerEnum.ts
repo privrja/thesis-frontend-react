@@ -60,7 +60,7 @@ export class ServerEnumHelper {
             case ServerEnum.CHEMSPIDER:
                 return "https://www.chemspider.com/Chemical-Structure." + identifier + ".html";
             case ServerEnum.NORINE:
-                return "https://bioinfo.lifl.fr/norine/result.jsp?ID=" + identifier;
+                return "https://bioinfo.cristal.univ-lille.fr/norine/result.jsp?ID=" + identifier;
             case ServerEnum.PDB:
                 return "https://www.rcsb.org/ligand/" + identifier;
             case ServerEnum.CHEBI:

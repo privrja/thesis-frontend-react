@@ -2,7 +2,7 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import {Field, Form, Formik, FormikHelpers} from "formik/dist";
 import styles from "../main.module.scss"
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Sleep from "../helper/Sleep";
@@ -36,7 +36,7 @@ class LoginPage extends React.Component<any> {
                         localStorage.setItem('token', token);
                         this.flashRef.current!.activate(FlashType.OK);
                         Sleep.sleep(500).then(() => {
-                            window.location.href = '/'
+                            window.location.href = URL_PREFIX
                         });
                     } else {
                         this.flashRef.current!.activate(FlashType.BAD);
@@ -81,7 +81,7 @@ class LoginPage extends React.Component<any> {
                         </Form>
                     </Formik>
 
-                    <a href='/register'>Don't have an account? Register here.</a>
+                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here.</a>
 
                 </section>
             </section>

@@ -1,6 +1,7 @@
 
 /* API URIs */
 export const ENDPOINT = 'http://localhost:8000/rest/';
+export const URL_PREFIX = '/thesis-frontend-react/';
 
 export const TOKEN = 'token';
 export const SELECTED_CONTAINER = 'selectedContainer';

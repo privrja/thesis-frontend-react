@@ -1,7 +1,7 @@
 import React from "react";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
-import {TOKEN} from "../constant/ApiConstants";
+import {TOKEN, URL_PREFIX} from "../constant/ApiConstants";
 import Sleep from "../helper/Sleep";
 
 class LogoutPage extends React.Component<any> {
@@ -22,7 +22,7 @@ class LogoutPage extends React.Component<any> {
         localStorage.removeItem(TOKEN);
         this.flashRef.current!.activate(FlashType.OK);
         Sleep.sleep(500).then(() => {
-            window.location.href = '/'
+            window.location.href = URL_PREFIX
         });
     }
 

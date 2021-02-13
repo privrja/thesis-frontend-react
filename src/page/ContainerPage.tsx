@@ -1,7 +1,7 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, ENDPOINT, SELECTED_CONTAINER, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
@@ -177,7 +177,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
                                     {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
                                     <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
-                                    <button onClick={() => window.location.href = '/container/' + container.id}>Details</button>
+                                    <button onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details</button>
                                     <button>Go on</button>
                                     <button>Clone</button>
                                     <button>Export</button>

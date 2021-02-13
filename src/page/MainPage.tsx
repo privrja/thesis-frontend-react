@@ -628,7 +628,7 @@ class MainPage extends React.Component<any, State> {
                         <label htmlFor='name' className={styles.main}>Name</label>
                         <input id="name" name="name" className={styles.main} onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                this.find()
+                                this.find();
                             }
                         }}/>
 
@@ -636,28 +636,28 @@ class MainPage extends React.Component<any, State> {
                         <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
                                   onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
-                                          this.find()
+                                          this.find();
                                       }
                                   }}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                this.find()
+                                this.find();
                             }
                         }}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                this.find()
+                                this.find();
                             }
                         }}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
                         <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                this.find()
+                                this.find();
                             }
                         }}/>
 
