@@ -36,10 +36,11 @@
     "typescript": "^3.9.9"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "firebase deploy",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "deploy": "firebase deploy",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
