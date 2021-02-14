@@ -10,6 +10,7 @@ import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import {saveAs} from 'file-saver'
 
 interface Container {
     id: number,
@@ -46,6 +47,7 @@ class ContainerPage extends ListComponent<any, State> {
     constructor(props: any) {
         super(props);
         this.freeContainers = this.freeContainers.bind(this);
+        this.exportModifications = this.exportModifications.bind(this);
         this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
     }
 
@@ -68,7 +70,10 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     create(values: Values): void {
-        this.defaultCreate(this.getEndpoint(), {containerName: values.containerName, visibility: values.visibility}, this.freeContainers);
+        this.defaultCreate(this.getEndpoint(), {
+            containerName: values.containerName,
+            visibility: values.visibility
+        }, this.freeContainers);
     }
 
     delete(key: number) {
@@ -108,6 +113,22 @@ class ContainerPage extends ListComponent<any, State> {
 
     getEndpoint(): string {
         return ENDPOINT + CONTAINER;
+    }
+
+    exportModifications(key: number) {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(this.getEndpointWithId(key) + '/modification/export', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    return response.blob().then(blob => saveAs(blob, 'data.txt'));
+                } else {
+                    this.flashRef.current!.activate(FlashType.BAD, 'Export failed');
+                }
+            });
+        }
     }
 
     render() {
@@ -168,20 +189,34 @@ class ContainerPage extends ListComponent<any, State> {
                             <tr key={container.id}>
                                 <td>{container.id}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME} id={TXT_EDIT_CONTAINER_NAME}/>: container.containerName}</td>
+                                    <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
+                                               id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
                                 <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY} options={visibilityOptions} selected={container.visibility}/> : container.visibility}</td>
+                                    <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
+                                                 options={visibilityOptions}
+                                                 selected={container.visibility}/> : container.visibility}</td>
                                 <td>{container.mode}</td>
                                 <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
                                 <td>
-                                    {this.state.editable === container.id ? <button className={styles.update} onClick={() => this.update(container.id)}>Update</button> : <div/>}
-                                    {this.state.editable === container.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
-                                    <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
-                                    <button onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details</button>
+                                    {this.state.editable === container.id ? <button className={styles.update}
+                                                                                    onClick={() => this.update(container.id)}>Update</button> :
+                                        <div/>}
+                                    {this.state.editable === container.id ?
+                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                        <div/>}
+                                    <button onClick={() => {
+                                        this.selectContainer(container.id);
+                                        window.location.reload();
+                                    }}>Select
+                                    </button>
+                                    <button
+                                        onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
+                                    </button>
                                     <button>Go on</button>
                                     <button>Clone</button>
-                                    <button>Export</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete</button>
+                                    <button onClick={() => this.exportModifications(container.id)}>Export</button>
+                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}
@@ -206,9 +241,13 @@ class ContainerPage extends ListComponent<any, State> {
                                 <td>{container.containerName}</td>
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>
-                                    <button onClick={() => {this.selectContainer(container.id); window.location.reload();}}>Select</button>
+                                    <button onClick={() => {
+                                        this.selectContainer(container.id);
+                                        window.location.reload();
+                                    }}>Select
+                                    </button>
                                     <button>Clone</button>
-                                    <button>Export</button>
+                                    <button onClick={() => this.exportModifications(container.id)}>Export</button>
                                 </td>
                             </tr>
                         ))}
