@@ -1,6 +1,6 @@
 
 /* API URIs */
-export const ENDPOINT = 'https://harrenhal.asuscomm.com:8000/rest/';
+export const ENDPOINT = 'http://harrenhal.asuscomm.com:8000/rest/';
 export const URL_PREFIX = '/';
 
 export const TOKEN = 'token';
