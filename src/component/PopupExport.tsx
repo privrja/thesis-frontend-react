@@ -54,18 +54,20 @@ class PopupExport extends React.Component<Props, State> {
 
     getFile(url: string) {
         let token = localStorage.getItem(TOKEN);
+        let headers: any = {method: 'GET'};
         if (token) {
-            fetch(ENDPOINT + 'container/' + this.state.containerId + url, {
+            headers = {
                 method: 'GET',
                 headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 200) {
-                    return response.blob().then(blob => saveAs(blob, 'data.txt'));
-                } else {
-                    this.props.onFail();
-                }
-            });
+            };
         }
+        fetch(ENDPOINT + 'container/' + this.state.containerId + url, headers).then(response => {
+            if (response.status === 200) {
+                return response.blob().then(blob => saveAs(blob, 'data.txt'));
+            } else {
+                this.props.onFail();
+            }
+        });
         this.deactivate();
     }
 
@@ -74,20 +76,31 @@ class PopupExport extends React.Component<Props, State> {
             return (
                 <div className={styles.popup}>{this.props.label}
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.all}>All</button>
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Sequences</button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Sequences
+                    </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Blocks</button>
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.modifications}>Modifications</button>
-                    <button className={styles.popupNo + ' ' + styles.popupButton} onClick={this.deactivate}>Cancel</button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton}
+                            onClick={this.modifications}>Modifications
+                    </button>
+                    <button className={styles.popupNo + ' ' + styles.popupButton} onClick={this.deactivate}>Cancel
+                    </button>
                 </div>
             )
         } else {
             return (
                 <div className={styles.hidden + ' ' + styles.popup}>{this.props.label}
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.all}>Export All</button>
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Export Sequences</button>
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Export Blocks</button>
-                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.modifications}>Export Modifications</button>
-                    <button className={styles.popupNo + ' ' + styles.popupButton} onClick={this.deactivate}>Cancel</button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.all}>Export All
+                    </button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Export
+                        Sequences
+                    </button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Export Blocks
+                    </button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.modifications}>Export
+                        Modifications
+                    </button>
+                    <button className={styles.popupNo + ' ' + styles.popupButton} onClick={this.deactivate}>Cancel
+                    </button>
                 </div>
             )
         }

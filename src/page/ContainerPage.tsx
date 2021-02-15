@@ -251,7 +251,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     }}>Select
                                     </button>
                                     <button>Clone</button>
-                                    <button onClick={() => this.exportModifications(container.id)}>Export</button>
+                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
                                 </td>
                             </tr>
                         ))}
