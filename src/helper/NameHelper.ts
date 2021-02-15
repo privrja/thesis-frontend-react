@@ -20,7 +20,7 @@ class NameHelper {
         } else {
             acronym = name.charAt(0).toUpperCase() + name.substr(1, 2).toLowerCase();
         }
-        return await mutex.runExclusive(() => this.duplicate(acronym))
+        return mutex.runExclusive(() => this.duplicate(acronym))
     }
 
     private duplicate(acronym: string): string {

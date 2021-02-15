@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React  from "react";
 import Modification from "../structure/Modification";
 import {SelectInput, SelectOption} from "./SelectInput";
 import OptionsHelper from "../helper/OptionsHelper";

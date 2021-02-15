@@ -189,6 +189,12 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    enterFind(e: any) {
+        if (e.key === 'Enter') {
+            this.find();
+        }
+    }
+
     save() {
         const token = localStorage.getItem(TOKEN);
         if (token) {
@@ -652,40 +658,19 @@ class MainPage extends React.Component<any, State> {
                                      options={SearchEnumHelper.getOptions()}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                this.find();
-                            }
-                        }}/>
+                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
-                                  onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                          this.find();
-                                      }
-                                  }}/>
+                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
-                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                this.find();
-                            }
-                        }}/>
+                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                this.find();
-                            }
-                        }}/>
+                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
-                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                this.find();
-                            }
-                        }}/>
+                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>

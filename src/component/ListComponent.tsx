@@ -84,7 +84,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
     }
 
-    defaultCreate(endpoint: string, body: any, successCallback: () => void = () => {}) {
+    defaultCreate(endpoint: string, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(endpoint, {
@@ -105,7 +105,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         }
     }
 
-    defaultUpdate(endpoint: string, key: number, body: any, successCallback: () => void = () => {}) {
+    defaultUpdate(endpoint: string, key: number, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(endpoint, {
@@ -127,7 +127,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.editEnd();
     }
 
-    defaultDelete(endpoint: string, key: number, successCallback: () => void = () => {}) {
+    defaultDelete(endpoint: string, key: number, successCallback: () => void = () => { /* Empty on purpose */ }) {
         const token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(endpoint, {
