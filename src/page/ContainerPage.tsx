@@ -10,7 +10,7 @@ import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
-import {saveAs} from 'file-saver'
+import PopupExport from "../component/PopupExport";
 
 interface Container {
     id: number,
@@ -44,8 +44,11 @@ const TXT_EDIT_CONTAINER_NAME = 'txt-edit-containerName';
 
 class ContainerPage extends ListComponent<any, State> {
 
+    popupExportRef: React.RefObject<PopupExport>;
+
     constructor(props: any) {
         super(props);
+        this.popupExportRef = React.createRef();
         this.freeContainers = this.freeContainers.bind(this);
         this.exportModifications = this.exportModifications.bind(this);
         this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
@@ -137,6 +140,7 @@ class ContainerPage extends ListComponent<any, State> {
                 <section className={styles.pageTable}>
                     <h1>Container</h1>
                     <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupExport label={'Export'} onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')} ref={this.popupExportRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
@@ -214,7 +218,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     </button>
                                     <button>Go on</button>
                                     <button>Clone</button>
-                                    <button onClick={() => this.exportModifications(container.id)}>Export</button>
+                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
                                     <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
                                     </button>
                                 </td>
