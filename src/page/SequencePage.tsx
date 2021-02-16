@@ -82,9 +82,11 @@ class SequencePage extends ListComponent<any, ListState> {
     }
 
     create(values: any): void {
+        /* Empty on purpose */
     }
 
     update(key: number): void {
+        /* Empty on purpose */
     }
 
 }
