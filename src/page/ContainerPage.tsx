@@ -50,7 +50,6 @@ class ContainerPage extends ListComponent<any, State> {
         super(props);
         this.popupExportRef = React.createRef();
         this.freeContainers = this.freeContainers.bind(this);
-        this.exportModifications = this.exportModifications.bind(this);
         this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
     }
 
@@ -116,22 +115,6 @@ class ContainerPage extends ListComponent<any, State> {
 
     getEndpoint(): string {
         return ENDPOINT + CONTAINER;
-    }
-
-    exportModifications(key: number) {
-        let token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(this.getEndpointWithId(key) + '/modification/export', {
-                method: 'GET',
-                headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 200) {
-                    return response.blob().then(blob => saveAs(blob, 'data.txt'));
-                } else {
-                    this.flashRef.current!.activate(FlashType.BAD, 'Export failed');
-                }
-            });
-        }
     }
 
     render() {

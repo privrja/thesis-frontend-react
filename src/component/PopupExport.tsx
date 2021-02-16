@@ -21,6 +21,7 @@ class PopupExport extends React.Component<Props, State> {
         this.all = this.all.bind(this);
         this.sequences = this.sequences.bind(this);
         this.blocks = this.blocks.bind(this);
+        this.mergedBlocks = this.mergedBlocks.bind(this);
         this.modifications = this.modifications.bind(this);
         this.getFile = this.getFile.bind(this);
         this.deactivate = this.deactivate.bind(this);
@@ -51,6 +52,9 @@ class PopupExport extends React.Component<Props, State> {
         this.getFile('/modification/export');
     }
 
+    mergedBlocks() {
+        this.getFile('/block/export/merge')
+    }
 
     getFile(url: string) {
         let token = localStorage.getItem(TOKEN);
@@ -79,6 +83,8 @@ class PopupExport extends React.Component<Props, State> {
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Sequences
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Blocks</button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.mergedBlocks}>Merged blocks
+                    </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton}
                             onClick={this.modifications}>Modifications
                     </button>
@@ -95,6 +101,8 @@ class PopupExport extends React.Component<Props, State> {
                         Sequences
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Export Blocks
+                    </button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.mergedBlocks}>Merged blocks
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.modifications}>Export
                         Modifications
