@@ -96,6 +96,8 @@ class Collaborator extends ListComponent<Props, State> {
     }
 
     update(key: number): void {
+        let mode = document.getElementById(SEL_EDIT_MODE) as HTMLSelectElement;
+        this.defaultUpdate(this.getEndpoint() + '/collaborator/' + key, key, {mode: mode.value});
     }
 
     delete(key: number): void {
@@ -137,9 +139,11 @@ class Collaborator extends ListComponent<Props, State> {
                 {localStorage.getItem(TOKEN) !== null ?
                     <div>
                         <h2>Add new user to container</h2>
-                        <Creatable className={styles.creatable} id={CRE_USER_ID} options={this.state.users} onChange={this.handleInputChange}/>
+                        <Creatable className={styles.creatable} id={CRE_USER_ID} options={this.state.users}
+                                   onChange={this.handleInputChange}/>
                         <label htmlFor={SEL_NEW_MODE}>Mode</label>
-                        <SelectInput id={SEL_NEW_MODE} name={SEL_NEW_MODE} options={PermissionEnumHelper.getOptions()} selected={PermissionEnumHelper.getName(PermissionEnum.RW)} />
+                        <SelectInput id={SEL_NEW_MODE} name={SEL_NEW_MODE} options={PermissionEnumHelper.getOptions()}
+                                     selected={PermissionEnumHelper.getName(PermissionEnum.RW)}/>
                         <button type="submit" className={styles.create} onClick={this.create}>Add new user</button>
                     </div> : ''}
 
