@@ -37,7 +37,7 @@ class PopupExport extends React.Component<Props, State> {
     }
 
     all() {
-        this.getFile('/export')
+        this.getFile('/export', 'archive.zip')
     }
 
     sequences() {
@@ -56,7 +56,7 @@ class PopupExport extends React.Component<Props, State> {
         this.getFile('/block/export/merge')
     }
 
-    getFile(url: string) {
+    getFile(url: string, fileName: string = 'data,txt') {
         let token = localStorage.getItem(TOKEN);
         let headers: any = {method: 'GET'};
         if (token) {
@@ -67,7 +67,7 @@ class PopupExport extends React.Component<Props, State> {
         }
         fetch(ENDPOINT + 'container/' + this.state.containerId + url, headers).then(response => {
             if (response.status === 200) {
-                return response.blob().then(blob => saveAs(blob, 'data.txt'));
+                return response.blob().then(blob => saveAs(blob, fileName));
             } else {
                 this.props.onFail();
             }

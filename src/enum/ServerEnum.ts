@@ -5,7 +5,7 @@ import NorineFinder from "../finder/NorineFinder";
 import PdbFinder from "../finder/PdbFinder";
 
 export enum ServerEnum {
-    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI
+    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES
 }
 
 export class ServerEnumHelper {
