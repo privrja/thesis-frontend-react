@@ -6,14 +6,11 @@ import ZeroParser from "./ZeroParser";
 
 class ServerNumReferenceParser implements IParser {
     parse(text: string): ParseResult {
-        console.log(text);
         let serverNumParser = new ServerNumParser();
         let serverResult = serverNumParser.parse(text);
         if (!serverResult.isAccepted()) {
-            console.log(serverResult.getErrorMessage());
             return this.reject();
         }
-        console.log(serverResult.getResult());
         let natParser = new NatParser();
         let result = natParser.parse(serverResult.getReminder());
         if (!result.isAccepted()) {

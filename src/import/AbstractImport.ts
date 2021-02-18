@@ -1,5 +1,6 @@
 import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 
 abstract class AbstractImport {
 
@@ -37,7 +38,6 @@ abstract class AbstractImport {
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack)
             }).then(response => {
-                console.log(response);
                 if (response.status === 200) {
                     // TODO response -> can be partially OK
                 } else {
@@ -49,9 +49,18 @@ abstract class AbstractImport {
         }
     }
 
+    protected getReference(text: string) {
+        let refParser = new ReferenceParser();
+        let refResult = refParser.parse(text);
+        if (!refResult.isAccepted()) {
+            return null;
+        }
+        return refResult.getResult() as Reference;
+    }
+
     abstract getType(): string;
     abstract getLineLength(): number;
-    abstract transformation(parts: any[]): void;
+    abstract transformation(parts: string[]): void;
 
 }
 

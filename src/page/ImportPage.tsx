@@ -8,6 +8,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import BlockMergeImport from "../import/BlockMergeImport";
+import SequenceImport from "../import/SequenceImport";
 
 const MODIFICATION = 'Modifications';
 const BLOCK = 'Blocks';
@@ -54,17 +55,20 @@ class ImportPage extends React.Component<any, State> {
             reader.onload = async () => {
                 let importType = document.getElementById(SEL_IMPORT_TYPE) as HTMLSelectElement;
                 let errorStack: string[] = [];
-                console.log(reader.result);
                 try {
                     switch (importType.value) {
                         case MODIFICATION:
                             errorStack = new ModificationImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
+                        default:
                         case BLOCK:
                             errorStack = new BlockImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                         case MERGE_BLOCK:
                             errorStack = new BlockMergeImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            break;
+                        case SEQUENCE:
+                            errorStack = new SequenceImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                     }
                     console.log(errorStack);
@@ -72,7 +76,6 @@ class ImportPage extends React.Component<any, State> {
                     this.flashRef.current!.activate(FlashType.BAD, e.message);
                 }
             };
-            console.log(event.target.files);
             reader.readAsText(event.target.files[0])
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
