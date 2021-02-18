@@ -89,7 +89,7 @@ class ImportPage extends React.Component<any, State> {
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
-    };
+    }
 
     render() {
         return (
