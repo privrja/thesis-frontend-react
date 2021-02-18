@@ -14,7 +14,7 @@ abstract class AbstractImport {
         this.containerId = containerId;
     }
 
-    async import():Promise<any[]> {
+    async import(): Promise<any[]> {
         this.errorStack = [];
         this.okStack = [];
         let rows = this.text.split('\n');
@@ -26,33 +26,38 @@ abstract class AbstractImport {
             }
             this.transformation(parts);
         }
-        console.log(this.okStack);
         await this.finder();
-        console.log(this.okStack);
         return this.send();
     }
 
     async send(): Promise<any[]> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            console.log(this.okStack);
-            console.log(JSON.stringify(this.okStack));
             return fetch(ENDPOINT + 'container/' + this.containerId + this.getType() + '/import', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack),
-            }).then(response => {
-                if (response.status === 200) {
-                    // TODO response -> can be partially OK
-                    return this.errorStack;
+            }).then(async response => {
+                if (response.status !== 200) {
+                    this.errorStack = this.errorStack.concat(this.okStack);
                 } else {
-                    // TODO bad
-                    return this.errorStack;
+                    let json = await response.json();
+                    this.errorStack = this.errorStack.concat(json.map((e: any) => this.parseObject(e)));
                 }
+                return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
             });
         } else {
             throw new Error(ERROR_LOGIN_NEEDED);
         }
+    }
+
+    parseObject(obj: Object) {
+        let data = '';
+        for (let key in obj) {
+            // @ts-ignore
+            data += obj[key] + '\t';
+        }
+        return data;
     }
 
     protected getReference(text: string) {
@@ -65,8 +70,11 @@ abstract class AbstractImport {
     }
 
     abstract getType(): string;
+
     abstract getLineLength(): number;
+
     abstract transformation(parts: string[]): void;
+
     protected abstract async finder(): Promise<boolean>;
 
 }

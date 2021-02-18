@@ -28,6 +28,8 @@ interface State {
 
 const SEL_IMPORT_TYPE = 'sel-import-type';
 
+const TXT_BAD_INPUTS = 'txt-wrong-inputs';
+
 class ImportPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
@@ -72,6 +74,13 @@ class ImportPage extends React.Component<any, State> {
                             break;
                     }
                     console.log(errorStack);
+                    if (errorStack.length > 0) {
+                        this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
+                        let area = document.getElementById(TXT_BAD_INPUTS) as HTMLTextAreaElement;
+                        area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
+                    } else {
+                        this.flashRef.current!.activate(FlashType.OK);
+                    }
                 } catch (e) {
                     this.flashRef.current!.activate(FlashType.BAD, e.message);
                 }
@@ -92,6 +101,10 @@ class ImportPage extends React.Component<any, State> {
                     <SelectInput id={SEL_IMPORT_TYPE} name={SEL_IMPORT_TYPE} options={IMPORT_OPTIONS}/>
                     <input type="file" name="file" onChange={this.changeHandler}/>
                 </section>
+                <div>
+                    <label htmlFor={TXT_BAD_INPUTS}>Bad inputs</label><br/>
+                    <textarea id={TXT_BAD_INPUTS} className={styles.areaBad}/>
+                </div>
             </section>
         )
     }

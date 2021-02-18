@@ -6,6 +6,7 @@ $tertiallyCColor: #E0E0E0;
 $colorFlashOk: #72A337;
 $colorFlashBad: #F20915;
 $colorFlashPending: #FF7400;
+$colorFlashWarning: #F9FF1A;
 
 $fontColor: #000000;
 $fontSize: 1.6vh;
@@ -255,6 +256,11 @@ textarea {
   font-size: 1.3vh;
 }
 
+.areaBad {
+  width: 50vw;
+  height: 35vh;
+}
+
 .main {
   width: 80%;
   display: block;
@@ -330,6 +336,10 @@ td, th {
 
 .flashPending {
   background-color: $colorFlashPending;
+}
+
+.flashWarning {
+  background-color: $colorFlashWarning;
 }
 
 .hidden {
