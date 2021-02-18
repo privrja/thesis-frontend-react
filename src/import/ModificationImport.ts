@@ -13,11 +13,15 @@ class ModificationImport extends AbstractImport {
     transformation(parts: any) {
         this.okStack.push({
             modificationName: parts[0],
-            modificationFormula: parts[1],
-            modificationMass: Number(parts[2]),
+            formula: parts[1],
+            mass: Number(parts[2]),
             nTerminal: parts[3] === '1',
             cTerminal: parts[4] === '1'
         });
+    }
+
+    protected async finder(): Promise<boolean> {
+        return true;
     }
 
 }

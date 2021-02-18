@@ -89,7 +89,7 @@ class PubChemFinder implements IFinder {
         }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
     }
 
-    findByIdentifiers(ids: []): Promise<SingleStructure[]> {
+    findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
         return fetch(ENDPOINT_URI + CID_CONSTANT + ids.join(',') + PROPERTY_CONSTANT + PROPERTY_VALUES + FORMAT_JSON, {
             method: 'POST'
         }).then(async response => {

@@ -30,6 +30,10 @@ class SequenceImport extends AbstractImport {
         }
     }
 
+    protected async finder(): Promise<boolean> {
+        return true;
+    }
+
 }
 
 export default SequenceImport;

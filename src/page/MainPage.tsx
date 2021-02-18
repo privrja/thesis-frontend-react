@@ -414,18 +414,33 @@ class MainPage extends React.Component<any, State> {
             sequence: blockStructures.sequence,
             sequenceType: blockStructures.sequenceType
         } as SequenceStructure;
-        fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles', {
+        let token = localStorage.getItem(TOKEN);
+        let endpoint = ENDPOINT + 'smiles/unique';
+        let init: any = {
             method: 'POST',
             body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
                 return {smiles: e}
             }))
-        }).then(responseUnique => {
+        };
+        if (token) {
+            endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles';
+            init = {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
+                    return {smiles: e}
+                }))
+            };
+        }
+        fetch(endpoint, init).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
                         this.setState({results: [], blocks: data, sequence: sequence});
                         this.blockFinder(data, sequence);
                     }
                 );
+            } else {
+                this.transformSmiles(blockStructures.blockSmiles, sequence);
             }
         }).catch(() => {
             this.transformSmiles(blockStructures.blockSmiles, sequence)
@@ -661,16 +676,19 @@ class MainPage extends React.Component<any, State> {
                         <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles} onKeyDown={(e) => this.enterFind(e)}/>
+                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
+                                  onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
-                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => this.enterFind(e)}/>
+                        <input id="formula" className={styles.main} name="formula"
+                               onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
-                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <input id="identifier" name="identifier" className={styles.main}
+                               onKeyDown={(e) => this.enterFind(e)}/>
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>

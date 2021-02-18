@@ -5,10 +5,10 @@ class ServerNumParser implements  IParser {
 
     parse(text: string): ParseResult {
         if (text.match('^CSID: ')) {
-            return new Accept(ServerEnum.PUBCHEM, text.substring(6));
+            return new Accept(ServerEnum.CHEMSPIDER, text.substring(6));
         }
         if (text.match('^CID: ')) {
-            return new Accept(ServerEnum.CHEMSPIDER, text.substring(5));
+            return new Accept(ServerEnum.PUBCHEM, text.substring(5));
         }
         return this.reject();
     }

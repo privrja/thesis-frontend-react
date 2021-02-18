@@ -39,6 +39,10 @@ class BlockMergeImport extends AbstractImport {
         }
     }
 
+    protected async finder(): Promise<boolean> {
+        return true;
+    }
+
 }
 
 export default BlockMergeImport;

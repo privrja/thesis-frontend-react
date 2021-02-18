@@ -6,12 +6,14 @@ import SmilesReferenceParser from "./SmilesReferenceParser";
 import NorineReferenceParser from "./NorineReferenceParser";
 
 export class Reference {
-    source: ServerEnum | null = ServerEnum.PUBCHEM;
-    identifier: number | null = null;
+    source: ServerEnum | null = null;
+    identifier: string | null = null;
+    smiles: string | null = null;
 
-    constructor(source: ServerEnum | null, identifier: number | null) {
+    constructor(source: ServerEnum | null, identifier: string | null, smiles: string | null = null) {
         this.source = source;
         this.identifier = identifier;
+        this.smiles = smiles;
     }
 }
 

@@ -14,7 +14,7 @@ abstract class AbstractImport {
         this.containerId = containerId;
     }
 
-    import() {
+    async import():Promise<any[]> {
         this.errorStack = [];
         this.okStack = [];
         let rows = this.text.split('\n');
@@ -26,22 +26,28 @@ abstract class AbstractImport {
             }
             this.transformation(parts);
         }
-        this.send();
-        return this.errorStack;
+        console.log(this.okStack);
+        await this.finder();
+        console.log(this.okStack);
+        return this.send();
     }
 
-    send() {
+    async send(): Promise<any[]> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            fetch(ENDPOINT + 'container/' + this.containerId + this.getType() + '/import', {
+            console.log(this.okStack);
+            console.log(JSON.stringify(this.okStack));
+            return fetch(ENDPOINT + 'container/' + this.containerId + this.getType() + '/import', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
-                body: JSON.stringify(this.okStack)
+                body: JSON.stringify(this.okStack),
             }).then(response => {
                 if (response.status === 200) {
                     // TODO response -> can be partially OK
+                    return this.errorStack;
                 } else {
                     // TODO bad
+                    return this.errorStack;
                 }
             });
         } else {
@@ -61,6 +67,7 @@ abstract class AbstractImport {
     abstract getType(): string;
     abstract getLineLength(): number;
     abstract transformation(parts: string[]): void;
+    protected abstract async finder(): Promise<boolean>;
 
 }
 

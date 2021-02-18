@@ -14,7 +14,7 @@ class SmilesReferenceParser implements IParser {
         let smilesParser = new SmilesParser();
         let smilesResult = smilesParser.parse(textResult.getReminder());
         if (smilesResult.isAccepted()) {
-            return new Accept(new Reference(null, smilesResult.getResult()), smilesResult.getReminder());
+            return new Accept(new Reference(null, null, smilesResult.getResult()), smilesResult.getReminder());
         }
         return this.reject();
     }

@@ -58,17 +58,17 @@ class ImportPage extends React.Component<any, State> {
                 try {
                     switch (importType.value) {
                         case MODIFICATION:
-                            errorStack = new ModificationImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new ModificationImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                         default:
                         case BLOCK:
-                            errorStack = new BlockImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new BlockImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                         case MERGE_BLOCK:
-                            errorStack = new BlockMergeImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new BlockMergeImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                         case SEQUENCE:
-                            errorStack = new SequenceImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new SequenceImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
                             break;
                     }
                     console.log(errorStack);
