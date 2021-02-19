@@ -84,13 +84,19 @@ abstract class AbstractImport {
         return refResult.getResult() as Reference;
     }
 
+    find(key: string) {
+        return this.okStack.find(e => e.identifier === key);
+    }
+
     abstract getType(): string;
 
     abstract getLineLength(): number;
 
     abstract transformation(parts: string[]): void;
 
-    protected abstract async finder(): Promise<boolean>;
+    protected async finder(): Promise<boolean> {
+        return true;
+    }
 
 }
 

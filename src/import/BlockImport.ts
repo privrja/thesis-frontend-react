@@ -46,10 +46,6 @@ class BlockImport extends AbstractImport {
         });
     }
 
-    find(key: string) {
-        return this.okStack.find(e => e.identifier === key);
-    }
-
 }
 
 export default BlockImport;
