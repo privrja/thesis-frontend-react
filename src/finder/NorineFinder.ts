@@ -81,6 +81,9 @@ class NorineFinder implements IFinder {
      * @param ids
      */
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
+        if (ids.length === 0) {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'peptides/json/smiles', {
             method: 'GET'
         }).then(response => {

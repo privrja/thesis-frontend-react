@@ -1,5 +1,4 @@
 import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
-import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 
@@ -59,7 +58,7 @@ abstract class AbstractImport {
                 body: JSON.stringify(this.okStack),
             }).then(async response => {
                 if (response.status !== 200) {
-                    this.errorStack = this.errorStack.concat(this.okStack);
+                    this.errorStack = this.errorStack.concat(this.okStack.map((e: any) => 'Something Bad happen' + this.parseObject(e)));
                     return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 } else {
                     await response.json().then(data => this.errorStack = this.errorStack.concat(data.map((e: any) => this.parseObject(e))));
@@ -67,7 +66,7 @@ abstract class AbstractImport {
                 }
             });
         } else {
-            throw new Error(ERROR_LOGIN_NEEDED);
+            return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
         }
     }
 

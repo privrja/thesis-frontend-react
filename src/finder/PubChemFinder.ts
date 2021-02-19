@@ -90,6 +90,9 @@ class PubChemFinder implements IFinder {
     }
 
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
+        if (ids.length === 0) {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + CID_CONSTANT + ids.join(',') + PROPERTY_CONSTANT + PROPERTY_VALUES + FORMAT_JSON, {
             method: 'POST'
         }).then(async response => {
