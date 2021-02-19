@@ -12,22 +12,18 @@ class SequenceImport extends AbstractImport {
 
     transformation(parts: string[]) {
         let ref = this.getReference(parts[8]);
-        if (ref) {
-            this.okStack.push({
-                sequenceType: parts[0],
-                sequenceName: parts[1],
-                formula: parts[2],
-                mass: Number(parts[3]),
-                sequence: parts[4],
-                nModification: parts[5],
-                cModification: parts[6],
-                bModification: parts[7],
-                source: ref.source,
-                identifier: ref.identifier
-            });
-        } else {
-            this.errorStack.push(parts.join('\t'))
-        }
+        this.okStack.push({
+            sequenceType: parts[0],
+            sequenceName: parts[1],
+            formula: parts[2],
+            mass: Number(parts[3]),
+            sequence: parts[4],
+            nModification: parts[5] === '' ? null : parts[5],
+            cModification: parts[6] === '' ? null : parts[5],
+            bModification: parts[7] === '' ? null : parts[5],
+            source: ref?.source ?? null,
+            identifier: ref?.identifier ?? null
+        });
     }
 
     protected async finder(): Promise<boolean> {

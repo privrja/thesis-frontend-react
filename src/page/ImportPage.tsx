@@ -51,6 +51,8 @@ class ImportPage extends React.Component<any, State> {
     }
 
     changeHandler(event: any) {
+        let area = document.getElementById(TXT_BAD_INPUTS) as HTMLTextAreaElement;
+        area.value = '';
         let token = localStorage.getItem(TOKEN);
         if (token) {
             const reader = new FileReader();
@@ -76,7 +78,6 @@ class ImportPage extends React.Component<any, State> {
                     console.log(errorStack);
                     if (errorStack.length > 0) {
                         this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
-                        let area = document.getElementById(TXT_BAD_INPUTS) as HTMLTextAreaElement;
                         area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
                     } else {
                         this.flashRef.current!.activate(FlashType.OK);
