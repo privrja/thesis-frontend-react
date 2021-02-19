@@ -16,12 +16,12 @@ class SequenceImport extends AbstractImport {
             this.okStack.push({
                 sequenceType: parts[0],
                 sequenceName: parts[1],
-                modificationFormula: parts[2],
-                modificationMass: Number(parts[3]),
+                formula: parts[2],
+                mass: Number(parts[3]),
                 sequence: parts[4],
                 nModification: parts[5],
                 cModification: parts[6],
-                bModificatio: parts[7],
+                bModification: parts[7],
                 source: ref.source,
                 identifier: ref.identifier
             });

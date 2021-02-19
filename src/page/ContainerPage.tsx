@@ -59,8 +59,8 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     freeContainers() {
-        fetch(ENDPOINT + 'free/container', {
-            method: 'GET'
+        fetch(ENDPOINT + 'free/container/', {
+            method: 'GET',
         })
             .then(response => response.json())
             .then(response => this.setState({freeContainers: response}));
