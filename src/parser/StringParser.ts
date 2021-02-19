@@ -9,7 +9,7 @@ class StringParser implements IParser {
     }
 
     parse(text: string): ParseResult {
-        if(text.match('/^' + this.textToMatch + '/')) {
+        if(text.match('^' + this.textToMatch)) {
             return new Accept(this.textToMatch, text.substring(this.textToMatch.length));
         }
         return this.reject();
