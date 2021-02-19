@@ -1,6 +1,7 @@
 import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
+import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 
 abstract class AbstractImport {
 
@@ -34,9 +35,13 @@ abstract class AbstractImport {
         this.okStack = [];
         let rows = this.text.split('\n');
         for (let i = 0; i < rows.length; ++i) {
+            if (rows[i] === '') {
+                continue;
+            }
             let parts = rows[i].split('\t');
             if (parts.length !== this.getLineLength()) {
-                this.errorStack.push(rows[i]);
+                console.log(rows[i]);
+                this.errorStack.push('ERROR: Bad number of items on line\t'.concat(rows[i]));
                 continue;
             }
             this.transformation(parts);
@@ -52,12 +57,12 @@ abstract class AbstractImport {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack),
-            }).then(response => {
+            }).then(async response => {
                 if (response.status !== 200) {
                     this.errorStack = this.errorStack.concat(this.okStack);
                     return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 } else {
-                    response.json().then(data => this.errorStack = this.errorStack.concat(data.map((e: any) => this.parseObject(e))));
+                    await response.json().then(data => this.errorStack = this.errorStack.concat(data.map((e: any) => this.parseObject(e))));
                     return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 }
             });
@@ -68,11 +73,30 @@ abstract class AbstractImport {
 
     parseObject(obj: Object) {
         let data = '';
+        let source = ServerEnum.PUBCHEM;
+        let identifier = '';
+        let error = '';
         for (let key in obj) {
+            if (key === 'source') {
+                // @ts-ignore
+                source = obj[key];
+                continue;
+            } else if (key === 'identifier') {
+                // @ts-ignore
+                identifier = obj[key];
+                continue;
+            } else if (key === 'error') {
+                // @ts-ignore
+                error = obj[key];
+                continue;
+            }
             // @ts-ignore
-            data += obj[key] + '\t';
+            data += obj[key] === null ? '' : obj[key] + '\t';
         }
-        return data;
+        if (identifier) {
+            data += ServerEnumHelper.getFullId(source, identifier);
+        }
+        return error + '\t' + data;
     }
 
     protected getReference(text: string) {
