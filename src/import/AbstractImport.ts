@@ -1,17 +1,32 @@
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 
 abstract class AbstractImport {
 
     protected text: string;
-    protected containerId: number;
     protected errorStack: string[] = [];
     protected okStack: any[] = [];
 
-    public constructor(text: string, containerId: number) {
+    public constructor(text: string) {
         this.text = text;
-        this.containerId = containerId;
+        this.getSelectedContainer = this.getSelectedContainer.bind(this);
+        this.send = this.send.bind(this);
+        this.import = this.import.bind(this);
+        this.getReference = this.getReference.bind(this);
+        this.parseObject = this.parseObject.bind(this);
+        this.getType = this.getType.bind(this);
+        this.getLineLength = this.getLineLength.bind(this);
+        this.transformation = this.transformation.bind(this);
+    }
+
+    getSelectedContainer(): number {
+        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
+        if (!selectedContainer) {
+            selectedContainer = '4';
+            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
+        }
+        return parseInt(selectedContainer);
     }
 
     async import(): Promise<any[]> {
@@ -33,18 +48,18 @@ abstract class AbstractImport {
     async send(): Promise<any[]> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            return fetch(ENDPOINT + 'container/' + this.containerId + this.getType() + '/import', {
+            return await fetch(ENDPOINT + 'container/' + this.getSelectedContainer() + this.getType() + '/import', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack),
-            }).then(async response => {
+            }).then(response => {
                 if (response.status !== 200) {
                     this.errorStack = this.errorStack.concat(this.okStack);
+                    return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 } else {
-                    let json = await response.json();
-                    this.errorStack = this.errorStack.concat(json.map((e: any) => this.parseObject(e)));
+                    response.json().then(data => this.errorStack = this.errorStack.concat(data.map((e: any) => this.parseObject(e))));
+                    return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 }
-                return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
             });
         } else {
             throw new Error(ERROR_LOGIN_NEEDED);

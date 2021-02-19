@@ -30,7 +30,7 @@ class BlockImport extends AbstractImport {
         }
     }
 
-    protected async finder(): Promise<boolean> {
+    protected finder(): Promise<boolean> {
         let identifiers: string[] = [];
         this.okStack.forEach((item: any) => {
             if (item.smiles === null && item.source === ServerEnum.PUBCHEM && item.identifier) {

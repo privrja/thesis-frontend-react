@@ -96,6 +96,7 @@ class MainPage extends React.Component<any, State> {
         this.save = this.save.bind(this);
         this.editorClose = this.editorClose.bind(this);
         this.blockFinder = this.blockFinder.bind(this);
+        this.refreshMolecule = this.refreshMolecule.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -648,6 +649,25 @@ class MainPage extends React.Component<any, State> {
         }
     }
 
+    refreshMolecule() {
+        let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement;
+        let search = Number(searchInput?.options[searchInput.selectedIndex].value);
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
+        let molecule = new SingleStructure(
+            identifierInput.value,
+            search,
+            nameInput.value,
+            smilesInput.value,
+            formulaInput.value,
+            Number(massInput.value)
+        );
+        this.setState({molecule: molecule});
+    }
+
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage} id={'main'}>
@@ -666,29 +686,29 @@ class MainPage extends React.Component<any, State> {
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getOptions()}/>
+                                     options={ServerEnumHelper.getOptions()} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
-                                     options={SearchEnumHelper.getOptions()}/>
+                                     options={SearchEnumHelper.getOptions()} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
-                                  onKeyDown={(e) => this.enterFind(e)}/>
+                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <input id="formula" className={styles.main} name="formula"
-                               onKeyDown={(e) => this.enterFind(e)}/>
+                               onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
                         <input id="identifier" name="identifier" className={styles.main}
-                               onKeyDown={(e) => this.enterFind(e)}/>
+                               onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>

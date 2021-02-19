@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../main.module.scss";
 import {SelectInput, SelectOption} from "../component/SelectInput";
-import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import ModificationImport from "../import/ModificationImport";
 import BlockImport from "../import/BlockImport"
 import Flash from "../component/Flash";
@@ -37,17 +37,7 @@ class ImportPage extends React.Component<any, State> {
     constructor(props: any) {
         super(props);
         this.flashRef = React.createRef();
-        this.getSelectedContainer = this.getSelectedContainer.bind(this);
         this.changeHandler = this.changeHandler.bind(this);
-    }
-
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
     }
 
     changeHandler(event: any) {
@@ -62,20 +52,19 @@ class ImportPage extends React.Component<any, State> {
                 try {
                     switch (importType.value) {
                         case MODIFICATION:
-                            errorStack = await new ModificationImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new ModificationImport(reader.result?.toString() ?? '').import();
                             break;
                         default:
                         case BLOCK:
-                            errorStack = await new BlockImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new BlockImport(reader.result?.toString() ?? '').import();
                             break;
                         case MERGE_BLOCK:
-                            errorStack = await new BlockMergeImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new BlockMergeImport(reader.result?.toString() ?? '').import();
                             break;
                         case SEQUENCE:
-                            errorStack = await new SequenceImport(reader.result?.toString() ?? '', this.getSelectedContainer()).import();
+                            errorStack = await new SequenceImport(reader.result?.toString() ?? '').import();
                             break;
                     }
-                    console.log(errorStack);
                     if (errorStack.length > 0) {
                         this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
                         area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
@@ -84,6 +73,7 @@ class ImportPage extends React.Component<any, State> {
                     }
                 } catch (e) {
                     this.flashRef.current!.activate(FlashType.BAD, e.message);
+                    throw e;
                 }
             };
             reader.readAsText(event.target.files[0])

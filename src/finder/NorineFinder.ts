@@ -44,7 +44,6 @@ class NorineFinder implements IFinder {
         ).then(async response => {
             if (response.status === 200) {
                 let json = await response.json() as NorineResponse;
-                console.log(json);
                 return [new SingleStructure(
                     json.norine.peptide[0].general.id,
                     ServerEnum.NORINE,
@@ -62,7 +61,9 @@ class NorineFinder implements IFinder {
     findByName(name: string): Promise<SingleStructure[]> {
         return fetch(ENDPOINT_URI + 'name/json/' + name, {
             method: 'GET'
-        }).then(async response => {return response.status === 200 ? this.jsonListResult(response): []});
+        }).then(async response => {
+            return response.status === 200 ? this.jsonListResult(response) : []
+        });
     }
 
     /**
@@ -79,8 +80,33 @@ class NorineFinder implements IFinder {
      * Can be done with download all from Norine and then find in it
      * @param ids
      */
-    findByIdentifiers(ids: []): Promise<SingleStructure[]> {
-        return Sleep.noSleepPromise();
+    findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
+        return fetch(ENDPOINT_URI + 'peptides/json/smiles', {
+            method: 'GET'
+        }).then(response => {
+            if (response.status === 200) {
+                return response.json().then(async data => {
+                    return ids.map(id => {
+                        return data.peptides.find((peptide: any) => peptide.general.id === id);
+                    }).map(pep => {
+                        if (pep) {
+                            return new SingleStructure(
+                                pep.general.id,
+                                ServerEnum.NORINE,
+                                pep.general.name,
+                                pep.structure.smiles,
+                                pep.general.formula,
+                                pep.general.mw
+                            );
+                        } else {
+                            return null;
+                        }
+                    }).filter(e => e !== null) as SingleStructure[];
+                });
+            } else {
+                return [];
+            }
+        });
     }
 
     /**
