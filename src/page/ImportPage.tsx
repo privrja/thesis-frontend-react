@@ -18,7 +18,7 @@ const SEQUENCE = 'Sequences';
 const IMPORT_OPTIONS = [
     new SelectOption(MODIFICATION, MODIFICATION),
     new SelectOption(BLOCK, BLOCK),
-    new SelectOption(MERGE_BLOCK, MERGE_BLOCK),
+    // new SelectOption(MERGE_BLOCK, MERGE_BLOCK),
     new SelectOption(SEQUENCE, SEQUENCE)
 ];
 

@@ -5,6 +5,7 @@ import {CONTAINER, ENDPOINT, SSEQUENCE} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
+import {ServerEnumHelper} from "../enum/ServerEnum";
 
 class SequencePage extends ListComponent<any, ListState> {
 
@@ -57,10 +58,13 @@ class SequencePage extends ListComponent<any, ListState> {
                                     <td>{sequence.nModification}</td>
                                     <td>{sequence.cModification}</td>
                                     <td>{sequence.bModification}</td>
-                                    <td>{sequence.identifier}</td>
+                                    <td>{sequence.identifier ? <a href={ServerEnumHelper.getLink(sequence.source, sequence.identifier)}
+                                           target={'_blank'}
+                                           rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : '' }
+                                    </td>
                                     <td>
                                         {this.state.editable === sequence.id ? <button className={styles.update}
-                                                                                           onClick={() => this.update(sequence.id)}>Update</button> :
+                                                                                       onClick={() => this.update(sequence.id)}>Update</button> :
                                             <div/>}
                                         {this.state.editable === sequence.id ?
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
