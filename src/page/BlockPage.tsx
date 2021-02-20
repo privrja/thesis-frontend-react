@@ -9,7 +9,7 @@ import {
     EDITOR_BACK,
     EDITOR_ITEM,
     EDITOR_SMILES,
-    URL_PREFIX
+    URL_PREFIX, DECIMAL_PLACES
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
@@ -209,8 +209,8 @@ class BlockPage extends ListComponent<any, State> {
                                         <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
                                                    id={TXT_EDIT_FORMULA}/> : block.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.mass.toString()} name={TXT_EDIT_MASS}
-                                                   id={TXT_EDIT_MASS}/> : block.mass}</td>
+                                        <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()} name={TXT_EDIT_MASS}
+                                                   id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
                                                    id={TXT_EDIT_LOSSES}/> : block.losses}</td>

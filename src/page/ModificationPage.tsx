@@ -1,7 +1,7 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, SMODIFICATION, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SMODIFICATION, TOKEN} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
@@ -17,14 +17,12 @@ const TXT_EDIT_C_TERMINAL = 'txt-edit-c-terminal';
 const TXT_EDIT_N_TERMINAL = 'txt-edit-n-terminal';
 const MODIFICATION_NAME = 'modificationName';
 const MODIFICATION_FORMULA = 'formula';
-const MODIFICATION_MASS = 'mass';
 const N_TERMINAL = 'nTerminal';
 const C_TERMINAL = 'cTerminal';
 
 interface Values {
     modificationName: string;
     formula: string;
-    mass?: number;
     nTerminal: boolean;
     cTerminal: boolean;
 }
@@ -100,22 +98,20 @@ class ModificationPage extends ListComponent<any, ListState> {
                                     <Field id={MODIFICATION_FORMULA} name={MODIFICATION_FORMULA}
                                            placeholder='Modification Formula'/>
 
-                                    <label htmlFor={MODIFICATION_MASS}>Mass:</label>
-                                    <Field id={MODIFICATION_MASS} name={MODIFICATION_MASS}
-                                           placeholder='Your new Modification Mass'/>
-
                                     <label htmlFor={N_TERMINAL}>N-terminal:</label>
                                     <Field type={'checkbox'} id={N_TERMINAL} name={N_TERMINAL}/>
 
-                                    <label htmlFor={C_TERMINAL}>N-terminal:</label>
+                                    <label htmlFor={C_TERMINAL}>C-terminal:</label>
                                     <Field type={'checkbox'} id={C_TERMINAL} name={C_TERMINAL}/>
 
-                                    <button type="submit" className={styles.create}>Create new container</button>
+                                    <button type="submit" className={styles.create}>Create new Modification</button>
                                 </Form>
                             </Formik>
 
                         </div> : ''
                     }
+
+                    {this.state.list.length > 0 ? <h2>List of Modifications</h2> : ''}
 
                     {this.state.list.length > 0 ?
                         <table>
@@ -142,8 +138,8 @@ class ModificationPage extends ListComponent<any, ListState> {
                                         <TextInput value={modification.modificationFormula} name={TXT_EDIT_FORMULA}
                                                    id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
                                     <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <TextInput value={modification.modificationMass.toString()} name={TXT_EDIT_MASS}
-                                                   id={TXT_EDIT_MASS}/> : modification.modificationMass}</td>
+                                        <TextInput value={modification.modificationMass.toFixed(DECIMAL_PLACES).toString()} name={TXT_EDIT_MASS}
+                                                   id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>
                                     <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
                                         <CheckInput checked={modification.nTerminal} name={TXT_EDIT_N_TERMINAL}
                                                     id={TXT_EDIT_N_TERMINAL}/> : NameHelper.booleanValue(modification.nTerminal)}</td>
@@ -157,7 +153,6 @@ class ModificationPage extends ListComponent<any, ListState> {
                                         {this.state.editable === modification.id ?
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
-                                        <button className={styles.update}>Editor</button>
                                         <button className={styles.delete}
                                                 onClick={() => this.popup(modification.id)}>Delete
                                         </button>

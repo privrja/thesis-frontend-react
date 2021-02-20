@@ -14,7 +14,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {DECIMAL_PLACES, ENDPOINT, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -36,7 +36,7 @@ const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 const SMILES_UNIQUE = 'smiles/unique';
 const PAGE_TITLE = 'Home';
 
-interface State {
+interface SequenceState {
     results: SingleStructure[];
     molecule?: SingleStructure;
     blocks: BlockStructure[];
@@ -48,6 +48,8 @@ interface State {
     title: string;
     editorBlockId?: number;
     family: any[];
+    sequenceId?: number;
+    sequenceEdit: boolean;
 }
 
 interface SequenceStructure {
@@ -74,7 +76,7 @@ const TXT_EDIT_BLOCK_LOSSES = 'txt-edit-losses';
 const SEL_EDIT_SOURCE = 'sel-edit-source';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
 
-class MainPage extends React.Component<any, State> {
+class MainPage extends React.Component<any, SequenceState> {
 
     flashRef: React.RefObject<Flash>;
     popupRef: React.RefObject<PopupSmilesDrawer>;
@@ -105,17 +107,46 @@ class MainPage extends React.Component<any, State> {
             title: PAGE_TITLE,
             selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
+            sequenceEdit: false
         };
     }
 
     componentDidMount(): void {
         this.initializeSmilesDrawers();
+        this.getSequenceId();
     }
 
     componentDidUpdate() {
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 1) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
+        }
+    }
+
+    getSequenceId() {
+        let editSequence = localStorage.getItem(SEQUENCE_EDIT);
+        let sequenceId = localStorage.getItem(SEQUENCE_ID);
+        if (editSequence === 'Yes' && sequenceId) {
+            this.setState({sequenceEdit: true, sequenceId: Number(sequenceId)});
+            // TODO fetch data
+            let token = localStorage.getItem(TOKEN);
+            let init;
+            if (token) {
+                init = {
+                    method: 'GET',
+                    headers: {'x-auth-token': token}
+                }
+            } else {
+                init = {method: 'GET'}
+            }
+            fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
+                if (response.status === 200) {
+                    response.json().then(sequence => {
+                        console.log(sequence);
+                    });
+                }
+            });
+
         }
     }
 
@@ -560,7 +591,7 @@ class MainPage extends React.Component<any, State> {
     showLargeSmiles(smiles: string) {
         this.popupRef.current!.activate();
         SmilesDrawer.parse(smiles, function (tree: any) {
-            largeSmilesDrawer.draw(tree, 'popupLargeSmiles');
+            largeSmilesDrawer.draw(tree, ELEMENT_LARGE_CANVAS);
         });
     }
 
@@ -685,7 +716,8 @@ class MainPage extends React.Component<any, State> {
                                      options={SearchEnumHelper.getOptions()} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
+                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                               onChange={this.refreshMolecule}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles}
@@ -696,7 +728,8 @@ class MainPage extends React.Component<any, State> {
                                onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
+                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                               onChange={this.refreshMolecule}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
                         <input id="identifier" name="identifier" className={styles.main}
@@ -721,7 +754,7 @@ class MainPage extends React.Component<any, State> {
                                         data-smiles={molecule.smiles}
                                         onClick={() => this.showLargeSmiles(molecule.smiles)}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
-                                <div className={styles.itemResults}>{molecule.mass}</div>
+                                <div className={styles.itemResults}>{molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
@@ -783,7 +816,7 @@ class MainPage extends React.Component<any, State> {
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
-                                                   value={block.block?.mass?.toString() ?? ''}/> : block.block?.mass}</td>
+                                                   value={block.block?.mass?.toFixed(DECIMAL_PLACES).toString() ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}

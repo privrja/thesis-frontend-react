@@ -1,7 +1,7 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, SSEQUENCE} from "../constant/ApiConstants";
+import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SSEQUENCE} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
@@ -55,7 +55,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                     <td>{sequence.sequenceType}</td>
                                     <td>{sequence.sequence}</td>
                                     <td>{sequence.formula}</td>
-                                    <td>{sequence.mass}</td>
+                                    <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
                                     <td>{sequence.family}</td>
                                     <td>{sequence.nModification}</td>
                                     <td>{sequence.cModification}</td>
