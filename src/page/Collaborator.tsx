@@ -9,6 +9,7 @@ import {PermissionEnum, PermissionEnumHelper} from "../enum/PermissionEnum";
 import Creatable from "react-select/creatable";
 import FlashType from "../component/FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import ContainerHelper from "../helper/ContainerHelper";
 
 const SEL_EDIT_MODE = 'sel-edit-mode';
 
@@ -40,7 +41,7 @@ class Collaborator extends ListComponent<Props, State> {
         this.state = {
             list: [],
             container: {containerName: '', visibility: ''},
-            selectedContainer: this.getSelectedContainer(),
+            selectedContainer: ContainerHelper.getSelectedContainer(),
             users: [],
         };
     }

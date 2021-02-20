@@ -1,7 +1,7 @@
 import * as React from "react";
 import Flash from "./Flash";
 import PopupYesNo from "./PopupYesNo";
-import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED, OK_CREATED} from "../constant/FlashConstants";
 
@@ -41,15 +41,6 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         if (this.state.selectedContainer) {
             this.list();
         }
-    }
-
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
     }
 
     popup(key: number): void {

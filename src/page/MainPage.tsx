@@ -14,7 +14,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -24,6 +24,7 @@ import NameHelper from "../helper/NameHelper";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import PopupEditor from "../component/PopupEditor";
+import ContainerHelper from "../helper/ContainerHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -102,18 +103,9 @@ class MainPage extends React.Component<any, State> {
             blocks: [],
             editSame: true,
             title: PAGE_TITLE,
-            selectedContainer: this.getSelectedContainer(),
+            selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
         };
-    }
-
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
     }
 
     componentDidMount(): void {

@@ -1,6 +1,7 @@
-import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
+import ContainerHelper from "../helper/ContainerHelper";
 
 abstract class AbstractImport {
 
@@ -10,7 +11,6 @@ abstract class AbstractImport {
 
     public constructor(text: string) {
         this.text = text;
-        this.getSelectedContainer = this.getSelectedContainer.bind(this);
         this.send = this.send.bind(this);
         this.import = this.import.bind(this);
         this.getReference = this.getReference.bind(this);
@@ -18,15 +18,6 @@ abstract class AbstractImport {
         this.getType = this.getType.bind(this);
         this.getLineLength = this.getLineLength.bind(this);
         this.transformation = this.transformation.bind(this);
-    }
-
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
     }
 
     async import(): Promise<any[]> {
@@ -52,7 +43,7 @@ abstract class AbstractImport {
     async send(): Promise<any[]> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            return await fetch(ENDPOINT + 'container/' + this.getSelectedContainer() + this.getType() + '/import', {
+            return await fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + this.getType() + '/import', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack),

@@ -5,6 +5,7 @@ import Flash from "../component/Flash";
 import styles from "../main.module.scss";
 import React from "react";
 import TextInput from "../component/TextInput";
+import ContainerHelper from "../helper/ContainerHelper";
 
 interface Props {
     containerId: number;
@@ -16,7 +17,7 @@ class Family extends ListComponent<Props, ListState> {
     constructor(props: Props) {
         super(props);
         this.getName = this.getName.bind(this);
-        this.state = {list: [], selectedContainer: this.getSelectedContainer()};
+        this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
 
     findName(key: number): string {

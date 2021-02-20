@@ -11,6 +11,7 @@ import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import PopupExport from "../component/PopupExport";
+import ContainerHelper from "../helper/ContainerHelper";
 
 interface Container {
     id: number,
@@ -50,7 +51,7 @@ class ContainerPage extends ListComponent<any, State> {
         super(props);
         this.popupExportRef = React.createRef();
         this.freeContainers = this.freeContainers.bind(this);
-        this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
+        this.state = {list: [], freeContainers: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
 
     componentDidMount(): void {
