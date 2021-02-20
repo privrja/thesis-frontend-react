@@ -19,6 +19,9 @@ import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import {ServerEnumHelper} from "../enum/ServerEnum";
 import {SelectInput} from "../component/SelectInput";
+import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
+// @ts-ignore
+import * as SmilesDrawer from 'smiles-drawer';
 
 interface State extends ListState {
     list: Block[];
@@ -33,6 +36,7 @@ interface Block {
     losses: string;
     smiles: string;
     uniqueSmiles: string;
+    family: string;
     source: number;
     identifier: string;
 }
@@ -46,10 +50,17 @@ const TXT_EDIT_SMILES = 'txt-edit-smiles';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
 const SEL_EDIT_SOURCE = 'sel-edit-source';
 
+let largeSmilesDrawer: SmilesDrawer.Drawer;
+const ELEMENT_LARGE_SMILES = 'popupLargeSmiles';
+
 class BlockPage extends ListComponent<any, State> {
+
+    popupSmilesRef: React.RefObject<PopupSmilesDrawer>;
 
     constructor(props: any) {
         super(props);
+        this.popupSmilesRef = React.createRef();
+        this.showLargeSmiles = this.showLargeSmiles.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
@@ -74,6 +85,24 @@ class BlockPage extends ListComponent<any, State> {
                 }
             });
         }
+        const large = document.getElementById(ELEMENT_LARGE_SMILES);
+        largeSmilesDrawer = new SmilesDrawer.Drawer({
+            width: large!.clientWidth,
+            height: large!.clientHeight,
+            compactDrawing: false,
+        });
+    }
+
+    /**
+     * Show popup with large result
+     * @param smiles
+     */
+    showLargeSmiles(smiles: string) {
+        console.log(smiles);
+        this.popupSmilesRef.current!.activate();
+        SmilesDrawer.parse(smiles, function (tree: any) {
+            largeSmilesDrawer.draw(tree, ELEMENT_LARGE_SMILES);
+        });
     }
 
     findName(key: number): string {
@@ -141,6 +170,7 @@ class BlockPage extends ListComponent<any, State> {
                     <h1>Blocks</h1>
                     <PopupYesNo label={"Realy want to delete block?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+                    <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge} ref={this.popupSmilesRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
                         <div>
@@ -159,6 +189,7 @@ class BlockPage extends ListComponent<any, State> {
                                 <th>Residue</th>
                                 <th>Mass</th>
                                 <th>Losses</th>
+                                <th>Family</th>
                                 <th>SMILES</th>
                                 <th>Identifier</th>
                                 <th>Actions</th>
@@ -183,6 +214,7 @@ class BlockPage extends ListComponent<any, State> {
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
                                                    id={TXT_EDIT_LOSSES}/> : block.losses}</td>
+                                    <td>{block.family}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput value={block.uniqueSmiles} name={TXT_EDIT_SMILES}
                                                    id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
@@ -205,6 +237,7 @@ class BlockPage extends ListComponent<any, State> {
                                             <div/>}
                                         <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                         </button>
+                                        <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
                                         <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete
                                         </button>
                                     </td>
