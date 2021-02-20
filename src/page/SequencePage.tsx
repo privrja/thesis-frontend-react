@@ -36,6 +36,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                 <th>Id</th>
                                 <th>Sequence name</th>
                                 <th>Type</th>
+                                <th>Sequence</th>
                                 <th>Formula</th>
                                 <th>Mass</th>
                                 <th>Family</th>
@@ -52,6 +53,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                     <td>{sequence.id}</td>
                                     <td>{sequence.sequenceName}</td>
                                     <td>{sequence.sequenceType}</td>
+                                    <td>{sequence.sequence}</td>
                                     <td>{sequence.formula}</td>
                                     <td>{sequence.mass}</td>
                                     <td>{sequence.family}</td>
