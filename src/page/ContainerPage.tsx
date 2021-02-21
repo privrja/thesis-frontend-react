@@ -12,6 +12,7 @@ import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import PopupExport from "../component/PopupExport";
 import ContainerHelper from "../helper/ContainerHelper";
+import Helper from "../helper/Helper";
 
 interface Container {
     id: number,
@@ -57,6 +58,7 @@ class ContainerPage extends ListComponent<any, State> {
     componentDidMount(): void {
         this.list();
         this.freeContainers();
+        Helper.resetStorage();
     }
 
     freeContainers() {
@@ -122,7 +124,6 @@ class ContainerPage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <h1>Container</h1>
                     <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
                     <PopupExport label={'Export'} onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')} ref={this.popupExportRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>

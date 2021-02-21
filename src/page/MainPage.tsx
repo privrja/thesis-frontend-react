@@ -715,7 +715,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     refreshMolecule() {
-        let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement;
+        let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
         let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
@@ -772,7 +772,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <TextInput name={'mass'} id={'mass'}
-                                   value={this.state.molecule?.mass?.toFixed(DECIMAL_PLACES) ?? ''}
+                                   value={this.state.molecule?.mass ? this.state.molecule.mass.toFixed(DECIMAL_PLACES) : ''}
                                    className={styles.main} onKeyDown={(e) => this.enterFind(e)}
                                    onChange={this.refreshMolecule}/>
 

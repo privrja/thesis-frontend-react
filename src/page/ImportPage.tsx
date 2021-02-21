@@ -9,6 +9,7 @@ import FlashType from "../component/FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import BlockMergeImport from "../import/BlockMergeImport";
 import SequenceImport from "../import/SequenceImport";
+import Helper from "../helper/Helper";
 
 const MODIFICATION = 'Modifications';
 const BLOCK = 'Blocks';
@@ -38,6 +39,10 @@ class ImportPage extends React.Component<any, State> {
         super(props);
         this.flashRef = React.createRef();
         this.changeHandler = this.changeHandler.bind(this);
+    }
+
+    componentDidMount(): void {
+        Helper.resetStorage();
     }
 
     changeHandler(event: any) {

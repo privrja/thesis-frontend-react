@@ -40,7 +40,7 @@ class LoginPage extends React.Component<any> {
                     if (token) {
                         localStorage.setItem(TOKEN, token);
                         this.flashRef.current!.activate(FlashType.OK);
-                        Helper.resetStorage();
+                        Helper.resetUserStorage();
                         Sleep.sleep(500).then(() => {
                             window.location.href = URL_PREFIX
                         });

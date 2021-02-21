@@ -14,6 +14,7 @@ import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ServerEnumHelper} from "../enum/ServerEnum";
+import Helper from "../helper/Helper";
 
 class SequencePage extends ListComponent<any, ListState> {
 
@@ -21,6 +22,11 @@ class SequencePage extends ListComponent<any, ListState> {
         super(props);
         this.detail = this.detail.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
+    }
+
+    componentDidMount(): void {
+        super.componentDidMount();
+        Helper.resetStorage();
     }
 
     findName(key: number): string {
@@ -41,9 +47,9 @@ class SequencePage extends ListComponent<any, ListState> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <h1>Sequences</h1>
                     <PopupYesNo label={"Really want to delete sequence?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+                    {this.state.list.length > 0 ? <h2>List of Sequences</h2> : ''}
                     {this.state.list.length > 0 ?
                         <table>
                             <thead>

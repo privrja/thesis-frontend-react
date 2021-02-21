@@ -25,7 +25,7 @@ class LogoutPage extends React.Component<any> {
     logout() {
         localStorage.removeItem(TOKEN);
         this.flashRef.current!.activate(FlashType.OK);
-        Helper.resetStorage();
+        Helper.resetUserStorage();
         Sleep.sleep(500).then(() => {
             window.location.href = URL_PREFIX
         });

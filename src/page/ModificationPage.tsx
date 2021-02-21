@@ -9,6 +9,7 @@ import ListComponent, {ListState} from "../component/ListComponent";
 import NameHelper from "../helper/NameHelper";
 import CheckInput from "../component/CheckInput";
 import {Field, Form, Formik, FormikHelpers} from "formik";
+import Helper from "../helper/Helper";
 
 const TXT_EDIT_MODIFICATION_NAME = 'txt-edit-modificationName';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -32,6 +33,11 @@ class ModificationPage extends ListComponent<any, ListState> {
     constructor(props: any) {
         super(props);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
+    }
+
+    componentDidMount(): void {
+        super.componentDidMount();
+        Helper.resetStorage();
     }
 
     findName(key: number): string {
@@ -65,13 +71,12 @@ class ModificationPage extends ListComponent<any, ListState> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <h1>Modifications</h1>
                     <PopupYesNo label={"Really want to delete modification?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
                         <div>
-                            <h2>Create new modification</h2>
+                            <h2>Create new Modification</h2>
                             <Formik
                                 initialValues={{
                                     modificationName: '',

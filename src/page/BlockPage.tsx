@@ -167,17 +167,18 @@ class BlockPage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <h1>Blocks</h1>
                     <PopupYesNo label={"Realy want to delete block?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge} ref={this.popupSmilesRef}/>
 
-                    {localStorage.getItem(TOKEN) !== null ?
-                        <div>
-                            <h2>Create new block</h2>
+                    {/*{localStorage.getItem(TOKEN) !== null ?*/}
+                    {/*    <div>*/}
+                    {/*        <h2>Create new block</h2>*/}
 
-                        </div> : <div/>
-                    }
+                    {/*    </div> : <div/>*/}
+                    {/*}*/}
+
+                    {this.state.list.length > 0 ? <h2>List of Blocks</h2> : ''}
 
                     {this.state.list.length > 0 ?
                         <table>

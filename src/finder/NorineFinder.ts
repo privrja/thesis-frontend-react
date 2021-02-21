@@ -50,7 +50,7 @@ class NorineFinder implements IFinder {
                     json.norine.peptide[0].general.name,
                     json.norine.peptide[0].structure.smiles,
                     json.norine.peptide[0].general.formula,
-                    json.norine.peptide[0].general.mw
+                    Number(json.norine.peptide[0].general.mw)
                 )];
             } else {
                 return [];

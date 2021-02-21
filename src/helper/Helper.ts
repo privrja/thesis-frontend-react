@@ -9,14 +9,20 @@ import {
 
 class Helper {
 
+    static resetUserStorage() {
+        this.resetStorage();
+        localStorage.setItem(SELECTED_CONTAINER, '1');
+    }
+
     static resetStorage() {
         localStorage.removeItem(SEQUENCE_EDIT);
         localStorage.removeItem(SEQUENCE_ID);
-        localStorage.setItem(SELECTED_CONTAINER, '1');
         localStorage.removeItem(EDITOR_SMILES);
         localStorage.removeItem(EDITOR_BACK);
         localStorage.removeItem(EDITOR_ITEM);
     }
+
+
 
 }
 
