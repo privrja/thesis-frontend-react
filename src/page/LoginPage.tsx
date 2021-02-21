@@ -2,10 +2,15 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import {Field, Form, Formik, FormikHelpers} from "formik/dist";
 import styles from "../main.module.scss"
-import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
+import {
+    ENDPOINT,
+    TOKEN,
+    URL_PREFIX
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Sleep from "../helper/Sleep";
+import Helper from "../helper/Helper";
 
 interface Values {
     name: string;
@@ -33,8 +38,9 @@ class LoginPage extends React.Component<any> {
                 if (response.status === 204) {
                     const token = response.headers.get('x-auth-token');
                     if (token) {
-                        localStorage.setItem('token', token);
+                        localStorage.setItem(TOKEN, token);
                         this.flashRef.current!.activate(FlashType.OK);
+                        Helper.resetStorage();
                         Sleep.sleep(500).then(() => {
                             window.location.href = URL_PREFIX
                         });
