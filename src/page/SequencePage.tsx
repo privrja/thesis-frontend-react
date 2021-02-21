@@ -1,7 +1,15 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SSEQUENCE} from "../constant/ApiConstants";
+import {
+    CONTAINER,
+    DECIMAL_PLACES,
+    ENDPOINT,
+    SEQUENCE_EDIT,
+    SEQUENCE_ID,
+    SSEQUENCE,
+    URL_PREFIX
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
@@ -11,6 +19,7 @@ class SequencePage extends ListComponent<any, ListState> {
 
     constructor(props: any) {
         super(props);
+        this.detail = this.detail.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
@@ -20,6 +29,12 @@ class SequencePage extends ListComponent<any, ListState> {
 
     getEndpoint() {
         return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SSEQUENCE;
+    }
+
+    detail(key: number) {
+        localStorage.setItem(SEQUENCE_EDIT, 'Yes');
+        localStorage.setItem(SEQUENCE_ID, key.toString());
+        document.location.href = URL_PREFIX;
     }
 
     render() {
@@ -71,7 +86,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                         {this.state.editable === sequence.id ?
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
-                                        <button className={styles.update}>Detail</button>
+                                        <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail</button>
                                         <button className={styles.delete}
                                                 onClick={() => this.popup(sequence.id)}>Delete
                                         </button>

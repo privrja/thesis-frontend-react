@@ -8,19 +8,21 @@ interface Props {
     className?: string;
     onChange?: () => void;
     onKeyDown?: (e: any) => void;
+    onInput?: () => void;
 }
 
 interface State {
     value: string;
 }
 
-class TextInput extends React.Component<Props, State> {
+class TextArea extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
         this.state = {value: props.value};
         this.handleChange = this.handleChange.bind(this);
         this.keyDown = this.keyDown.bind(this);
+        this.input = this.input.bind(this);
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -42,9 +44,16 @@ class TextInput extends React.Component<Props, State> {
         }
     }
 
-    render() {
-        return <input type="text" className={this.props.className} id={this.props.id} name={this.props.name} value={this.state.value} onChange={this.handleChange} size={this.props.size} onKeyDown={this.keyDown}/>
+    input() {
+        if (this.props.onInput) {
+            this.props.onInput();
+        }
     }
+
+    render() {
+        return <textarea id={this.props.id} name={this.props.name} value={this.state.value} className={this.props.className} onInput={this.input} onKeyDown={this.keyDown} onChange={this.handleChange}/>
+    }
+
 }
 
-export default TextInput;
+export default TextArea;
