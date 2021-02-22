@@ -1,8 +1,7 @@
-import * as React  from "react";
+import React, {ChangeEvent}  from "react";
 import Modification from "../structure/Modification";
 import {SelectInput, SelectOption} from "./SelectInput";
 import OptionsHelper from "../helper/OptionsHelper";
-import {ChangeEvent} from "react";
 
 interface Props {
     id: string;

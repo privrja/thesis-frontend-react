@@ -30,7 +30,6 @@ abstract class AbstractImport {
             }
             let parts = rows[i].split('\t');
             if (parts.length !== this.getLineLength()) {
-                console.log(rows[i]);
                 this.errorStack.push('ERROR: Bad number of items on line\t'.concat(rows[i]));
                 continue;
             }
@@ -43,7 +42,7 @@ abstract class AbstractImport {
     async send(): Promise<any[]> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            return await fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + this.getType() + '/import', {
+            return fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + this.getType() + '/import', {
                 method: 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(this.okStack),
