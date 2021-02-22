@@ -13,6 +13,9 @@ interface Props {
     blockLength: number;
     sequenceType?: string;
     sequence?: string;
+    nModification?: any;
+    cModification?: any;
+    bModification?: any;
     modifications?: Modification[];
     onFamilyChange?: (family: any[]) => void;
 }
@@ -135,11 +138,11 @@ class ModificationComponent extends React.Component<Props, State> {
                     </div>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
-                                   ref={this.nModificationRef}/>
+                                   ref={this.nModificationRef} modification={this.props.nModification}/>
                 <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications}
-                                   ref={this.cModificationRef}/>
-                <ModificationInput type='b' title='Branch-terminal modification'
-                                   modifications={this.props.modifications} ref={this.bModificationRef}/>
+                                   ref={this.cModificationRef} modification={this.props.cModification}/>
+                <ModificationInput type='b' title='Branch-terminal modification' modifications={this.props.modifications}
+                                   ref={this.bModificationRef} modification={this.props.bModification}/>
             </div>
         );
     }

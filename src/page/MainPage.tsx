@@ -44,6 +44,9 @@ interface SequenceState {
     sequence?: SequenceStructure;
     selectedContainer: number;
     modifications?: Modification[];
+    nModification?: any;
+    cModification?: any;
+    bModification?: any;
     editable?: number;
     editSame: boolean;
     title: string;
@@ -145,12 +148,6 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
-                        console.log(sequence);
-                        // let modifications = [] as Modification[];
-                        // modifications.push(sequence.cModification);
-                        // modifications.push(sequence.nModification);
-                        // modifications.push(sequence.bModification);
-                        // modifications = modifications.filter(e => e !== null);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
@@ -164,14 +161,16 @@ class MainPage extends React.Component<any, SequenceState> {
                                 sequence: sequence.sequence,
                                 sequenceType: sequence.sequenceType,
                             },
-                            // modifications: modifications,
+                            nModification: sequence.nModification,
+                            cModification: sequence.cModification,
+                            bModification: sequence.bModification,
                             blocks: sequence.blocks.map((block: any) => {
                                 return { id: block.id,
                                     databaseId: block.source,
                                     acronym: block.acronym,
                                     smiles: block.smiles,
                                     unique: block.uniqueSmiles,
-                                    // sameAs: 0,
+                                    sameAs: block.sameAs,
                                     block: new SingleStructure(
                                         block.identifier,
                                         block.source,
@@ -820,6 +819,9 @@ class MainPage extends React.Component<any, SequenceState> {
                                                sequenceType={this.state.sequence?.sequenceType}
                                                sequence={this.state.sequence?.sequence}
                                                modifications={this.state.modifications}
+                                               nModification={this.state.nModification}
+                                               cModification={this.state.cModification}
+                                               bModification={this.state.bModification}
                                                onFamilyChange={(family: any[]) => this.setState({family: family})}/>
                         <table>
                             <thead>

@@ -5,22 +5,25 @@ import {SelectOption} from "./SelectInput";
 import Modification from "../structure/Modification";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faMinus} from '@fortawesome/free-solid-svg-icons'
+import TextInput from "./TextInput";
+import CheckInput from "./CheckInput";
 
 interface Props {
     type: string;
     title: string;
     modifications?: Modification[];
+    modification?: any;
 }
 
 interface State {
     isVisible: boolean;
     isDisabled: boolean;
     title: string;
+    modification?: any
 }
 
 const MODIFICATION = '-modification';
 const FORMULA = '-formula';
-const MASS = '-mass';
 const NTERMINAL = '-nterminal';
 const CTERMINAL = '-cterminal';
 
@@ -33,7 +36,16 @@ class ModificationInput extends React.Component<Props, State> {
         this.deactivate = this.deactivate.bind(this);
         this.disable = this.disable.bind(this);
         this.unDisable = this.unDisable.bind(this);
-        this.state = {isVisible: false, isDisabled: false, title: props.title};
+        let modification = this.props.modification;
+        if (!modification) {
+            modification = {id: null, modificationName: '', formula: '', nTerminal: this.props.type === 'n', cTerminal: this.props.type === 'c'};
+        }
+        this.state = {
+            isVisible: this.props.modification !== null ,
+            isDisabled: false,
+            title: props.title,
+            modification: modification
+        };
     }
 
     select(): void {
@@ -41,13 +53,26 @@ class ModificationInput extends React.Component<Props, State> {
         if (selectedModification) {
             let modification = this.props.modifications?.find(e => e.id === parseInt(selectedModification.value));
             if (modification) {
-                ModificationInput.setupInput('txt-' + this.props.type + MODIFICATION, modification.modificationName);
-                ModificationInput.setupInput('txt-' + this.props.type + FORMULA, modification.modificationFormula);
-                ModificationInput.setupInput('txt-' + this.props.type + MASS, modification.modificationMass.toString());
+                console.log(modification);
+                this.setState({
+                    modification: {
+                        id: modification.id,
+                        modificationName: modification.modificationName,
+                        formula: modification.modificationFormula,
+                        nTerminal: modification.nTerminal,
+                        cTerminal: modification.cTerminal,
+                    }
+                });
+                ModificationInput.disableInput('txt-' + this.props.type + MODIFICATION);
+                ModificationInput.disableInput('txt-' + this.props.type + FORMULA);
+                ModificationInput.disableInput('chk-' + this.props.type + NTERMINAL);
+                ModificationInput.disableInput('chk-' + this.props.type + CTERMINAL);
             } else {
+                this.setState({modification: {id: null, modificationName: '', formula: '', nTerminal: this.props.type === 'n', cTerminal: this.props.type === 'c'}});
                 ModificationInput.unDisableInput('txt-' + this.props.type + MODIFICATION);
                 ModificationInput.unDisableInput('txt-' + this.props.type + FORMULA);
-                ModificationInput.unDisableInput('txt-' + this.props.type + MASS);
+                ModificationInput.unDisableInput('chk-' + this.props.type + NTERMINAL);
+                ModificationInput.unDisableInput('chk-' + this.props.type + CTERMINAL);
             }
         }
     }
@@ -60,15 +85,13 @@ class ModificationInput extends React.Component<Props, State> {
         this.changeTitle(this.props.title);
     }
 
-    private static setupInput(elemId: string, value: string) {
+    private static disableInput(elemId: string) {
         let elem = document.getElementById(elemId) as HTMLInputElement;
-        elem.value = value;
         elem.disabled = true;
     }
 
     private static unDisableInput(elemId: string) {
         let elem = document.getElementById(elemId) as HTMLInputElement;
-        elem.value = '';
         elem.disabled = false;
     }
 
@@ -106,30 +129,44 @@ class ModificationInput extends React.Component<Props, State> {
                                                     name={'sel-' + this.props.type + MODIFICATION}
                                                     modifications={this.props.modifications}
                                                     defaultOption={new SelectOption('nothing', 'Add new')}
+                                                    selected={this.state.modification.id?.toString() ?? 'nothing'}
                                                     onChange={this.select}/>
                                 : <div/>
                             }
 
                             <label htmlFor={'txt-' + this.props.type + MODIFICATION}>Name</label>
-                            <input type="text" id={'txt-' + this.props.type + MODIFICATION}
-                                   name={this.props.type + 'Modification'} value=""/>
+                            <TextInput id={'txt-' + this.props.type + MODIFICATION}
+                                       name={this.props.type + MODIFICATION}
+                                       value={this.state.modification?.modificationName ?? ''}
+                                       disabled={this.state.modification.id !== null}
+                                       onChange={(e: any) => {
+                                           let modification = this.state.modification;
+                                           modification.formula = e.value;
+                                           this.setState({
+                                               modification: modification
+                                           });
+                                       }}/>
 
                             <label htmlFor={'txt-' + this.props.type + FORMULA}>Formula</label>
-                            <input type="text" id={'txt-' + this.props.type + FORMULA}
-                                   name={this.props.type + 'Formula'}
-                                   value=""/>
-
-                            <label htmlFor={'txt-' + this.props.type + MASS}>Monoisotopic Mass</label>
-                            <input type="text" id={'txt-' + this.props.type + MASS} name={this.props.type + 'Mass'}
-                                   value=""/>
+                            <TextInput id={'txt-' + this.props.type + FORMULA}
+                                       name={this.props.type + FORMULA}
+                                       value={this.state.modification?.formula ?? ''}
+                                       disabled={this.state.modification.id !== null}
+                                       onChange={(e: any) => {
+                                           let modification = this.state.modification;
+                                           modification.formula = e.value;
+                                           this.setState({
+                                               modification: modification
+                                           });
+                                       }}/>
 
                             <label htmlFor={'chk-' + this.props.type + NTERMINAL} className="chk">N-terminal</label>
-                            <input type="checkbox" id={'chk-' + this.props.type + NTERMINAL}
-                                   name={this.props.type + 'nTerminal'} checked={this.props.type === 'n'}/>
+                            <CheckInput name={this.props.type + 'nTerminal'} id={'chk-' + this.props.type + NTERMINAL}
+                                        checked={this.state.modification.nTerminal} disabled={this.state.modification.id !== null}/>
 
                             <label htmlFor={'chk-' + this.props.type + CTERMINAL} className="chk">C-terminal</label>
-                            <input type="checkbox" id={'chk-' + this.props.type + CTERMINAL}
-                                   name={this.props.type + 'cTerminal'} checked={this.props.type === 'c'}/>
+                            <CheckInput name={this.props.type + 'cTerminal'} id={'chk-' + this.props.type + CTERMINAL}
+                                        checked={this.state.modification.cTerminal} disabled={this.state.modification.id !== null}/>
                         </div>
                         : <div/>}
                 </div>

@@ -5,20 +5,22 @@ interface Props {
     id: string;
     value: string;
     size?: number;
+    disabled?: boolean;
     className?: string;
-    onChange?: () => void;
+    onChange?: (e: any) => void;
     onKeyDown?: (e: any) => void;
 }
 
 interface State {
     value: string;
+    disabled: boolean;
 }
 
 class TextInput extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {value: props.value};
+        this.state = {value: props.value, disabled: this.props.disabled ?? false};
         this.handleChange = this.handleChange.bind(this);
         this.keyDown = this.keyDown.bind(this);
     }
@@ -32,7 +34,7 @@ class TextInput extends React.Component<Props, State> {
     handleChange(event: any) {
         this.setState({value: event.target.value});
         if (this.props.onChange) {
-            this.props.onChange();
+            this.props.onChange(event);
         }
     }
 
@@ -43,7 +45,7 @@ class TextInput extends React.Component<Props, State> {
     }
 
     render() {
-        return <input type="text" className={this.props.className} id={this.props.id} name={this.props.name} value={this.state.value} onChange={this.handleChange} size={this.props.size} onKeyDown={this.keyDown}/>
+        return <input type="text" className={this.props.className} id={this.props.id} name={this.props.name} value={this.state.value} disabled={this.state.disabled} onChange={this.handleChange} size={this.props.size} onKeyDown={this.keyDown}/>
     }
 }
 
