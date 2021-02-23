@@ -477,7 +477,7 @@ class MainPage extends React.Component<any, SequenceState> {
         console.log(blockStructures);
         let sequence = {
             sequence: blockStructures.sequence,
-            sequenceType: blockStructures.sequenceType
+            sequenceType: blockStructures.sequenceType,
         } as SequenceStructure;
         let token = localStorage.getItem(TOKEN);
         let endpoint = ENDPOINT + 'smiles/unique';

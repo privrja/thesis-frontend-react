@@ -9,7 +9,12 @@ import {
     EDITOR_BACK,
     EDITOR_ITEM,
     EDITOR_SMILES,
-    URL_PREFIX, DECIMAL_PLACES
+    URL_PREFIX,
+    DECIMAL_PLACES,
+    EDITOR_NEW_BLOCK_NAME,
+    EDITOR_NEW_BLOCK_ACRONYM,
+    EDITOR_NEW_BLOCK_FORMULA,
+    EDITOR_NEW_BLOCK_SMILES
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
@@ -22,9 +27,17 @@ import {SelectInput} from "../component/SelectInput";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
+import {Field, Form, Formik, FormikHelpers} from "formik";
 
 interface State extends ListState {
     list: Block[];
+}
+
+interface Values {
+    blockName: string;
+    acronym: string;
+    formula: string;
+    smiles: string;
 }
 
 interface Block {
@@ -49,6 +62,10 @@ const TXT_EDIT_LOSSES = 'txt-edit-losses';
 const TXT_EDIT_SMILES = 'txt-edit-smiles';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
 const SEL_EDIT_SOURCE = 'sel-edit-source';
+const BLOCK_NAME = 'blockName';
+const BLOCK_ACRONYM = 'acronym';
+const BLOCK_FORMULA = 'formula';
+const BLOCK_SMILES = 'smiles';
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 const ELEMENT_LARGE_SMILES = 'popupLargeSmiles';
@@ -66,24 +83,31 @@ class BlockPage extends ListComponent<any, State> {
 
     componentDidMount() {
         if (this.state.selectedContainer) {
-            this.defaultListTransformation(this.getEndpoint(), response => {
-                let key = Number(localStorage.getItem(EDITOR_ITEM));
-                if (!isNaN(key)) {
-                    this.setState({editable: key});
-                    response.forEach((block: any, index: number, array: any[]) => {
-                        if (block.id === key) {
-                            array[index].smiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
-                            array[index].uniqueSmiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
-                        }
-                    });
-                }
-                this.setState({list: response});
-                if (key) {
-                    localStorage.removeItem(EDITOR_ITEM);
-                    localStorage.removeItem(EDITOR_SMILES);
-                    localStorage.removeItem(EDITOR_BACK);
-                }
-            });
+            let key = Number(localStorage.getItem(EDITOR_ITEM));
+            if (key === -1) {
+                this.defaultListTransformation(this.getEndpoint(), response => {
+                    this.setState({list: response});
+                    (document.getElementById(BLOCK_NAME) as HTMLInputElement).value = localStorage.getItem(EDITOR_NEW_BLOCK_NAME) ?? (document.getElementById(BLOCK_NAME) as HTMLInputElement).value;
+                    (document.getElementById(BLOCK_ACRONYM) as HTMLInputElement).value = localStorage.getItem(EDITOR_NEW_BLOCK_ACRONYM) ?? '';
+                    (document.getElementById(BLOCK_FORMULA) as HTMLInputElement).value = localStorage.getItem(EDITOR_SMILES) ? '' : localStorage.getItem(EDITOR_NEW_BLOCK_FORMULA) ?? '';
+                    (document.getElementById(BLOCK_SMILES) as HTMLInputElement).value = localStorage.getItem(EDITOR_SMILES) ?? localStorage.getItem(EDITOR_NEW_BLOCK_SMILES) ?? '';
+                    this.resetStorage(key);
+                });
+            } else {
+                this.defaultListTransformation(this.getEndpoint(), response => {
+                    if (!isNaN(key)) {
+                        this.setState({editable: key});
+                        response.forEach((block: any, index: number, array: any[]) => {
+                            if (block.id === key) {
+                                array[index].smiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
+                                array[index].uniqueSmiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
+                            }
+                        });
+                    }
+                    this.setState({list: response});
+                    this.resetStorage(key);
+                });
+            }
         }
         const large = document.getElementById(ELEMENT_LARGE_SMILES);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
@@ -93,12 +117,23 @@ class BlockPage extends ListComponent<any, State> {
         });
     }
 
+    resetStorage(key: number) {
+        if (key) {
+            localStorage.removeItem(EDITOR_ITEM);
+            localStorage.removeItem(EDITOR_SMILES);
+            localStorage.removeItem(EDITOR_BACK);
+            localStorage.removeItem(EDITOR_NEW_BLOCK_NAME);
+            localStorage.removeItem(EDITOR_NEW_BLOCK_ACRONYM);
+            localStorage.removeItem(EDITOR_NEW_BLOCK_FORMULA);
+            localStorage.removeItem(EDITOR_NEW_BLOCK_SMILES);
+        }
+    }
+
     /**
      * Show popup with large result
      * @param smiles
      */
     showLargeSmiles(smiles: string) {
-        console.log(smiles);
         this.popupSmilesRef.current!.activate();
         SmilesDrawer.parse(smiles, function (tree: any) {
             largeSmilesDrawer.draw(tree, ELEMENT_LARGE_SMILES);
@@ -113,8 +148,8 @@ class BlockPage extends ListComponent<any, State> {
         return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SBLOCK;
     }
 
-    create(): void {
-        // TODO
+    create(values: Values): void {
+        this.defaultCreate(this.getEndpoint(), values);
     }
 
     update(key: number) {
@@ -160,7 +195,17 @@ class BlockPage extends ListComponent<any, State> {
     editor(key: number) {
         localStorage.setItem(EDITOR_BACK, URL_PREFIX + 'container/' + this.state.selectedContainer + '/block');
         localStorage.setItem(EDITOR_ITEM, key.toString());
-        document.location.href = URL_PREFIX + 'smiles/' + this.find(key).smiles;
+        let smiles;
+        if (key === -1) {
+            smiles = (document.getElementById(BLOCK_SMILES) as HTMLInputElement).value;
+            localStorage.setItem(EDITOR_NEW_BLOCK_NAME, (document.getElementById(BLOCK_NAME) as HTMLInputElement).value);
+            localStorage.setItem(EDITOR_NEW_BLOCK_ACRONYM, (document.getElementById(BLOCK_ACRONYM) as HTMLInputElement).value);
+            localStorage.setItem(EDITOR_NEW_BLOCK_FORMULA, (document.getElementById(BLOCK_FORMULA) as HTMLInputElement).value);
+            localStorage.setItem(EDITOR_NEW_BLOCK_SMILES, (document.getElementById(BLOCK_SMILES) as HTMLInputElement).value);
+        } else {
+            smiles = this.find(key).smiles;
+        }
+        document.location.href = URL_PREFIX + 'smiles/' + smiles;
     }
 
     render() {
@@ -169,14 +214,52 @@ class BlockPage extends ListComponent<any, State> {
                 <section className={styles.pageTable}>
                     <PopupYesNo label={"Realy want to delete block?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge} ref={this.popupSmilesRef}/>
+                    <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
+                                       ref={this.popupSmilesRef}/>
 
-                    {/*{localStorage.getItem(TOKEN) !== null ?*/}
-                    {/*    <div>*/}
-                    {/*        <h2>Create new block</h2>*/}
+                    {localStorage.getItem(TOKEN) !== null ?
+                        <div>
+                            <h2>Create new block</h2>
+                            <Formik
+                                initialValues={{
+                                    blockName: '',
+                                    acronym: '',
+                                    formula: '',
+                                    smiles: ''
+                                }}
+                                onSubmit={(
+                                    values: Values,
+                                    {setSubmitting}: FormikHelpers<Values>
+                                ) => {
+                                    setTimeout(() => {
+                                        this.create(values);
+                                        setSubmitting(false);
+                                    }, 500);
+                                }}
+                            >
+                                <Form id="blockCreate">
+                                    <label htmlFor={BLOCK_NAME}>Name:</label>
+                                    <Field id={BLOCK_NAME} name={BLOCK_NAME}
+                                           placeholder='Name'/>
 
-                    {/*    </div> : <div/>*/}
-                    {/*}*/}
+                                    <label htmlFor={BLOCK_ACRONYM}>Acronym:</label>
+                                    <Field id={BLOCK_ACRONYM} name={BLOCK_ACRONYM}
+                                           placeholder='Name'/>
+
+                                    <label htmlFor={BLOCK_FORMULA}>Formula:</label>
+                                    <Field id={BLOCK_FORMULA} name={BLOCK_FORMULA}
+                                           placeholder='Residue'/>
+
+                                    <label htmlFor={BLOCK_SMILES}>SMILES:</label>
+                                    <Field id={BLOCK_SMILES} name={BLOCK_SMILES}
+                                           placeholder='SMILES'/>
+
+                                    <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
+                                    <button type="submit" className={styles.create}>Create new Block</button>
+                                </Form>
+                            </Formik>
+                        </div> : ''
+                    }
 
                     {this.state.list.length > 0 ? <h2>List of Blocks</h2> : ''}
 
@@ -210,7 +293,8 @@ class BlockPage extends ListComponent<any, State> {
                                         <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
                                                    id={TXT_EDIT_FORMULA}/> : block.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()} name={TXT_EDIT_MASS}
+                                        <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()}
+                                                   name={TXT_EDIT_MASS}
                                                    id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
