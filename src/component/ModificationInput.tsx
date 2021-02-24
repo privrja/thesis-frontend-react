@@ -41,7 +41,7 @@ class ModificationInput extends React.Component<Props, State> {
             modification = {id: null, modificationName: '', formula: '', nTerminal: this.props.type === 'n', cTerminal: this.props.type === 'c'};
         }
         this.state = {
-            isVisible: this.props.modification !== null ,
+            isVisible: this.props.modification !== undefined && this.props.modification !== null,
             isDisabled: false,
             title: props.title,
             modification: modification
