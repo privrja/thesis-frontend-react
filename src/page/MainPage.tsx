@@ -152,7 +152,7 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
-                        console.log(sequence.smiles, sequence.usmiles);
+                        console.log(sequence);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
@@ -174,7 +174,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             blocks: sequence.blocks.map((block: any) => {
                                 return {
                                     id: block.originalId,
-                                    databaseId: block.source,
+                                    databaseId: block.id,
                                     acronym: block.acronym,
                                     smiles: block.smiles,
                                     unique: block.uniqueSmiles,
@@ -206,7 +206,6 @@ class MainPage extends React.Component<any, SequenceState> {
             decaySource = JSON.parse(decays);
         }
         if (decaySource.length > 0) {
-            console.log(decaySource);
            init = {
                width: area!.clientWidth,
                height: area!.clientHeight,
@@ -228,7 +227,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 themes: OPTION_THEMES,
             }
         }
-        console.log(decays);
         smilesDrawer = new SmilesDrawer.Drawer(init);
         const large = document.getElementById(ELEMENT_LARGE_CANVAS);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
@@ -347,19 +345,22 @@ class MainPage extends React.Component<any, SequenceState> {
                     }
                 })
             };
-            fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence', {
-                method: 'POST',
+            let endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence';
+            fetch(endpoint + (this.state.sequenceEdit ? '/' + this.state.sequenceId?.toString() ?? '' : ''), {
+                method: this.state.sequenceEdit ? 'PUT' : 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(sequence)
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence created');
+                } else if(response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK, 'Sequence updated');
                 } else {
                     if (response.status === 401) {
                         localStorage.removeItem(TOKEN);
                     }
                     this.flashRef.current!.activate(FlashType.BAD);
-                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(err => console.log(err));
                 }
                 document.location.href = '#main';
             });
@@ -770,6 +771,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let block = this.state.blocks.find(e => e.id === key);
         let position = this.getAcronymPosition(key);
         if (block && this.state.sequence && this.state.sequence.sequenceOriginal && this.state.sequence.sequence) {
+            console.log(position, block.acronym, key, this.state.sequence.sequenceOriginal);
             let sequenceOriginal = this.removeFromSequence(this.state.sequence?.sequenceOriginal, position, key.toString());
             let sequence = this.removeFromSequence(this.state.sequence?.sequence, position, block.acronym);
             this.setState({
@@ -866,6 +868,23 @@ class MainPage extends React.Component<any, SequenceState> {
                         if (inBracket) {
                             cntInBracket++;
                         }
+                        let char = '';
+                        let acronymString = '';
+                        while (char !== ']') {
+                            acronymString += char;
+                            i++;
+                            char = this.state.sequence.sequenceOriginal[i];
+                        }
+                        if (acronymString === key.toString()) {
+                            position = cntPosition;
+                            if (cntInBracket) {
+                                endings = true;
+                            } else {
+                                end = true;
+                            }
+                            break;
+                        }
+                        i--;
                         continue;
                     case '(':
                         inBracket = true;
@@ -878,14 +897,6 @@ class MainPage extends React.Component<any, SequenceState> {
                         inBracket = false;
                         cntInBracket = 0;
                         continue;
-                    case key.toString():
-                        position = cntPosition;
-                        if (cntInBracket) {
-                            endings = true;
-                        } else {
-                            end = true;
-                        }
-                        break;
                     default:
                         continue;
                 }
