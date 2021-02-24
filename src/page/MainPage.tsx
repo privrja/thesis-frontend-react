@@ -29,6 +29,7 @@ import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import PopupEditor from "../component/PopupEditor";
 import ContainerHelper from "../helper/ContainerHelper";
 import TextArea from "../component/TextArea";
+import Sleep from "../helper/Sleep";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -320,7 +321,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
                 sequence: txtSequence.value,
-                decays: this.state.sequence?.decays,
+                decays: '[' + smilesDrawer.graph.decays.toString() + ']',
                 sequenceOriginal: this.state.sequence?.sequenceOriginal,
                 sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
                 nModification: nModification,
@@ -355,6 +356,12 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence created');
                 } else if(response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence updated');
+                    localStorage.removeItem(SEQUENCE_EDIT);
+                    localStorage.removeItem(SEQUENCE_ID);
+                    window.location.href = '#';
+                    Sleep.sleep(500).then(() => {
+                        window.location.href = '/container/' + this.state.selectedContainer + '/sequence';
+                    });
                 } else {
                     if (response.status === 401) {
                         localStorage.removeItem(TOKEN);
