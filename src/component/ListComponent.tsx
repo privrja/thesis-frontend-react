@@ -9,7 +9,12 @@ export interface ListState {
     selectedContainer: number;
     editable?: number;
     list: any[];
+    lastSortParam?: string;
+    lastSortOrder?: string;
 }
+
+const ORDER_BY_ASC = 'asc';
+const ORDER_BY_DESC = 'desc';
 
 abstract class ListComponent<P extends any, S extends ListState> extends React.Component<P, S> {
 
@@ -54,6 +59,15 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     editEnd(): void {
         this.setState({editable: undefined});
+    }
+
+    sortBy(param: string) {
+        let order = this.state.lastSortOrder === ORDER_BY_ASC ? ORDER_BY_DESC : ORDER_BY_ASC;
+        if (this.state.lastSortParam !== param) {
+            order = ORDER_BY_ASC;
+        }
+        this.defaultList(this.getEndpoint() + '?sort=' + param + '&order=' + order);
+        this.setState({lastSortParam: param, lastSortOrder: order});
     }
 
     defaultList(endpoint: string) {
