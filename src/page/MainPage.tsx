@@ -5,7 +5,7 @@ import Helmet from "react-helmet";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
 import {
-    OPTION_DRAW_DECAY_POINTS,
+    OPTION_DRAW_DECAY_POINTS, OPTION_DRAW_DECAY_POINTS_SOURCE,
     OPTION_THEMES
 } from "../constant/SmilesDrawerConstants";
 import {SelectInput} from "../component/SelectInput";
@@ -211,7 +211,7 @@ class MainPage extends React.Component<any, SequenceState> {
                width: area!.clientWidth,
                height: area!.clientHeight,
                compactDrawing: false,
-               drawDecayPoints: 2,
+               drawDecayPoints: OPTION_DRAW_DECAY_POINTS_SOURCE,
                offsetX: area!.offsetLeft,
                offsetY: area!.offsetTop,
                themes: OPTION_THEMES,

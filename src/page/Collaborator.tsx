@@ -38,6 +38,7 @@ class Collaborator extends ListComponent<Props, State> {
         super(props);
         this.users = this.users.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.transformation = this.transformation.bind(this);
         this.state = {
             list: [],
             container: {containerName: '', visibility: ''},
@@ -54,14 +55,17 @@ class Collaborator extends ListComponent<Props, State> {
         return ENDPOINT + CONTAINER + '/' + this.props.containerId;
     }
 
+    transformation(response: any) {
+        this.setState({
+            container: {
+                containerName: response.containerName,
+                visibility: response.visibility
+            }, list: response.collaborators
+        });
+    }
+
     list(): void {
-        this.defaultListTransformation(this.getEndpoint(),
-            response => this.setState({
-                container: {
-                    containerName: response.containerName,
-                    visibility: response.visibility
-                }, list: response.collaborators
-            }));
+        this.defaultListTransformation(this.getEndpoint(), this.transformation);
     }
 
     componentDidMount(): void {
@@ -153,8 +157,8 @@ class Collaborator extends ListComponent<Props, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th>User name</th>
-                            <th>Mode</th>
+                            <th onClick={() => this.sortBy('nick', this.getEndpoint(), this.transformation)}>User name</th>
+                            <th onClick={() => this.sortBy('mode', this.getEndpoint(), this.transformation)}>Mode</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

@@ -122,12 +122,12 @@ class ModificationPage extends ListComponent<any, ListState> {
                         <table>
                             <thead>
                             <tr>
-                                <th>Id</th>
-                                <th>Modification name</th>
-                                <th>Formula</th>
-                                <th>Mass</th>
-                                <th>N-terminal</th>
-                                <th>C-terminal</th>
+                                <th onClick={() => this.sortBy('id')}>Id</th>
+                                <th onClick={() => this.sortBy('modificationName')}>Modification name</th>
+                                <th onClick={() => this.sortBy('modificationFormula')}>Formula</th>
+                                <th onClick={() => this.sortBy('modificationMass')}>Mass</th>
+                                <th onClick={() => this.sortBy('nTerminal')}>N-terminal</th>
+                                <th onClick={() => this.sortBy('cTerminal')}>C-terminal</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>

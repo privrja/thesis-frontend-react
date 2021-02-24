@@ -125,7 +125,9 @@ class ContainerPage extends ListComponent<any, State> {
             <section className={styles.page}>
                 <section className={styles.pageTable}>
                     <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
-                    <PopupExport label={'Export'} onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')} ref={this.popupExportRef}/>
+                    <PopupExport label={'Export'}
+                                 onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')}
+                                 ref={this.popupExportRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
@@ -165,10 +167,10 @@ class ContainerPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>Container name</th>
-                            <th>Visibility</th>
-                            <th>Mode</th>
+                            <th onClick={() => this.sortBy('id')}>Id</th>
+                            <th onClick={() => this.sortBy('containerName')}>Container name</th>
+                            <th onClick={() => this.sortBy('visibility')}>Visibility</th>
+                            <th onClick={() => this.sortBy('mode')}>Mode</th>
                             <th>Is selected</th>
                             <th>Actions</th>
                         </tr>
@@ -203,7 +205,8 @@ class ContainerPage extends ListComponent<any, State> {
                                     </button>
                                     <button>Go on</button>
                                     <button>Clone</button>
-                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
+                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
+                                    </button>
                                     <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
                                     </button>
                                 </td>
@@ -217,8 +220,10 @@ class ContainerPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>Container name</th>
+                            <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th>
+                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container
+                                Name
+                            </th>
                             <th>Is selected</th>
                             <th>Actions</th>
                         </tr>
@@ -236,7 +241,8 @@ class ContainerPage extends ListComponent<any, State> {
                                     }}>Select
                                     </button>
                                     <button>Clone</button>
-                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
+                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
+                                    </button>
                                 </td>
                             </tr>
                         ))}

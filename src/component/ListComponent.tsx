@@ -61,12 +61,19 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.setState({editable: undefined});
     }
 
-    sortBy(param: string) {
+    sortBy(param: string, endpoint?: string, transformationCallback?: (e: any) => void) {
         let order = this.state.lastSortOrder === ORDER_BY_ASC ? ORDER_BY_DESC : ORDER_BY_ASC;
         if (this.state.lastSortParam !== param) {
             order = ORDER_BY_ASC;
         }
-        this.defaultList(this.getEndpoint() + '?sort=' + param + '&order=' + order);
+        if (!endpoint) {
+            endpoint = this.getEndpoint();
+        }
+        if (!transformationCallback) {
+            this.defaultList(endpoint + '?sort=' + param + '&order=' + order, );
+        } else {
+            this.defaultListTransformation(endpoint + '?sort=' + param + '&order=' + order, transformationCallback);
+        }
         this.setState({lastSortParam: param, lastSortOrder: order});
     }
 

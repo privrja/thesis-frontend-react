@@ -99,7 +99,7 @@ class NorineFinder implements IFinder {
                                 pep.general.name,
                                 pep.structure.smiles,
                                 pep.general.formula,
-                                pep.general.mw
+                                Number(pep.general.mw)
                             );
                         } else {
                             return null;
@@ -138,7 +138,7 @@ class NorineFinder implements IFinder {
             e.general.name,
             e.structure.smiles,
             e.general.formula,
-            e.general.mw
+            Number(e.general.mw)
         ));
     }
 
