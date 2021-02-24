@@ -4,7 +4,10 @@ import styles from "../main.module.scss";
 import Helmet from "react-helmet";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
-import {OPTION_DRAW_DECAY_POINTS, OPTION_THEMES} from "../constant/SmilesDrawerConstants";
+import {
+    OPTION_DRAW_DECAY_POINTS,
+    OPTION_THEMES
+} from "../constant/SmilesDrawerConstants";
 import {SelectInput} from "../component/SelectInput";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
@@ -60,6 +63,7 @@ interface SequenceStructure {
     sequenceType: string;
     sequence: string;
     sequenceOriginal: string;
+    decays: string;
 }
 
 interface BlockStructure {
@@ -117,7 +121,7 @@ class MainPage extends React.Component<any, SequenceState> {
         };
     }
 
-    componentDidMount(): void {
+    componentDidMount() {
         this.initializeSmilesDrawers();
         this.getSequenceId();
     }
@@ -148,6 +152,7 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
+                        console.log(sequence.smiles, sequence.usmiles);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
@@ -160,7 +165,8 @@ class MainPage extends React.Component<any, SequenceState> {
                             sequence: {
                                 sequence: sequence.sequence,
                                 sequenceType: sequence.sequenceType,
-                                sequenceOriginal: sequence.sequenceOriginal
+                                sequenceOriginal: sequence.sequenceOriginal,
+                                decays: sequence.decays
                             },
                             nModification: sequence.nModification,
                             cModification: sequence.cModification,
@@ -184,25 +190,46 @@ class MainPage extends React.Component<any, SequenceState> {
                                 }
                             }),
                         });
+                        this.initializeSmilesDrawers(sequence.decays);
                         this.drawSmiles();
                     });
                 }
             });
-
         }
     }
 
-    initializeSmilesDrawers() {
+    initializeSmilesDrawers(decays?: string) {
         const area = document.getElementById(ELEMENT_CANVAS);
-        smilesDrawer = new SmilesDrawer.Drawer({
-            width: area!.clientWidth,
-            height: area!.clientHeight,
-            compactDrawing: false,
-            drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
-            offsetX: area!.offsetLeft,
-            offsetY: area!.offsetTop,
-            themes: OPTION_THEMES,
-        });
+        let init;
+        let decaySource = [];
+        if (decays) {
+            decaySource = JSON.parse(decays);
+        }
+        if (decaySource.length > 0) {
+            console.log(decaySource);
+           init = {
+               width: area!.clientWidth,
+               height: area!.clientHeight,
+               compactDrawing: false,
+               drawDecayPoints: 2,
+               offsetX: area!.offsetLeft,
+               offsetY: area!.offsetTop,
+               themes: OPTION_THEMES,
+               decaySource: decaySource
+           }
+        } else {
+            init = {
+                width: area!.clientWidth,
+                height: area!.clientHeight,
+                compactDrawing: false,
+                drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
+                offsetX: area!.offsetLeft,
+                offsetY: area!.offsetTop,
+                themes: OPTION_THEMES,
+            }
+        }
+        console.log(decays);
+        smilesDrawer = new SmilesDrawer.Drawer(init);
         const large = document.getElementById(ELEMENT_LARGE_CANVAS);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
             width: large!.clientWidth,
@@ -295,6 +322,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
                 sequence: txtSequence.value,
+                decays: this.state.sequence?.decays,
                 sequenceOriginal: this.state.sequence?.sequenceOriginal,
                 sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
                 nModification: nModification,
@@ -483,6 +511,7 @@ class MainPage extends React.Component<any, SequenceState> {
             sequence: blockStructures.sequence,
             sequenceType: blockStructures.sequenceType,
             sequenceOriginal: blockStructures.sequence,
+            decays: '[' + blockStructures.decays?.toString() + ']',
         } as SequenceStructure;
         let token = localStorage.getItem(TOKEN);
         let endpoint = ENDPOINT + 'smiles/unique';
@@ -748,7 +777,8 @@ class MainPage extends React.Component<any, SequenceState> {
                 sequence: {
                     sequence: sequence,
                     sequenceOriginal: sequenceOriginal,
-                    sequenceType: this.state.sequence.sequenceType
+                    sequenceType: this.state.sequence.sequenceType,
+                    decays: this.state.sequence.decays
                 }
             })
         }
@@ -794,17 +824,16 @@ class MainPage extends React.Component<any, SequenceState> {
                 break;
             }
         }
-        console.log(positionIndex, inBracket);
         if (position.removeBracket) {
-            let newSequence = this.removings(sequence, inBracket, positionIndex, acronym);
+            let newSequence = this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
             let positionEnd = newSequence.indexOf(')', bracketPosition);
             return newSequence.substr(0, bracketPosition - 1) + '-' + newSequence.substring(bracketPosition + 1, positionEnd -1) + '-' + newSequence.substring(positionEnd + 1);
         } else {
-            return this.removings(sequence, inBracket, positionIndex, acronym);
+            return this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
         }
     }
 
-    removings(sequence: string, inBracket: boolean, positionIndex: number, acronym: string) {
+    removeSequenceAcronyms(sequence: string, inBracket: boolean, positionIndex: number, acronym: string) {
         if (inBracket) {
             if (sequence[positionIndex - 1] === '(') {
                 return sequence.substr(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
@@ -813,13 +842,10 @@ class MainPage extends React.Component<any, SequenceState> {
         } else {
             if (positionIndex + acronym.length + 2 > sequence.length || sequence[positionIndex + acronym.length + 2] !== '-') {
                 if (positionIndex - 1 > 0 && sequence[positionIndex - 1] === '-') {
-                    // remove before
                     return sequence.substring(0, positionIndex -1) + sequence.substring(positionIndex + acronym.length + 2);
                 }
-                // remove only
                 return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 2);
             } else {
-                // remove after
                 return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
             }
         }
