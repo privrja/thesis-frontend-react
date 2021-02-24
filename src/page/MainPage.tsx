@@ -59,6 +59,7 @@ interface SequenceState {
 interface SequenceStructure {
     sequenceType: string;
     sequence: string;
+    sequenceOriginal: string;
 }
 
 interface BlockStructure {
@@ -133,7 +134,6 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequenceId = localStorage.getItem(SEQUENCE_ID);
         if (editSequence === 'Yes' && sequenceId) {
             this.setState({sequenceEdit: true, sequenceId: Number(sequenceId)});
-            // TODO fetch data
             let token = localStorage.getItem(TOKEN);
             let init;
             if (token) {
@@ -160,12 +160,14 @@ class MainPage extends React.Component<any, SequenceState> {
                             sequence: {
                                 sequence: sequence.sequence,
                                 sequenceType: sequence.sequenceType,
+                                sequenceOriginal: sequence.sequenceOriginal
                             },
                             nModification: sequence.nModification,
                             cModification: sequence.cModification,
                             bModification: sequence.bModification,
                             blocks: sequence.blocks.map((block: any) => {
-                                return { id: block.id,
+                                return {
+                                    id: block.originalId,
                                     databaseId: block.source,
                                     acronym: block.acronym,
                                     smiles: block.smiles,
@@ -293,6 +295,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
                 sequence: txtSequence.value,
+                sequenceOriginal: this.state.sequence?.sequenceOriginal,
                 sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
                 nModification: nModification,
                 cModification: cModification,
@@ -303,6 +306,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks: this.state.blocks.map(block => {
                     return {
                         databaseId: block.databaseId,
+                        originalId: block.id,
                         sameAs: block.sameAs,
                         acronym: block.acronym,
                         blockName: block.block?.structureName,
@@ -478,6 +482,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequence = {
             sequence: blockStructures.sequence,
             sequenceType: blockStructures.sequenceType,
+            sequenceOriginal: blockStructures.sequence,
         } as SequenceStructure;
         let token = localStorage.getItem(TOKEN);
         let endpoint = ENDPOINT + 'smiles/unique';
@@ -732,6 +737,141 @@ class MainPage extends React.Component<any, SequenceState> {
         this.setState({molecule: molecule});
     }
 
+    removeBlock(key: number) {
+        let block = this.state.blocks.find(e => e.id === key);
+        let position = this.getAcronymPosition(key);
+        if (block && this.state.sequence && this.state.sequence.sequenceOriginal && this.state.sequence.sequence) {
+            let sequenceOriginal = this.removeFromSequence(this.state.sequence?.sequenceOriginal, position, key.toString());
+            let sequence = this.removeFromSequence(this.state.sequence?.sequence, position, block.acronym);
+            this.setState({
+                blocks: this.state.blocks.filter(e => e.id !== key),
+                sequence: {
+                    sequence: sequence,
+                    sequenceOriginal: sequenceOriginal,
+                    sequenceType: this.state.sequence.sequenceType
+                }
+            })
+        }
+        this.setState({blocks: this.state.blocks.filter(e => e.id !== key)})
+    }
+
+    removeFromSequence(sequence: string, position: any, acronym: string) {
+        let cntPosition = 0;
+        let positionIndex = 0;
+        let inBracket = false;
+        let bracketPosition = 0;
+        let end = false;
+        let endings = false;
+        for (let i = 0; i < sequence.length; ++i) {
+            switch (sequence[i]) {
+                case '[':
+                    cntPosition++;
+                    if (cntPosition === position.position) {
+                        positionIndex = i;
+                        if (inBracket) {
+                            endings = true;
+                        } else {
+                            end = true;
+                        }
+                    }
+                    break;
+                case '(':
+                    inBracket = true;
+                    bracketPosition = i;
+                    continue;
+                case ')':
+                    if (endings) {
+                        end = true;
+                        break;
+                    }
+                    inBracket = false;
+                    bracketPosition = 0;
+                    continue;
+                default:
+                    continue;
+            }
+            if(end) {
+                break;
+            }
+        }
+        console.log(positionIndex, inBracket);
+        if (position.removeBracket) {
+            let newSequence = this.removings(sequence, inBracket, positionIndex, acronym);
+            let positionEnd = newSequence.indexOf(')', bracketPosition);
+            return newSequence.substr(0, bracketPosition - 1) + '-' + newSequence.substring(bracketPosition + 1, positionEnd -1) + '-' + newSequence.substring(positionEnd + 1);
+        } else {
+            return this.removings(sequence, inBracket, positionIndex, acronym);
+        }
+    }
+
+    removings(sequence: string, inBracket: boolean, positionIndex: number, acronym: string) {
+        if (inBracket) {
+            if (sequence[positionIndex - 1] === '(') {
+                return sequence.substr(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+            }
+            return sequence.substr(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+        } else {
+            if (positionIndex + acronym.length + 2 > sequence.length || sequence[positionIndex + acronym.length + 2] !== '-') {
+                if (positionIndex - 1 > 0 && sequence[positionIndex - 1] === '-') {
+                    // remove before
+                    return sequence.substring(0, positionIndex -1) + sequence.substring(positionIndex + acronym.length + 2);
+                }
+                // remove only
+                return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 2);
+            } else {
+                // remove after
+                return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+            }
+        }
+    }
+
+    getAcronymPosition(key: number) {
+        if (this.state.sequence && this.state.sequence.sequenceOriginal) {
+            let cntPosition = 0;
+            let position = 0;
+            let inBracket = false;
+            let cntInBracket = 0;
+            let end = false;
+            let endings = false;
+            for (let i = 0; i < this.state.sequence.sequenceOriginal.length; ++i) {
+                switch (this.state.sequence.sequenceOriginal[i]) {
+                    case '[':
+                        cntPosition++;
+                        if (inBracket) {
+                            cntInBracket++;
+                        }
+                        continue;
+                    case '(':
+                        inBracket = true;
+                        continue;
+                    case ')':
+                        if (endings) {
+                            end = true;
+                            break;
+                        }
+                        inBracket = false;
+                        cntInBracket = 0;
+                        continue;
+                    case key.toString():
+                        position = cntPosition;
+                        if (cntInBracket) {
+                            endings = true;
+                        } else {
+                            end = true;
+                        }
+                        break;
+                    default:
+                        continue;
+                }
+                if (end) {
+                    break;
+                }
+            }
+            return {position: position, removeBracket: inBracket && cntInBracket === 2};
+        }
+    }
+
+
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage} id={'main'}>
@@ -762,7 +902,9 @@ class MainPage extends React.Component<any, SequenceState> {
                                    onChange={this.refreshMolecule}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <TextArea name={'smiles'} id={'smiles'} className={styles.main} value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
+                        <TextArea name={'smiles'} id={'smiles'} className={styles.main}
+                                  value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
+                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
@@ -893,7 +1035,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                         }}>Editor
                                         </button>
                                         <button className={styles.delete}
-                                                onClick={() => this.setState({blocks: this.state.blocks.filter(e => e.id !== block.id)})}>Remove
+                                                onClick={() => this.removeBlock(block.id)}>Remove
                                         </button>
                                     </td>
                                 </tr>
