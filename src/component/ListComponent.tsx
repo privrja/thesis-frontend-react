@@ -4,6 +4,7 @@ import PopupYesNo from "./PopupYesNo";
 import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED, OK_CREATED} from "../constant/FlashConstants";
+import FetchHelper from "../helper/FetchHelper";
 
 export interface ListState {
     selectedContainer: number;
@@ -82,18 +83,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     }
 
     defaultListTransformation(endpoint: string, transformationCallback: (e: any) => void) {
-        const token = localStorage.getItem(TOKEN);
-        fetch(endpoint, token ? {
-            method: 'GET',
-            headers: {'x-auth-token': token}
-        } : {
-            method: 'GET'
-        }).then(response => {
-            if (response.status === 401) {
-                localStorage.removeItem(TOKEN);
-            }
-            return response;
-        }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
+        FetchHelper.fetch(endpoint, transformationCallback);
     }
 
     defaultCreate(endpoint: string, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {

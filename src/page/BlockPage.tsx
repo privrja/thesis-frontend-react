@@ -323,6 +323,7 @@ class BlockPage extends ListComponent<any, State> {
                                         <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                         </button>
                                         <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
+                                        <button onClick={() => {document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'}}>Usage</button>
                                         <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete
                                         </button>
                                     </td>

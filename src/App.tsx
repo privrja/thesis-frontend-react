@@ -18,6 +18,7 @@ import ReferencePage from "./page/ReferencePage";
 import SequencePage from "./page/SequencePage";
 import {URL_PREFIX} from "./constant/ApiConstants";
 import ImportPage from "./page/ImportPage";
+import BlockUsagePage from "./page/BlockUsagePage";
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
                 <Route path={URL_PREFIX + 'register/'} component={RegisterPage}/>
                 <Route path={URL_PREFIX + 'container/:id/modification/'} exact component={ModificationPage}/>
                 <Route path={URL_PREFIX + 'container/:id/block/'} exact component={BlockPage}/>
+                <Route path={URL_PREFIX + 'container/:id/block/:blockId/usage'} exact component={BlockUsagePage}/>
                 <Route path={URL_PREFIX + 'container/:id/sequence/'} exact component={SequencePage}/>
                 <Route path={URL_PREFIX + 'smiles/:smiles'} exact component={EditorPage}/>
                 <Route path={URL_PREFIX + 'smiles/'} exact component={EditorPage}/>

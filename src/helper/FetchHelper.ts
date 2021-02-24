@@ -1,4 +1,4 @@
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 
 class FetchHelper {
 
@@ -12,6 +12,21 @@ class FetchHelper {
                 }
             }
         });
+    }
+
+    static fetch(endpoint: string, transformationCallback: (e: any) => void) {
+        const token = localStorage.getItem(TOKEN);
+        fetch(endpoint, token ? {
+            method: 'GET',
+            headers: {'x-auth-token': token}
+        } : {
+            method: 'GET'
+        }).then(response => {
+            if (response.status === 401) {
+                localStorage.removeItem(TOKEN);
+            }
+            return response;
+        }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
     }
 
 }
