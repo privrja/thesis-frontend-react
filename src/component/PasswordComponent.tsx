@@ -3,7 +3,7 @@ import styles from "../main.module.scss";
 import Flash from "./Flash";
 import FlashType from "./FlashType";
 import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
-import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 
 const TXT_PASSWORD_2 = 'txt-password2';
 const TXT_PASSWORD = 'txt-password';
@@ -33,7 +33,7 @@ class PasswordComponent extends React.Component<any, any> {
                     if (response.status === 204) {
                         this.flashRef.current!.activate(FlashType.OK);
                     } else {
-                        this.flashRef.current!.activate(FlashType.BAD, 'Something goes wrong');
+                        this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG);
                     }
                 })
             } else {
