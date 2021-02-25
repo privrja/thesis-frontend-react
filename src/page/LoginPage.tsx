@@ -11,6 +11,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Sleep from "../helper/Sleep";
 import Helper from "../helper/Helper";
+import PopupYesNo from "../component/PopupYesNo";
 
 interface Values {
     name: string;
@@ -20,11 +21,16 @@ interface Values {
 class LoginPage extends React.Component<any> {
 
     flashRef: React.RefObject<Flash>;
+    popupRef: React.RefObject<PopupYesNo>;
 
     constructor(props: any) {
         super(props);
-
         this.flashRef = React.createRef();
+        this.popupRef = React.createRef();
+        this.login = this.login.bind(this);
+        this.conditionsOk = this.conditionsOk.bind(this);
+        this.conditionsKo = this.conditionsKo.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
     login(values: Values) {
@@ -41,9 +47,11 @@ class LoginPage extends React.Component<any> {
                         localStorage.setItem(TOKEN, token);
                         this.flashRef.current!.activate(FlashType.OK);
                         Helper.resetUserStorage();
-                        Sleep.sleep(500).then(() => {
-                            window.location.href = URL_PREFIX
-                        });
+                        if (response.headers.get('x-condition') !== "1") {
+                            this.popupRef.current!.activate();
+                        } else {
+                            this.refresh();
+                        }
                     } else {
                         this.flashRef.current!.activate(FlashType.BAD);
                     }
@@ -53,6 +61,35 @@ class LoginPage extends React.Component<any> {
             })
     }
 
+    refresh() {
+        Sleep.sleep(500).then(() => {
+            window.location.href = URL_PREFIX
+        });
+    }
+
+    conditionsOk() {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'condition', {
+                method: 'POST',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 204) {
+                    this.refresh();
+                } else {
+                    this.conditionsKo();
+                }
+            })
+        } else {
+            this.conditionsKo();
+        }
+    }
+
+    conditionsKo() {
+        localStorage.removeItem(TOKEN);
+        this.refresh();
+    }
+
     render() {
         return (
             <section className={styles.pageLogin + ' ' + styles.page}>
@@ -60,6 +97,7 @@ class LoginPage extends React.Component<any> {
                     <h1>Login</h1>
 
                     <Flash textBad='Login failure!' textOk='Login sucessful!' ref={this.flashRef}/>
+                    <PopupYesNo label={'You need to agree with terms and conditions'} onYes={this.conditionsOk} onNo={this.conditionsKo} ref={this.popupRef} />
 
                     <Formik
                         initialValues={{
