@@ -19,6 +19,7 @@ import SequencePage from "./page/SequencePage";
 import {URL_PREFIX} from "./constant/ApiConstants";
 import ImportPage from "./page/ImportPage";
 import BlockUsagePage from "./page/BlockUsagePage";
+import SettingPage from "./page/SettingPage";
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
                 <Route path={URL_PREFIX + 'condition/'} component={ConditionsPage}/>
                 <Route path={URL_PREFIX + 'reference/'} component={ReferencePage}/>
                 <Route path={URL_PREFIX + 'import/'} component={ImportPage}/>
+                <Route path={URL_PREFIX + 'setup/'} component={SettingPage}/>
             </Router>
 
             <Footer/>
