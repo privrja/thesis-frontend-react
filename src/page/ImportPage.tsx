@@ -19,7 +19,7 @@ const SEQUENCE = 'Sequences';
 const IMPORT_OPTIONS = [
     new SelectOption(MODIFICATION, MODIFICATION),
     new SelectOption(BLOCK, BLOCK),
-    // new SelectOption(MERGE_BLOCK, MERGE_BLOCK),
+    new SelectOption(MERGE_BLOCK, MERGE_BLOCK),
     new SelectOption(SEQUENCE, SEQUENCE)
 ];
 
@@ -28,7 +28,6 @@ interface State {
 }
 
 const SEL_IMPORT_TYPE = 'sel-import-type';
-
 const TXT_BAD_INPUTS = 'txt-wrong-inputs';
 
 class ImportPage extends React.Component<any, State> {

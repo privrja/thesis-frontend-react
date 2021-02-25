@@ -5,7 +5,7 @@ const SEPARATOR_SLASH = '/';
 class BlockMergeImport extends AbstractImport {
 
     getType(): string {
-        return '/block/merge'
+        return '/block'
     }
 
     getLineLength(): number {
@@ -24,7 +24,7 @@ class BlockMergeImport extends AbstractImport {
                     this.okStack.push({
                         blockName: blockNames[i],
                         acronym: acronyms[i],
-                        residue: parts[2],
+                        formula: parts[2],
                         blockMass: Number(parts[3]),
                         losses: losses.length > 0 ? losses[i] : '',
                         source: ref.source,
