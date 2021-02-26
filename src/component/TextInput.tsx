@@ -9,6 +9,7 @@ interface Props {
     className?: string;
     onChange?: (e: any) => void;
     onKeyDown?: (e: any) => void;
+    placeholder?: string;
 }
 
 interface State {
@@ -45,7 +46,7 @@ class TextInput extends React.Component<Props, State> {
     }
 
     render() {
-        return <input type="text" className={this.props.className} id={this.props.id} name={this.props.name} value={this.state.value} disabled={this.state.disabled} onChange={this.handleChange} size={this.props.size} onKeyDown={this.keyDown}/>
+        return <input type="text" placeholder={this.props.placeholder} className={this.props.className} id={this.props.id} name={this.props.name} value={this.state.value} disabled={this.state.disabled} onChange={this.handleChange} size={this.props.size} onKeyDown={this.keyDown}/>
     }
 }
 

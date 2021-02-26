@@ -27,17 +27,9 @@ import {SelectInput} from "../component/SelectInput";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
-import {Field, Form, Formik, FormikHelpers} from "formik";
 
 interface State extends ListState {
     list: Block[];
-}
-
-interface Values {
-    blockName: string;
-    acronym: string;
-    formula: string;
-    smiles: string;
 }
 
 interface Block {
@@ -148,8 +140,12 @@ class BlockPage extends ListComponent<any, State> {
         return ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SBLOCK;
     }
 
-    create(values: Values): void {
-        this.defaultCreate(this.getEndpoint(), values);
+    create(): void {
+        let blockName = document.getElementById(BLOCK_NAME) as HTMLInputElement;
+        let acronym = document.getElementById(BLOCK_ACRONYM) as HTMLInputElement;
+        let formula = document.getElementById(BLOCK_FORMULA) as HTMLInputElement;
+        let smiles = document.getElementById(BLOCK_SMILES) as HTMLInputElement;
+        this.defaultCreate(this.getEndpoint(), {blockName: blockName.value, acronym: acronym.value, formula: formula.value, smiles: smiles.value});
     }
 
     update(key: number) {
@@ -220,44 +216,24 @@ class BlockPage extends ListComponent<any, State> {
                     {localStorage.getItem(TOKEN) !== null ?
                         <div>
                             <h2>Create new block</h2>
-                            <Formik
-                                initialValues={{
-                                    blockName: '',
-                                    acronym: '',
-                                    formula: '',
-                                    smiles: ''
-                                }}
-                                onSubmit={(
-                                    values: Values,
-                                    {setSubmitting}: FormikHelpers<Values>
-                                ) => {
-                                    setTimeout(() => {
-                                        this.create(values);
-                                        setSubmitting(false);
-                                    }, 500);
-                                }}
-                            >
-                                <Form id="blockCreate">
-                                    <label htmlFor={BLOCK_NAME}>Name:</label>
-                                    <Field id={BLOCK_NAME} name={BLOCK_NAME}
-                                           placeholder='Name'/>
+                            <label htmlFor={BLOCK_NAME}>Name:</label>
+                            <input type={'text'} id={BLOCK_NAME} name={BLOCK_NAME}
+                                   placeholder='Name'/>
 
-                                    <label htmlFor={BLOCK_ACRONYM}>Acronym:</label>
-                                    <Field id={BLOCK_ACRONYM} name={BLOCK_ACRONYM}
-                                           placeholder='Name'/>
+                            <label htmlFor={BLOCK_ACRONYM}>Acronym:</label>
+                            <input type={'text'} id={BLOCK_ACRONYM} name={BLOCK_ACRONYM}
+                                   placeholder='Acronym'/>
 
-                                    <label htmlFor={BLOCK_FORMULA}>Formula:</label>
-                                    <Field id={BLOCK_FORMULA} name={BLOCK_FORMULA}
-                                           placeholder='Residue'/>
+                            <label htmlFor={BLOCK_FORMULA}>Formula:</label>
+                            <input type={'text'} id={BLOCK_FORMULA} name={BLOCK_FORMULA}
+                                   placeholder='Residue'/>
 
-                                    <label htmlFor={BLOCK_SMILES}>SMILES:</label>
-                                    <Field id={BLOCK_SMILES} name={BLOCK_SMILES}
-                                           placeholder='SMILES'/>
+                            <label htmlFor={BLOCK_SMILES}>SMILES:</label>
+                            <input type={'text'} id={BLOCK_SMILES} name={BLOCK_SMILES}
+                                   placeholder='SMILES'/>
 
-                                    <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
-                                    <button type="submit" className={styles.create}>Create new Block</button>
-                                </Form>
-                            </Formik>
+                            <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
+                            <button className={styles.create} onClick={this.create}>Create new Block</button>
                         </div> : ''
                     }
 
@@ -323,7 +299,10 @@ class BlockPage extends ListComponent<any, State> {
                                         <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                         </button>
                                         <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
-                                        <button onClick={() => {document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'}}>Usage</button>
+                                        <button onClick={() => {
+                                            document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'
+                                        }}>Usage
+                                        </button>
                                         <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete
                                         </button>
                                     </td>
