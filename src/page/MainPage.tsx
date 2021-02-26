@@ -8,7 +8,7 @@ import {
     OPTION_DRAW_DECAY_POINTS, OPTION_DRAW_DECAY_POINTS_SOURCE,
     OPTION_THEMES
 } from "../constant/SmilesDrawerConstants";
-import {SelectInput} from "../component/SelectInput";
+import {SelectInput, SelectOption} from "../component/SelectInput";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
 import IFinder from "../finder/IFinder";
@@ -17,7 +17,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {DECIMAL_PLACES, ENDPOINT, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -30,6 +30,7 @@ import PopupEditor from "../component/PopupEditor";
 import ContainerHelper from "../helper/ContainerHelper";
 import TextArea from "../component/TextArea";
 import Sleep from "../helper/Sleep";
+import Creatable from "react-select/creatable";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -48,6 +49,7 @@ interface SequenceState {
     sequence?: SequenceStructure;
     selectedContainer: number;
     modifications?: Modification[];
+    blockOptions?: SelectOption[];
     nModification?: any;
     cModification?: any;
     bModification?: any;
@@ -58,6 +60,9 @@ interface SequenceState {
     family: any[];
     sequenceId?: number;
     sequenceEdit: boolean;
+    databaseBlockSelect?: number;
+    blocksAll: any[],
+    blockEdit?: any,
 }
 
 interface SequenceStructure {
@@ -85,6 +90,7 @@ const TXT_EDIT_BLOCK_MASS = 'txt-edit-mass';
 const TXT_EDIT_BLOCK_LOSSES = 'txt-edit-losses';
 const SEL_EDIT_SOURCE = 'sel-edit-source';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
+const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
 class MainPage extends React.Component<any, SequenceState> {
 
@@ -111,6 +117,8 @@ class MainPage extends React.Component<any, SequenceState> {
         this.blockFinder = this.blockFinder.bind(this);
         this.refreshMolecule = this.refreshMolecule.bind(this);
         this.fetchModifications = this.fetchModifications.bind(this);
+        this.blockDbChange = this.blockDbChange.bind(this);
+        this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -118,7 +126,8 @@ class MainPage extends React.Component<any, SequenceState> {
             title: PAGE_TITLE,
             selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
-            sequenceEdit: false
+            sequenceEdit: false,
+            blocksAll: []
         };
     }
 
@@ -478,6 +487,7 @@ class MainPage extends React.Component<any, SequenceState> {
             }
         );
         this.fetchModifications();
+        this.fetchBlockOptions();
     }
 
     async fetchModifications() {
@@ -683,7 +693,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editEnd() {
-        this.setState({editable: undefined});
+        this.setState({editable: undefined, databaseBlockSelect: undefined});
     }
 
     replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
@@ -714,22 +724,34 @@ class MainPage extends React.Component<any, SequenceState> {
             sameBlocks.forEach(block => {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
+                blocks[block.id].unique = smiles.value;
                 blocks[block.id].block!.structureName = name.value;
                 blocks[block.id].block!.formula = formula.value;
                 blocks[block.id].block!.mass = Number(mass.value);
                 blocks[block.id].block!.losses = losses.value;
                 blocks[block.id].block!.database = Number(source.value);
                 blocks[block.id].block!.identifier = identifier.value;
+                if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
+                    blocks[block.id].databaseId = this.state.blockEdit.id;
+                } else {
+                    blocks[block.id].databaseId = null;
+                }
             });
         } else {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
+            blocks[blockId].unique = smiles.value;
             blocks[blockId].block!.structureName = name.value;
             blocks[blockId].block!.formula = formula.value;
             blocks[blockId].block!.mass = Number(mass.value);
             blocks[blockId].block!.losses = losses.value;
             blocks[blockId].block!.database = Number(source.value);
             blocks[blockId].block!.identifier = identifier.value;
+            if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
+                blocks[blockId].databaseId = this.state.blockEdit.id;
+            } else {
+                blocks[blockId].databaseId = null;
+            }
         }
         this.setState({blocks: blocks, sequence: sequence});
         this.editEnd();
@@ -938,6 +960,49 @@ class MainPage extends React.Component<any, SequenceState> {
         }
     }
 
+    fetchBlockOptions() {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        let options = data.map((block: any) => {
+                            return {value: block.id, label: block.acronym}
+                        });
+                        options.unshift(new SelectOption('-1', 'Not in DB'));
+                        this.setState({
+                            blocksAll: data,
+                            blockOptions: options,
+                        })
+                    });
+                }
+            });
+        }
+    }
+
+    blockDbChange(newValue: any) {
+        let block = this.state.blocksAll.find(block => block.id === newValue.value);
+        if (block) {
+            let editBlock = {
+                id: block.id,
+                acronym: block.acronym,
+                smiles: block.smiles,
+                unique: block.uniqueSmiles,
+                blockName: block.blockName,
+                formula: block.formula,
+                mass: block.mass,
+                losses: block.losses,
+                source: block.source,
+                identifier: block.identifier
+            };
+            this.setState({blockEdit: editBlock});
+        } else {
+            this.setState({blockEdit: undefined});
+        }
+    }
 
     render() {
         return (
@@ -1035,7 +1100,8 @@ class MainPage extends React.Component<any, SequenceState> {
                         <table>
                             <thead>
                             <tr>
-                                <th/>
+                                <th>DB acronym</th>
+                                <th>Preview</th>
                                 <th>Acronym</th>
                                 <th>SMILES</th>
                                 <th>Name</th>
@@ -1049,6 +1115,10 @@ class MainPage extends React.Component<any, SequenceState> {
                             <tbody>
                             {this.state.blocks.map(block => (
                                 <tr>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <Creatable className={styles.creatable} id={TXT_EDIT_BLOCK_DB_ACRONYM}
+                                                   options={this.state.blockOptions}
+                                                   onChange={this.blockDbChange}/> : (block.databaseId ? block.acronym : '')}</td>
                                     <td>
                                         <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall}
                                                 data-smiles={block.unique}
@@ -1056,35 +1126,40 @@ class MainPage extends React.Component<any, SequenceState> {
                                     </td>
                                     <td onClick={() => this.edit(block.id)}
                                         className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.acronym} name={TXT_EDIT_BLOCK_ACRONYM}
-                                                   id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
+                                        <TextInput
+                                            value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
+                                            name={TXT_EDIT_BLOCK_ACRONYM}
+                                            id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
                                     <td onClick={() => this.edit(block.id)}
                                         className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.unique ?? ''} name={TXT_EDIT_BLOCK_SMILES}
-                                                   id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
+                                        <TextInput
+                                            value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
+                                            name={TXT_EDIT_BLOCK_SMILES}
+                                            id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
-                                                   value={block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
-                                                   value={block.block?.formula ?? ''}/> : block.block?.formula}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
-                                                   value={block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.mass.toFixed(DECIMAL_PLACES) : block.block?.mass?.toFixed(DECIMAL_PLACES)) : block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
                                     <td className={styles.tdMin}
                                         onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
-                                                   value={block.block?.losses ?? ''}/> : block.block?.losses}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.losses : block.block?.losses) : block.block?.losses ?? ''}/> : block.block?.losses}</td>
                                     <td className={styles.tdMin}>
                                         {this.state.editable === block.id
                                             ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                                 options={ServerEnumHelper.getOptions()}
-                                                                selected={block.block?.database.toString()}/><TextInput
-                                                value={block.block?.identifier ?? ''} id={TXT_EDIT_IDENTIFIER}
-                                                name={TXT_EDIT_IDENTIFIER}/></div>
+                                                                selected={this.state.blockEdit ? this.state.blockEdit.source.toString() : block.block?.database.toString()}/>
+                                                <TextInput
+                                                    value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
+                                                    id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
                                             :
                                             <a href={ServerEnumHelper.getLink(Number(block.block?.database), block.block?.identifier ?? '')}
                                                target={'_blank'}
