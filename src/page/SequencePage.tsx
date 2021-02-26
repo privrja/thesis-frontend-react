@@ -15,12 +15,17 @@ import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ServerEnumHelper} from "../enum/ServerEnum";
 import Helper from "../helper/Helper";
+import FetchHelper from "../helper/FetchHelper";
+import FlashType from "../component/FlashType";
+import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 
 class SequencePage extends ListComponent<any, ListState> {
 
     constructor(props: any) {
         super(props);
         this.detail = this.detail.bind(this);
+        this.clone = this.clone.bind(this);
+        this.cloneTransformation = this.cloneTransformation.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
@@ -41,6 +46,15 @@ class SequencePage extends ListComponent<any, ListState> {
         localStorage.setItem(SEQUENCE_EDIT, 'Yes');
         localStorage.setItem(SEQUENCE_ID, key.toString());
         document.location.href = URL_PREFIX;
+    }
+
+    clone(key: number) {
+        FetchHelper.fetch(this.getEndpointWithId(key) + '/clone', 'POST', this.cloneTransformation, () => this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG));
+    }
+
+    cloneTransformation() {
+       this.flashRef.current!.activate(FlashType.OK);
+       this.list();
     }
 
     render() {
@@ -93,6 +107,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
                                         <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail</button>
+                                        <button className={styles.create} onClick={() => this.clone(sequence.id)}>Clone</button>
                                         <button className={styles.delete}
                                                 onClick={() => this.popup(sequence.id)}>Delete
                                         </button>

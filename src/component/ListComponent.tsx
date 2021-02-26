@@ -83,7 +83,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     }
 
     defaultListTransformation(endpoint: string, transformationCallback: (e: any) => void) {
-        FetchHelper.fetch(endpoint, transformationCallback);
+        FetchHelper.fetch(endpoint, 'GET', transformationCallback);
     }
 
     defaultCreate(endpoint: string, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {

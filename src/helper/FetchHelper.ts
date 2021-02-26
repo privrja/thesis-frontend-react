@@ -14,10 +14,10 @@ class FetchHelper {
         });
     }
 
-    static fetch(endpoint: string, transformationCallback: (e: any) => void) {
+    static fetch(endpoint: string, method: string, transformationCallback: (e: any) => void, badCallback?: (e: any) => void) {
         const token = localStorage.getItem(TOKEN);
         fetch(endpoint, token ? {
-            method: 'GET',
+            method: method,
             headers: {'x-auth-token': token}
         } : {
             method: 'GET'
@@ -26,7 +26,15 @@ class FetchHelper {
                 localStorage.removeItem(TOKEN);
             }
             return response;
-        }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(transformationCallback);
+            } else {
+                if (badCallback) {
+                    badCallback(response);
+                }
+            }
+        });
     }
 
 }

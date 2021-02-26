@@ -25,7 +25,7 @@ class BlockUsagePage extends ListComponent<any, State> {
     componentDidMount(): void {
         if (this.state.selectedContainer) {
             this.list();
-            FetchHelper.fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block/' + this.state.blockId, (response) => this.setState({block: response}));
+            FetchHelper.fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block/' + this.state.blockId, 'GET', (response) => this.setState({block: response}));
         }
         Helper.resetStorage();
     }
