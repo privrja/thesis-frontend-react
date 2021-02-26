@@ -8,7 +8,8 @@ import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
 interface Values {
     name: string;
     password: string;
-    password2: string
+    password2: string;
+    conditions: boolean;
 }
 
 class RegisterPage extends React.Component<any> {
@@ -38,6 +39,10 @@ class RegisterPage extends React.Component<any> {
 
     register(values: Values) {
         values.name = values.name.trim();
+        if (!values.conditions) {
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to agree with terms and conditions');
+            return;
+        }
         let check = this.checkEmpty(values.name, 'Name is empty');
         check = check && this.checkEmpty(values.password, 'Password is empty');
         check = check && this.checkEmpty(values.password2, 'Password is empty');
@@ -72,7 +77,8 @@ class RegisterPage extends React.Component<any> {
                         initialValues={{
                             name: '',
                             password: '',
-                            password2: ''
+                            password2: '',
+                            conditions: false
                         }}
                         onSubmit={(
                             values: Values,
