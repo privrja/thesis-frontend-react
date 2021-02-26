@@ -207,16 +207,16 @@ class MainPage extends React.Component<any, SequenceState> {
             decaySource = JSON.parse(decays);
         }
         if (decaySource.length > 0) {
-           init = {
-               width: area!.clientWidth,
-               height: area!.clientHeight,
-               compactDrawing: false,
-               drawDecayPoints: OPTION_DRAW_DECAY_POINTS_SOURCE,
-               offsetX: area!.offsetLeft,
-               offsetY: area!.offsetTop,
-               themes: OPTION_THEMES,
-               decaySource: decaySource
-           }
+            init = {
+                width: area!.clientWidth,
+                height: area!.clientHeight,
+                compactDrawing: false,
+                drawDecayPoints: OPTION_DRAW_DECAY_POINTS_SOURCE,
+                offsetX: area!.offsetLeft,
+                offsetY: area!.offsetTop,
+                themes: OPTION_THEMES,
+                decaySource: decaySource
+            }
         } else {
             init = {
                 width: area!.clientWidth,
@@ -354,7 +354,7 @@ class MainPage extends React.Component<any, SequenceState> {
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence created');
-                } else if(response.status === 204) {
+                } else if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence updated');
                     localStorage.removeItem(SEQUENCE_EDIT);
                     localStorage.removeItem(SEQUENCE_ID);
@@ -736,22 +736,45 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editorClose(smiles: string) {
-        if (this.state.editorBlockId) {
+        if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
                 let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
-                sameBlocks.forEach(block => {
-                    blocks[block.id].smiles = smiles;
-                    blocks[block.id].unique = smiles;
-                    blocks[block.id].block!.formula = '';
-                    blocks[block.id].block!.mass = undefined;
+                fetch(ENDPOINT + 'smiles/formula', {
+                    method: 'POST',
+                    body: JSON.stringify([{smiles: smiles}])
+                }).then(response => {
+                    if (response.status === 200) {
+                        response.json().then(data => {
+                            sameBlocks.forEach(block => {
+                                blocks[block.id].smiles = smiles;
+                                blocks[block.id].unique = smiles;
+                                blocks[block.id].block!.formula = data[0].formula;
+                                blocks[block.id].block!.mass = data[0].mass;
+                            });
+                            console.log(blocks);
+                            this.setState({blocks: blocks});
+                        });
+                    }
                 });
             } else {
-                blocks[this.state.editorBlockId].smiles = smiles;
-                blocks[this.state.editorBlockId].unique = smiles;
+                let blockId = this.state.editorBlockId;
+                fetch(ENDPOINT + 'smiles/formula', {
+                    method: 'POST',
+                    body: JSON.stringify([{smiles: smiles}])
+                }).then(response => {
+                    if (response.status === 200) {
+                        response.json().then(data => {
+                            blocks[blockId].smiles = smiles;
+                            blocks[blockId].unique = smiles;
+                            blocks[blockId].block!.formula = data[0].formula;
+                            blocks[blockId].block!.mass = data[0].mass;
+                            this.setState({blocks: blocks});
+                        });
+                    }
+                });
             }
-            this.setState({blocks: blocks});
         }
     }
 
@@ -829,14 +852,14 @@ class MainPage extends React.Component<any, SequenceState> {
                 default:
                     continue;
             }
-            if(end) {
+            if (end) {
                 break;
             }
         }
         if (position.removeBracket) {
             let newSequence = this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
             let positionEnd = newSequence.indexOf(')', bracketPosition);
-            return newSequence.substr(0, bracketPosition - 1) + '-' + newSequence.substring(bracketPosition + 1, positionEnd -1) + '-' + newSequence.substring(positionEnd + 1);
+            return newSequence.substr(0, bracketPosition - 1) + '-' + newSequence.substring(bracketPosition + 1, positionEnd - 1) + '-' + newSequence.substring(positionEnd + 1);
         } else {
             return this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
         }
@@ -851,7 +874,7 @@ class MainPage extends React.Component<any, SequenceState> {
         } else {
             if (positionIndex + acronym.length + 2 > sequence.length || sequence[positionIndex + acronym.length + 2] !== '-') {
                 if (positionIndex - 1 > 0 && sequence[positionIndex - 1] === '-') {
-                    return sequence.substring(0, positionIndex -1) + sequence.substring(positionIndex + acronym.length + 2);
+                    return sequence.substring(0, positionIndex - 1) + sequence.substring(positionIndex + acronym.length + 2);
                 }
                 return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 2);
             } else {
