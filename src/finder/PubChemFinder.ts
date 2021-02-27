@@ -124,6 +124,8 @@ class PubChemFinder implements IFinder {
             } else {
                 return [];
             }
+        }).catch(() => {
+            return [];
         });
     }
 

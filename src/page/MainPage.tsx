@@ -31,6 +31,7 @@ import ContainerHelper from "../helper/ContainerHelper";
 import TextArea from "../component/TextArea";
 import Sleep from "../helper/Sleep";
 import Creatable from "react-select/creatable";
+import LossesHelper from "../helper/LossesHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -390,6 +391,11 @@ class MainPage extends React.Component<any, SequenceState> {
         let finder = new PubChemFinder();
         Parallel.map(data, async (item: any) => {
             if (item.sameAs === null && item.block === null) {
+                let block = await finder.findBySmiles(item.smiles).then(data => data[0]).catch(() => undefined);
+                if (block) {
+                    block.formula = LossesHelper.removeWaterFromFormula(block.formula);
+                    block.mass = LossesHelper.removeWaterFromMass(block.mass ?? 0);
+                }
                 return {
                     id: item.id,
                     databaseId: null,
@@ -397,7 +403,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     smiles: item.smiles,
                     unique: item.unique,
                     sameAs: null,
-                    block: await finder.findBySmiles(item.smiles).then(data => data[0])
+                    block: block
                 } as BlockStructure;
             } else {
                 if (item.block === null) {
