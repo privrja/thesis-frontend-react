@@ -18,6 +18,7 @@ interface Props {
     bModification?: any;
     modifications?: Modification[];
     onFamilyChange?: (family: any[]) => void;
+    family: any[];
 }
 
 interface State {
@@ -40,7 +41,7 @@ class ModificationComponent extends React.Component<Props, State> {
         this.family = this.family.bind(this);
         this.handleFamilyChange = this.handleFamilyChange.bind(this);
         this.updateModifications = this.updateModifications.bind(this);
-        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: []}
+        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: this.props.family}
     }
 
     componentDidMount(): void {
@@ -133,7 +134,8 @@ class ModificationComponent extends React.Component<Props, State> {
                     <TextInput id="txt-sequence" name="sequence" size={60} value={this.state.sequence}/>
                     <div className={styles.padding}>
                         <label htmlFor={'cre-family'}>Family</label>
-                        <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions}
+                        {console.log(this.state.family)}
+                        <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions} value={this.state.family}
                                    onChange={this.handleFamilyChange} isMulti={true}/>
                     </div>
                 </div>

@@ -182,6 +182,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             nModification: sequence.nModification,
                             cModification: sequence.cModification,
                             bModification: sequence.bModification,
+                            family: sequence.family.map((family: any) => {return { value: family.id, label: family.family}}),
                             blocks: sequence.blocks.map((block: any) => {
                                 return {
                                     id: block.originalId,
@@ -591,7 +592,7 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({results: [], blocks: []});
+        this.setState({results: [], blocks: [], family: []});
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
@@ -1123,6 +1124,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                                nModification={this.state.nModification}
                                                cModification={this.state.cModification}
                                                bModification={this.state.bModification}
+                                               family={this.state.family}
                                                onFamilyChange={(family: any[]) => this.setState({family: family})}/>
                         <table>
                             <thead>
