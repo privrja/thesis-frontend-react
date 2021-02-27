@@ -693,7 +693,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editEnd() {
-        this.setState({editable: undefined, databaseBlockSelect: undefined});
+        this.setState({editable: undefined, databaseBlockSelect: undefined, blockEdit: undefined});
     }
 
     replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
@@ -725,12 +725,23 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
                 blocks[block.id].unique = smiles.value;
-                blocks[block.id].block!.structureName = name.value;
-                blocks[block.id].block!.formula = formula.value;
-                blocks[block.id].block!.mass = Number(mass.value);
+                if (!blocks[block.id].block) {
+                    blocks[block.id].block = new SingleStructure(
+                        identifier.value,
+                        Number(source.value),
+                        name.value,
+                        smiles.value,
+                        formula.value,
+                        Number(mass.value)
+                    );
+                } else {
+                    blocks[block.id].block!.structureName = name.value;
+                    blocks[block.id].block!.formula = formula.value;
+                    blocks[block.id].block!.mass = Number(mass.value);
+                    blocks[block.id].block!.database = Number(source.value);
+                    blocks[block.id].block!.identifier = identifier.value;
+                }
                 blocks[block.id].block!.losses = losses.value;
-                blocks[block.id].block!.database = Number(source.value);
-                blocks[block.id].block!.identifier = identifier.value;
                 if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
                     blocks[block.id].databaseId = this.state.blockEdit.id;
                 } else {
@@ -741,12 +752,23 @@ class MainPage extends React.Component<any, SequenceState> {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
             blocks[blockId].unique = smiles.value;
-            blocks[blockId].block!.structureName = name.value;
-            blocks[blockId].block!.formula = formula.value;
-            blocks[blockId].block!.mass = Number(mass.value);
+            if (!blocks[blockId].block) {
+                blocks[blockId].block = new SingleStructure(
+                    identifier.value,
+                    Number(source.value),
+                    name.value,
+                    smiles.value,
+                    formula.value,
+                    Number(mass.value)
+                );
+            } else {
+                blocks[blockId].block!.structureName = name.value;
+                blocks[blockId].block!.formula = formula.value;
+                blocks[blockId].block!.mass = Number(mass.value);
+                blocks[blockId].block!.database = Number(source.value);
+                blocks[blockId].block!.identifier = identifier.value;
+            }
             blocks[blockId].block!.losses = losses.value;
-            blocks[blockId].block!.database = Number(source.value);
-            blocks[blockId].block!.identifier = identifier.value;
             if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
                 blocks[blockId].databaseId = this.state.blockEdit.id;
             } else {
@@ -775,7 +797,6 @@ class MainPage extends React.Component<any, SequenceState> {
                                 blocks[block.id].block!.formula = data[0].formula;
                                 blocks[block.id].block!.mass = data[0].mass;
                             });
-                            console.log(blocks);
                             this.setState({blocks: blocks});
                         });
                     }
@@ -1156,7 +1177,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                         {this.state.editable === block.id
                                             ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                                 options={ServerEnumHelper.getOptions()}
-                                                                selected={this.state.blockEdit ? this.state.blockEdit.source.toString() : block.block?.database.toString()}/>
+                                                                selected={this.state.blockEdit ? (this.state.blockEdit.source ? this.state.blockEdit.toString() : '') : block.block?.database.toString()}/>
                                                 <TextInput
                                                     value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
                                                     id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
