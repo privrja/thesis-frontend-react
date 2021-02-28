@@ -661,6 +661,11 @@ class MainPage extends React.Component<any, SequenceState> {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
             smilesInput.value = Canonical.getCanonicalSmiles(smilesInput.value);
+            let molecule = this.state.molecule;
+            if (molecule) {
+                molecule.smiles = smilesInput.value;
+                this.setState({molecule: molecule});
+            }
             this.drawSmiles();
         }
     }

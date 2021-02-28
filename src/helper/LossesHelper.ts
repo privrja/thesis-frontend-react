@@ -42,7 +42,9 @@ class LossesHelper {
         map.set('O', oxygen);
         let formulaText = '';
         map.forEach((value: number, key: string) => {
-           formulaText += key + value.toString();
+            if (value !== 0) {
+                formulaText += key + (value === 1 ? '' : value.toString());
+            }
         });
         return formulaText;
     }
