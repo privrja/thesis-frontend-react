@@ -134,7 +134,6 @@ class ModificationComponent extends React.Component<Props, State> {
                     <TextInput id="txt-sequence" name="sequence" size={60} value={this.state.sequence}/>
                     <div className={styles.padding}>
                         <label htmlFor={'cre-family'}>Family</label>
-                        {console.log(this.state.family)}
                         <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions} value={this.state.family}
                                    onChange={this.handleFamilyChange} isMulti={true}/>
                     </div>
