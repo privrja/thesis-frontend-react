@@ -81,6 +81,9 @@ class ModificationComponent extends React.Component<Props, State> {
         if (prevProps.sequence !== this.props.sequence) {
             this.setState({sequence: this.props.sequence ?? ''});
         }
+        if (prevProps.family !== this.props.family) {
+            this.setState({family: this.props.family});
+        }
     }
 
     private disable(value: SequenceEnum) {

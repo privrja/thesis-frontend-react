@@ -120,6 +120,7 @@ class MainPage extends React.Component<any, SequenceState> {
         this.fetchModifications = this.fetchModifications.bind(this);
         this.blockDbChange = this.blockDbChange.bind(this);
         this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
+        this.similarity = this.similarity.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -163,7 +164,6 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
-                        console.log(sequence);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
@@ -561,6 +561,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 responseUnique.json().then(async data => {
                         this.setState({results: [], blocks: data, sequence: sequence});
                         this.blockFinder(data, sequence);
+                        this.similarity(data);
                     }
                 );
             } else {
@@ -586,6 +587,27 @@ class MainPage extends React.Component<any, SequenceState> {
             this.setState({blocks: data});
             this.blockFinder(data, sequence);
         }
+    }
+
+    similarity(data: any[]) {
+        let filtered : number[] = [];
+        data.forEach((block: any) => {
+            if (block.block.sameAs !== null) {
+                filtered.push(block.block.databaseId);
+            }
+        });
+        fetch(ENDPOINT + 'smiles/similarity', {
+            method: 'POST',
+            body: JSON.stringify({
+                sequenceName: this.state.molecule?.structureName ?? '',
+                blockLength: filtered.length,
+                blocks: filtered
+            })
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => this.setState({family: data}));
+            }
+        });
     }
 
     /**
@@ -856,7 +878,6 @@ class MainPage extends React.Component<any, SequenceState> {
         let block = this.state.blocks.find(e => e.id === key);
         let position = this.getAcronymPosition(key);
         if (block && this.state.sequence && this.state.sequence.sequenceOriginal && this.state.sequence.sequence) {
-            console.log(position, block.acronym, key, this.state.sequence.sequenceOriginal);
             let sequenceOriginal = this.removeFromSequence(this.state.sequence?.sequenceOriginal, position, key.toString());
             let sequence = this.removeFromSequence(this.state.sequence?.sequence, position, block.acronym);
             this.setState({
