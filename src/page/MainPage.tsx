@@ -592,7 +592,7 @@ class MainPage extends React.Component<any, SequenceState> {
     similarity(data: any[]) {
         let filtered : number[] = [];
         data.forEach((block: any) => {
-            if (block.block.sameAs !== null) {
+            if (block.sameAs === null && block.block) {
                 filtered.push(block.block.databaseId);
             }
         });
