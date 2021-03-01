@@ -4,6 +4,7 @@ export const ENDPOINT = 'https://localhost:8000/rest/';
 export const URL_PREFIX = '/';
 
 export const TOKEN = 'token';
+export const CHEMSPIDER_KEY = 'chemspiderKey';
 export const SELECTED_CONTAINER = 'selectedContainer';
 export const EDITOR_SMILES = 'editorSmiles';
 export const EDITOR_BACK = 'editorBack';

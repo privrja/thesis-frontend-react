@@ -17,7 +17,15 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
+import {
+    CHEMSPIDER_KEY,
+    CONTAINER,
+    DECIMAL_PLACES,
+    ENDPOINT,
+    SEQUENCE_EDIT,
+    SEQUENCE_ID,
+    TOKEN
+} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -136,6 +144,7 @@ class MainPage extends React.Component<any, SequenceState> {
     componentDidMount() {
         this.initializeSmilesDrawers();
         this.getSequenceId();
+        this.initializeChemSpider();
     }
 
     componentDidUpdate() {
@@ -143,6 +152,10 @@ class MainPage extends React.Component<any, SequenceState> {
         if (small.length > 1) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
         }
+    }
+
+    initializeChemSpider() {
+        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => localStorage.setItem(CHEMSPIDER_KEY, data.apiKey));
     }
 
     getSequenceId() {
@@ -621,7 +634,9 @@ class MainPage extends React.Component<any, SequenceState> {
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
-        let finder: IFinder = ServerEnumHelper.getFinder(database);
+        let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
+        console.log(apiKey);
+        let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
         let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
         if (response.length === 0) {
             this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');

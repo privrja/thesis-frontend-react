@@ -3,6 +3,7 @@ import IFinder from "../finder/IFinder";
 import PubChemFinder from "../finder/PubChemFinder";
 import NorineFinder from "../finder/NorineFinder";
 import PdbFinder from "../finder/PdbFinder";
+import ChemSpiderFinder from "../finder/ChemSpiderFinder";
 
 export enum ServerEnum {
     PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES
@@ -20,11 +21,14 @@ export class ServerEnumHelper {
         ];
     }
 
-    static getFinder(value: ServerEnum): IFinder {
+    static getFinder(value: ServerEnum, apiKey?: string): IFinder {
         switch (value) {
             case ServerEnum.PUBCHEM:
                 return new PubChemFinder();
             case ServerEnum.CHEMSPIDER:
+                if (apiKey) {
+                    return new ChemSpiderFinder(apiKey);
+                }
                 break;
             case ServerEnum.NORINE:
                 return new NorineFinder();
@@ -72,7 +76,7 @@ export class ServerEnumHelper {
         if (identifier === null) {
             identifier = "0";
         }
-        switch(database) {
+        switch (database) {
             default:
             case ServerEnum.PUBCHEM:
                 return 'CID: ' + identifier;
