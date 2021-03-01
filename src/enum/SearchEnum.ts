@@ -13,7 +13,6 @@ export class SearchEnumHelper {
             new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
             new SelectOption(SearchEnum.SMILES.toString(), this.getName(SearchEnum.SMILES)),
             new SelectOption(SearchEnum.FORMULA.toString(), this.getName(SearchEnum.FORMULA)),
-            new SelectOption(SearchEnum.MASS.toString(), this.getName(SearchEnum.MASS)),
             new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
         ]
     }

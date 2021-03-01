@@ -69,6 +69,9 @@ export class ServerEnumHelper {
     }
 
     static getFullId(database: ServerEnum, identifier: string) {
+        if (identifier === null) {
+            identifier = "0";
+        }
         switch(database) {
             default:
             case ServerEnum.PUBCHEM:
