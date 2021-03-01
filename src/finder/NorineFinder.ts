@@ -72,7 +72,32 @@ class NorineFinder implements IFinder {
      * @param formula
      */
     findByFormula(formula: string): Promise<SingleStructure[]> {
-        return Sleep.noSleepPromise();
+        if (formula === '') {
+            return Sleep.noSleepPromise();
+        }
+        return fetch(ENDPOINT_URI + 'peptides/json/smiles', {
+            method: 'GET'
+        }).then(async response => {
+            if (response.status === 200) {
+                let res: SingleStructure[] = [];
+                let json = await response.json() as ListPeptides;
+                json.peptides.forEach((peptide: Peptide) => {
+                    if (peptide.general.formula === formula) {
+                        res.push(new SingleStructure(
+                            peptide.general.id,
+                            ServerEnum.NORINE,
+                            peptide.general.name,
+                            peptide.structure.smiles,
+                            peptide.general.formula,
+                            Number(peptide.general.mw)
+                        ));
+                    }
+                });
+                return res;
+            } else {
+                return [];
+            }
+        });
     }
 
     /**
