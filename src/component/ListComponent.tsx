@@ -12,6 +12,7 @@ export interface ListState {
     list: any[];
     lastSortParam?: string;
     lastSortOrder?: string;
+    filter?: string;
 }
 
 const ORDER_BY_ASC = 'asc';
@@ -41,6 +42,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.list = this.list.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
+        this.addFilter = this.addFilter.bind(this);
+        this.clearConcreteFilter = this.clearConcreteFilter.bind(this);
     }
 
     componentDidMount(): void {
@@ -71,11 +74,22 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
             endpoint = this.getEndpoint();
         }
         if (!transformationCallback) {
-            this.defaultList(endpoint + '?sort=' + param + '&order=' + order, );
+            this.defaultList(endpoint + '?' + (this.state.filter ?? '') + 'sort=' + param + '&order=' + order, );
         } else {
-            this.defaultListTransformation(endpoint + '?sort=' + param + '&order=' + order, transformationCallback);
+            this.defaultListTransformation(endpoint + '?' + (this.state.filter ?? '') + ListComponent.sortURI(param, order), transformationCallback);
         }
         this.setState({lastSortParam: param, lastSortOrder: order});
+    }
+
+    addFilter(filter: string, valueName: string, value: string) {
+        if (value !== '') {
+            return filter + valueName + '=' + value + '&'
+        }
+        return filter;
+    }
+
+    clearConcreteFilter(filter: string) {
+        (document.getElementById(filter) as HTMLInputElement).value = '';
     }
 
     defaultList(endpoint: string) {
@@ -162,7 +176,17 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     }
 
     list(): void {
-        this.defaultList(this.getEndpoint());
+        this.defaultList(this.getEndpoint() + '?' + (this.state.filter ?? '') + ListComponent.sortURI(this.state.lastSortParam, this.state.lastSortOrder));
+    }
+
+    static sortURI(param?: string, order?: string) {
+        if (!param) {
+            return '';
+        }
+        if (!order) {
+            order = 'asc';
+        }
+        return 'sort=' + param + '&order=' + order;
     }
 
     delete(key: number): void {

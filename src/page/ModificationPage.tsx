@@ -28,10 +28,20 @@ interface Values {
     cTerminal: boolean;
 }
 
+const TXT_FILTER_MODIFICATION_ID = 'txt-filter-id';
+const TXT_FILTER_MODIFICATION_NAME = 'txt-filter-modificationName';
+const TXT_FILTER_MODIFICATION_FORMULA = 'txt-filter-modificationFormula';
+const TXT_FILTER_MODIFICATION_MASS_FROM = 'txt-filter-modificationMass-from';
+const TXT_FILTER_MODIFICATION_MASS_TO = 'txt-filter-modificationMass-to';
+const TXT_FILTER_MODIFICATION_N_TERMINAL = 'txt-filter-nTerminal';
+const TXT_FILTER_MODIFICATION_C_TERMINAL = 'txt-filter-cTerminal';
+
 class ModificationPage extends ListComponent<any, ListState> {
 
     constructor(props: any) {
         super(props);
+        this.filter = this.filter.bind(this);
+        this.clear = this.clear.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
@@ -65,6 +75,43 @@ class ModificationPage extends ListComponent<any, ListState> {
             nTerminal: nTerminal.checked,
             cTerminal: cTerminal.checked
         });
+    }
+
+    filter() {
+        let id = document.getElementById(TXT_FILTER_MODIFICATION_ID) as HTMLInputElement;
+        let name = document.getElementById(TXT_FILTER_MODIFICATION_NAME) as HTMLInputElement;
+        let formula = document.getElementById(TXT_FILTER_MODIFICATION_FORMULA) as HTMLInputElement;
+        let mass_from = document.getElementById(TXT_FILTER_MODIFICATION_MASS_FROM) as HTMLInputElement;
+        let mass_to = document.getElementById(TXT_FILTER_MODIFICATION_MASS_TO) as HTMLInputElement;
+        let nTerminal = document.getElementById(TXT_FILTER_MODIFICATION_N_TERMINAL) as HTMLInputElement;
+        let cTerminal = document.getElementById(TXT_FILTER_MODIFICATION_C_TERMINAL) as HTMLInputElement;
+
+        let filter =
+            this.addFilter(
+                this.addFilter(
+                    this.addFilter(
+                        this.addFilter(
+                            this.addFilter(
+                                this.addFilter(
+                                    this.addFilter('', 'id', id.value)
+                                    , 'modificationName', name.value)
+                                , 'modificationFormula', formula.value)
+                            , 'modificationMassFrom', mass_from.value)
+                        , 'modificationMassTo', mass_to.value)
+                    , 'nTerminal', nTerminal.value)
+                , 'cTerminal', cTerminal.value);
+        this.setState({filter: filter}, this.list);
+    }
+
+    clear() {
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_ID);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_NAME);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_FORMULA);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_MASS_FROM);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_MASS_TO);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_N_TERMINAL);
+        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_C_TERMINAL);
+        this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
     }
 
     render() {
@@ -116,58 +163,72 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </div> : ''
                     }
 
-                    {this.state.list.length > 0 ? <h2>List of Modifications</h2> : ''}
+                    <h2>List of Modifications</h2>
 
-                    {this.state.list.length > 0 ?
-                        <table>
-                            <thead>
-                            <tr>
-                                <th onClick={() => this.sortBy('id')}>Id</th>
-                                <th onClick={() => this.sortBy('modificationName')}>Modification name</th>
-                                <th onClick={() => this.sortBy('modificationFormula')}>Formula</th>
-                                <th onClick={() => this.sortBy('modificationMass')}>Mass</th>
-                                <th onClick={() => this.sortBy('nTerminal')}>N-terminal</th>
-                                <th onClick={() => this.sortBy('cTerminal')}>C-terminal</th>
-                                <th>Actions</th>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th onClick={() => this.sortBy('id')}>Id</th>
+                            <th onClick={() => this.sortBy('modificationName')}>Modification name</th>
+                            <th onClick={() => this.sortBy('modificationFormula')}>Formula</th>
+                            <th onClick={() => this.sortBy('modificationMass')}>Mass</th>
+                            <th onClick={() => this.sortBy('nTerminal')}>N-terminal</th>
+                            <th onClick={() => this.sortBy('cTerminal')}>C-terminal</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_ID}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_NAME}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_FORMULA}/></td>
+                            <td>
+                                <input type={'text'} id={TXT_FILTER_MODIFICATION_MASS_FROM}/>
+                                <input type={'text'} id={TXT_FILTER_MODIFICATION_MASS_TO}/>
+                            </td>
+                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_N_TERMINAL}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_C_TERMINAL}/></td>
+                            <td>
+                                <button onClick={this.filter}>Filter</button>
+                                <button className={styles.delete} onClick={this.clear}>Clear</button>
+                            </td>
+                        </tr>
+                        {this.state.list.length > 0 && this.state.list.map(modification => (
+                            <tr key={modification.id}>
+                                <td>{modification.id}</td>
+                                <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
+                                    <TextInput value={modification.modificationName}
+                                               name={TXT_EDIT_MODIFICATION_NAME}
+                                               id={TXT_EDIT_MODIFICATION_NAME}/> : modification.modificationName}</td>
+                                <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
+                                    <TextInput value={modification.formula} name={TXT_EDIT_FORMULA}
+                                               id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
+                                <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
+                                    <TextInput
+                                        value={modification.mass.toFixed(DECIMAL_PLACES).toString()}
+                                        name={TXT_EDIT_MASS}
+                                        id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>
+                                <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
+                                    <CheckInput checked={modification.nTerminal} name={TXT_EDIT_N_TERMINAL}
+                                                id={TXT_EDIT_N_TERMINAL}/> : NameHelper.booleanValue(modification.nTerminal)}</td>
+                                <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
+                                    <CheckInput checked={modification.cTerminal} name={TXT_EDIT_C_TERMINAL}
+                                                id={TXT_EDIT_C_TERMINAL}/> : NameHelper.booleanValue(modification.cTerminal)}</td>
+                                <td>
+                                    {this.state.editable === modification.id ? <button className={styles.update}
+                                                                                       onClick={() => this.update(modification.id)}>Update</button> :
+                                        <div/>}
+                                    {this.state.editable === modification.id ?
+                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                        <div/>}
+                                    <button className={styles.delete}
+                                            onClick={() => this.popup(modification.id)}>Delete
+                                    </button>
+                                </td>
                             </tr>
-                            </thead>
-                            <tbody>
-                            {this.state.list.map(modification => (
-                                <tr key={modification.id}>
-                                    <td>{modification.id}</td>
-                                    <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <TextInput value={modification.modificationName}
-                                                   name={TXT_EDIT_MODIFICATION_NAME}
-                                                   id={TXT_EDIT_MODIFICATION_NAME}/> : modification.modificationName}</td>
-                                    <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <TextInput value={modification.modificationFormula} name={TXT_EDIT_FORMULA}
-                                                   id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
-                                    <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <TextInput value={modification.modificationMass.toFixed(DECIMAL_PLACES).toString()} name={TXT_EDIT_MASS}
-                                                   id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>
-                                    <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <CheckInput checked={modification.nTerminal} name={TXT_EDIT_N_TERMINAL}
-                                                    id={TXT_EDIT_N_TERMINAL}/> : NameHelper.booleanValue(modification.nTerminal)}</td>
-                                    <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                        <CheckInput checked={modification.cTerminal} name={TXT_EDIT_C_TERMINAL}
-                                                    id={TXT_EDIT_C_TERMINAL}/> : NameHelper.booleanValue(modification.cTerminal)}</td>
-                                    <td>
-                                        {this.state.editable === modification.id ? <button className={styles.update}
-                                                                                           onClick={() => this.update(modification.id)}>Update</button> :
-                                            <div/>}
-                                        {this.state.editable === modification.id ?
-                                            <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                            <div/>}
-                                        <button className={styles.delete}
-                                                onClick={() => this.popup(modification.id)}>Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                        : ''
-                    }
+                        ))}
+                        </tbody>
+                    </table>
                 </section>
             </section>
         )
