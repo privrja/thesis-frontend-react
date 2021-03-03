@@ -636,7 +636,13 @@ class MainPage extends React.Component<any, SequenceState> {
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
         let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
-        let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
+        let response;
+        if (search === SearchEnum.SMILES && database === ServerEnum.MASS_SPEC_BLOCKS) {
+            let blockStructures = smilesDrawer.buildBlockSmiles();
+            response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles);
+        } else {
+            response = await SearchEnumHelper.find(search, finder, searchParam?.value);
+        }
         if (response.length === 0) {
             this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
         } else if (response.length === 1) {

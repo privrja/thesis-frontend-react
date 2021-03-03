@@ -38,7 +38,7 @@ class MassSpecBlocksFinder implements IFinder {
         return this.prepare('name', name, {sequenceName: name});
     }
 
-    findBySmiles(smiles: string): Promise<SingleStructure[]> {
+    findBySmiles(smiles: any): Promise<SingleStructure[]> {
         return this.prepare('similarity', smiles, {smiles: smiles});
     }
 

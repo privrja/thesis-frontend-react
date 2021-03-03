@@ -84,7 +84,7 @@ export class ServerEnumHelper {
     }
 
     static getFullId(database: ServerEnum, identifier: string) {
-        if (identifier === null) {
+        if (identifier === null || identifier === undefined) {
             identifier = "0";
         }
         switch (database) {
@@ -98,7 +98,9 @@ export class ServerEnumHelper {
             case ServerEnum.PDB:
                 return 'PDB: ' + identifier;
             case ServerEnum.CHEBI:
-                return 'ChEBI: '
+                return 'ChEBI: ' + identifier;
+            case ServerEnum.MASS_SPEC_BLOCKS:
+                return 'MSB: ' + identifier;
         }
     }
 
