@@ -98,8 +98,8 @@ class ModificationPage extends ListComponent<any, ListState> {
                                 , 'modificationFormula', formula.value)
                             , 'modificationMassFrom', mass_from.value)
                         , 'modificationMassTo', mass_to.value)
-                    , 'nTerminal', nTerminal.value)
-                , 'cTerminal', cTerminal.value);
+                    , 'nTerminal', nTerminal.value.toLowerCase())
+                , 'cTerminal', cTerminal.value.toLowerCase());
         this.setState({filter: filter}, this.list);
     }
 
