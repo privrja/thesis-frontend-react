@@ -635,7 +635,6 @@ class MainPage extends React.Component<any, SequenceState> {
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
-        console.log(apiKey);
         let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
         let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
         if (response.length === 0) {
@@ -656,7 +655,6 @@ class MainPage extends React.Component<any, SequenceState> {
      * @param search by which parameter was searched
      */
     select(molecule: SingleStructure, search ?: number) {
-        this.flashRef.current!.deactivate();
         if (search === undefined) {
             let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);

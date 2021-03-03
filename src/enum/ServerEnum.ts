@@ -4,9 +4,11 @@ import PubChemFinder from "../finder/PubChemFinder";
 import NorineFinder from "../finder/NorineFinder";
 import PdbFinder from "../finder/PdbFinder";
 import ChemSpiderFinder from "../finder/ChemSpiderFinder";
+import MassSpecBlocksFinder from "../finder/MassSpecBlocksFinder";
+import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 
 export enum ServerEnum {
-    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES
+    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES, MASS_SPEC_BLOCKS
 }
 
 export class ServerEnumHelper {
@@ -17,7 +19,8 @@ export class ServerEnumHelper {
             new SelectOption(ServerEnum.CHEMSPIDER.toString(), this.getName(ServerEnum.CHEMSPIDER)),
             new SelectOption(ServerEnum.NORINE.toString(), this.getName(ServerEnum.NORINE)),
             new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
-            new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI))
+            new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI)),
+            new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS))
         ];
     }
 
@@ -36,6 +39,12 @@ export class ServerEnumHelper {
                 return new PdbFinder();
             case ServerEnum.CHEBI:
                 break;
+            case ServerEnum.MASS_SPEC_BLOCKS:
+                let token = localStorage.getItem(TOKEN);
+                let container = localStorage.getItem(SELECTED_CONTAINER);
+                if (container) {
+                    return new MassSpecBlocksFinder(Number(container), token ?? undefined);
+                }
         }
         return new PubChemFinder();
     }
@@ -53,6 +62,8 @@ export class ServerEnumHelper {
                 return 'PDB';
             case ServerEnum.CHEBI:
                 return 'ChEBI';
+            case ServerEnum.MASS_SPEC_BLOCKS:
+                return 'MassSpecBlocks';
         }
     }
 
