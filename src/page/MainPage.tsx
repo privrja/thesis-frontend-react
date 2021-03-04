@@ -1086,7 +1086,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
                 <PopupEditor id={'popupEditor'} className={styles.popupLargeEditor} ref={this.popupEditorRef}
                              onClose={this.editorClose}/>
-                <section id='home'>
+                <section>
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
                     </div>

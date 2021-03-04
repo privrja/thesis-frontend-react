@@ -24,7 +24,7 @@ import SettingPage from "./page/SettingPage";
 function App() {
 
     return (
-        <div>
+        <div id={'home'}>
             <Header/>
             <Helmet>
                 <title>MassSpecBlocks</title>
