@@ -44,15 +44,21 @@ class PasswordComponent extends React.Component<any, any> {
         }
     }
 
+    enterCall(e: any, call: () => void) {
+        if (e.key === 'Enter') {
+            call();
+        }
+    }
+
     render() {
         return (
             <section>
                 <h3>Change Password</h3>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={TXT_PASSWORD}>Password:</label>
-                <input type={PASSWORD} id={TXT_PASSWORD}/>
+                <input type={PASSWORD} id={TXT_PASSWORD} onKeyDown={(e) => this.enterCall(e, this.changePassword)}/>
                 <label htmlFor={TXT_PASSWORD_2}>Repeat password:</label>
-                <input type={PASSWORD} id={TXT_PASSWORD_2}/>
+                <input type={PASSWORD} id={TXT_PASSWORD_2} onKeyDown={(e) => this.enterCall(e, this.changePassword)}/>
                 <button className={styles.update} onClick={this.changePassword}>Change</button>
             </section>
         );

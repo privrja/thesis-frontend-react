@@ -197,6 +197,12 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         return this.state.list.find(e => e.id === key);
     }
 
+    enterCall(e: any, call: () => void) {
+        if (e.key === 'Enter') {
+            call();
+        }
+    }
+
     abstract create(values: any): void;
 
     abstract update(key: number): void;

@@ -28,13 +28,19 @@ class ChemSpiderKey extends React.Component<any, any> {
         });
     }
 
+    enterCall(e: any, call: () => void) {
+        if (e.key === 'Enter') {
+            call();
+        }
+    }
+
     render() {
         return (
             <section>
                 <h3>Set ChemSpider Key</h3>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'txt-key'}>API Key:</label>
-                <input type={'text'} id={'txt-key'}/>
+                <input type={'text'} id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)}/>
                 <button className={styles.update} onClick={this.setupKey}>Change</button>
             </section>
         );

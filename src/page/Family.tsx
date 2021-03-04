@@ -28,7 +28,7 @@ class Family extends ListComponent<Props, ListState> {
         return ENDPOINT + 'container/' + this.props.containerId + '/' + this.props.type + SFAMILY
     }
 
-    create(values: any): void {
+    create(): void {
         let name = document.getElementById('txt-new-' + this.props.type + '-family-name') as HTMLInputElement;
         this.defaultCreate(this.getEndpoint(), {family: name.value});
     }
@@ -49,7 +49,7 @@ class Family extends ListComponent<Props, ListState> {
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                 <h2>Create new {this.getName()} Family</h2>
-                <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'} placeholder={'New Family Name'}/>
+                <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'} onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'New Family Name'}/>
                 <button onClick={this.create} className={styles.create}>Create new Family</button>
 
                 { this.state.list.length > 0 ? <h2 id={this.props.type + 'Families'}>{this.getName()} Families</h2> : '' }
