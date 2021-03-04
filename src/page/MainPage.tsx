@@ -724,7 +724,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 body: JSON.stringify([{smiles: smilesInput.value}])
             }).then(response => {
                 if (response.status === 200) {
-                    response.json().then(data => smilesInput!.value = data[0].unique ?? data[0].smiles)
+                    response.json().then(data => {smilesInput!.value = data[0].unique ?? data[0].smiles; this.drawSmiles()});
                 }
             });
         }
