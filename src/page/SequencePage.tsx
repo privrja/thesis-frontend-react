@@ -145,11 +145,11 @@ class SequencePage extends ListComponent<any, ListState> {
                             <th onClick={() => this.sortBy('sequence')}>Sequence</th>
                             <th onClick={() => this.sortBy('sequenceFormula')}>Formula</th>
                             <th onClick={() => this.sortBy('sequenceMass')}>Mass</th>
-                            <th>Family</th>
-                            <th>N</th>
-                            <th>C</th>
-                            <th>Branch</th>
-                            <th>Identifier</th>
+                            <th onClick={() => this.sortBy('family')}>Family</th>
+                            <th onClick={() => this.sortBy('nModification')}>N</th>
+                            <th onClick={() => this.sortBy('cModification')}>C</th>
+                            <th onClick={() => this.sortBy('bModification')}>Branch</th>
+                            <th onClick={() => this.sortBy('identifier')}>Identifier</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

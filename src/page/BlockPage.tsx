@@ -315,7 +315,7 @@ class BlockPage extends ListComponent<any, State> {
                             <th onClick={() => this.sortBy('losses')}>Losses</th>
                             <th onClick={() => this.sortBy('family')}>Family</th>
                             <th onClick={() => this.sortBy('blockSmiles')}>SMILES</th>
-                            <th onClick={() => this.sortBy('source')}>Identifier</th>
+                            <th onClick={() => this.sortBy('identifier')}>Identifier</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
