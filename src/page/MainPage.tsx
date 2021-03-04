@@ -1174,7 +1174,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <table>
                             <thead>
                             <tr>
-                                <th>DB acronym</th>
+                                <th>MSB acronym</th>
                                 <th>Preview</th>
                                 <th>Acronym</th>
                                 <th>SMILES</th>
@@ -1198,35 +1198,29 @@ class MainPage extends React.Component<any, SequenceState> {
                                                 data-smiles={block.unique}
                                                 onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
                                     </td>
-                                    <td onClick={() => this.edit(block.id)}
-                                        className={styles.tdMin}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput
                                             value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
                                             name={TXT_EDIT_BLOCK_ACRONYM}
                                             id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
-                                    <td onClick={() => this.edit(block.id)}
-                                        className={styles.tdMin}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput
                                             value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
                                             name={TXT_EDIT_BLOCK_SMILES}
                                             id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.mass.toFixed(DECIMAL_PLACES) : block.block?.mass?.toFixed(DECIMAL_PLACES)) : block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.losses : block.block?.losses) : block.block?.losses ?? ''}/> : block.block?.losses}</td>
-                                    <td className={styles.tdMin}>
+                                    <td>
                                         {this.state.editable === block.id
                                             ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                                 options={ServerEnumHelper.getOptions()}
@@ -1238,7 +1232,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                             <a href={ServerEnumHelper.getLink(Number(block.block?.database), block.block?.identifier ?? '')}
                                                target={'_blank'}
                                                rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(Number(block.block?.database), block.block?.identifier ?? '')}</a>}</td>
-                                    <td className={styles.tdMin}>
+                                    <td>
                                         {this.state.editable === block.id ? <button className={styles.update}
                                                                                     onClick={() => this.update(block.id)}>Update</button> :
                                             <div/>}
