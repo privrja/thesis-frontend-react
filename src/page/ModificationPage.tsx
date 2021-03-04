@@ -164,7 +164,6 @@ class ModificationPage extends ListComponent<any, ListState> {
                     }
 
                     <h2>List of Modifications</h2>
-
                     <table>
                         <thead>
                         <tr>
@@ -179,15 +178,15 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_ID}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_NAME}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_FORMULA}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_ID} placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_NAME} placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_FORMULA} placeholder={'Formula'}/></td>
                             <td>
-                                <input type={'text'} id={TXT_FILTER_MODIFICATION_MASS_FROM}/>
-                                <input type={'text'} id={TXT_FILTER_MODIFICATION_MASS_TO}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_MASS_TO} placeholder={'Mass to'}/>
                             </td>
-                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_N_TERMINAL}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_MODIFICATION_C_TERMINAL}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_N_TERMINAL} placeholder={'N terminal'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_MODIFICATION_C_TERMINAL} placeholder={'C terminal'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>

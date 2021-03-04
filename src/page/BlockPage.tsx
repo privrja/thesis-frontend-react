@@ -304,7 +304,6 @@ class BlockPage extends ListComponent<any, State> {
                     }
 
                     <h2>List of Blocks</h2>
-
                     <table>
                         <thead>
                         <tr>
@@ -322,18 +321,18 @@ class BlockPage extends ListComponent<any, State> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_ID}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_NAME}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_ACRONYM}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_FORMULA}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_ID} placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_NAME} placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_ACRONYM} placeholder={'Acronym'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_FORMULA} placeholder={'Formula'}/></td>
                             <td>
-                                <input type={'text'} id={TXT_FILTER_BLOCK_MASS_FROM}/>
-                                <input type={'text'} id={TXT_FILTER_BLOCK_MASS_TO}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_MASS_TO} placeholder={'Mass to'}/>
                             </td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_LOSSES}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_FAMILY}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_SMILES}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_BLOCK_IDENTIFIER}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_LOSSES} placeholder={'Losses'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_FAMILY} placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_SMILES} placeholder={'Smiles'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_BLOCK_IDENTIFIER} placeholder={'Identifier'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>

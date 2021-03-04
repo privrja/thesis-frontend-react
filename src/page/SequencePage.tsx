@@ -155,20 +155,20 @@ class SequencePage extends ListComponent<any, ListState> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_ID}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_NAME}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_TYPE}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_FORMULA}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_ID} placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_NAME} placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_TYPE} placeholder={'Type'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE} placeholder={'Sequence'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_FORMULA} placeholder={'Formula'}/></td>
                             <td>
-                                <input type={'text'} id={TXT_FILTER_SEQUENCE_MASS_FROM}/>
-                                <input type={'text'} id={TXT_FILTER_SEQUENCE_MASS_TO}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_MASS_TO} placeholder={'Mass to'}/>
                             </td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_FAMILY}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_N_MODIFICATION}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_C_MODIFICATION}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_B_MODIFICATION}/></td>
-                            <td><input type={'text'} id={TXT_FILTER_SEQUENCE_IDENTIFIER}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_FAMILY} placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_C_MODIFICATION} placeholder={'C Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_B_MODIFICATION} placeholder={'B Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'} id={TXT_FILTER_SEQUENCE_IDENTIFIER} placeholder={'Identifier'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
