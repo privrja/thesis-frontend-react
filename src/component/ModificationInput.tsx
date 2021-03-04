@@ -53,7 +53,6 @@ class ModificationInput extends React.Component<Props, State> {
         if (selectedModification) {
             let modification = this.props.modifications?.find(e => e.id === parseInt(selectedModification.value));
             if (modification) {
-                console.log(modification);
                 this.setState({
                     modification: {
                         id: modification.id,

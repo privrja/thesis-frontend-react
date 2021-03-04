@@ -365,7 +365,7 @@ class BlockPage extends ListComponent<any, State> {
                                     {this.state.editable === block.id
                                         ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                             options={ServerEnumHelper.getOptions()}
-                                                            selected={block.source.toString()}/><TextInput
+                                                            selected={block.source?.toString()}/><TextInput
                                             value={block.identifier} id={TXT_EDIT_IDENTIFIER}
                                             name={TXT_EDIT_IDENTIFIER}/></div>
                                         : <a href={ServerEnumHelper.getLink(block.source, block.identifier)}
