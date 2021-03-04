@@ -312,9 +312,9 @@ class BlockPage extends ListComponent<any, State> {
                             <th onClick={() => this.sortBy('acronym')}>Acronym</th>
                             <th onClick={() => this.sortBy('residue')}>Residue</th>
                             <th onClick={() => this.sortBy('blockMass')}>Mass</th>
-                            <th>Losses</th>
-                            <th>Family</th>
-                            <th>SMILES</th>
+                            <th onClick={() => this.sortBy('losses')}>Losses</th>
+                            <th onClick={() => this.sortBy('family')}>Family</th>
+                            <th onClick={() => this.sortBy('blockSmiles')}>SMILES</th>
                             <th onClick={() => this.sortBy('source')}>Identifier</th>
                             <th>Actions</th>
                         </tr>
