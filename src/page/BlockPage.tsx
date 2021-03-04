@@ -58,6 +58,16 @@ const BLOCK_NAME = 'blockName';
 const BLOCK_ACRONYM = 'acronym';
 const BLOCK_FORMULA = 'formula';
 const BLOCK_SMILES = 'smiles';
+const TXT_FILTER_BLOCK_ID = 'txt-filter-blockId';
+const TXT_FILTER_BLOCK_NAME = 'txt-filter-blockName';
+const TXT_FILTER_BLOCK_ACRONYM = 'txt-filter-blockAcronym';
+const TXT_FILTER_BLOCK_FORMULA = 'txt-filter-blockFormula';
+const TXT_FILTER_BLOCK_MASS_FROM = 'txt-filter-blockMassFrom';
+const TXT_FILTER_BLOCK_MASS_TO = 'txt-filter-blockMassTo';
+const TXT_FILTER_BLOCK_LOSSES = 'txt-filter-blockLosses';
+const TXT_FILTER_BLOCK_FAMILY = 'txt-filter-blockFamily';
+const TXT_FILTER_BLOCK_SMILES = 'txt-filter-blockSmiles';
+const TXT_FILTER_BLOCK_IDENTIFIER = 'txt-filter-blockIdentifier';
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 const ELEMENT_LARGE_SMILES = 'popupLargeSmiles';
@@ -70,6 +80,8 @@ class BlockPage extends ListComponent<any, State> {
         super(props);
         this.popupSmilesRef = React.createRef();
         this.showLargeSmiles = this.showLargeSmiles.bind(this);
+        this.filter = this.filter.bind(this);
+        this.clear = this.clear.bind(this);
         this.state = {list: [], selectedContainer: this.props.match.params.id};
     }
 
@@ -145,7 +157,12 @@ class BlockPage extends ListComponent<any, State> {
         let acronym = document.getElementById(BLOCK_ACRONYM) as HTMLInputElement;
         let formula = document.getElementById(BLOCK_FORMULA) as HTMLInputElement;
         let smiles = document.getElementById(BLOCK_SMILES) as HTMLInputElement;
-        this.defaultCreate(this.getEndpoint(), {blockName: blockName.value, acronym: acronym.value, formula: formula.value, smiles: smiles.value});
+        this.defaultCreate(this.getEndpoint(), {
+            blockName: blockName.value,
+            acronym: acronym.value,
+            formula: formula.value,
+            smiles: smiles.value
+        });
     }
 
     update(key: number) {
@@ -204,6 +221,55 @@ class BlockPage extends ListComponent<any, State> {
         document.location.href = URL_PREFIX + 'smiles/' + smiles;
     }
 
+    filter() {
+        let id = document.getElementById(TXT_FILTER_BLOCK_ID) as HTMLInputElement;
+        let name = document.getElementById(TXT_FILTER_BLOCK_NAME) as HTMLInputElement;
+        let acronym = document.getElementById(TXT_FILTER_BLOCK_ACRONYM) as HTMLInputElement;
+        let formula = document.getElementById(TXT_FILTER_BLOCK_FORMULA) as HTMLInputElement;
+        let massFrom = document.getElementById(TXT_FILTER_BLOCK_MASS_FROM) as HTMLInputElement;
+        let massTo = document.getElementById(TXT_FILTER_BLOCK_MASS_TO) as HTMLInputElement;
+        let losses = document.getElementById(TXT_FILTER_BLOCK_LOSSES) as HTMLInputElement;
+        let family = document.getElementById(TXT_FILTER_BLOCK_FAMILY) as HTMLInputElement;
+        let smiles = document.getElementById(TXT_FILTER_BLOCK_SMILES) as HTMLInputElement;
+        let identifier = document.getElementById(TXT_FILTER_BLOCK_IDENTIFIER) as HTMLInputElement;
+
+        let filter =
+            this.addFilter(
+                this.addFilter(
+                    this.addFilter(
+                        this.addFilter(
+                            this.addFilter(
+                                this.addFilter(
+                                    this.addFilter(
+                                        this.addFilter(
+                                            this.addFilter(
+                                                this.addFilter('', 'id', id.value)
+                                                , 'blockName', name.value)
+                                            , 'acronym', acronym.value)
+                                        , 'residue', formula.value)
+                                    , 'blockMassFrom', massFrom.value)
+                                , 'blockMassTo', massTo.value)
+                            , 'losses', losses.value)
+                        , 'family', family.value)
+                    , 'blockSmiles', smiles.value)
+                , 'identifier', identifier.value);
+        this.setState({filter: filter}, this.list);
+    }
+
+    clear() {
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_ID);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_NAME);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_ACRONYM);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_FORMULA);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_MASS_FROM);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_MASS_TO);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_LOSSES);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_FAMILY);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_SMILES);
+        this.clearConcreteFilter(TXT_FILTER_BLOCK_IDENTIFIER);
+        this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -237,81 +303,96 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : ''
                     }
 
-                    {this.state.list.length > 0 ? <h2>List of Blocks</h2> : ''}
+                    <h2>List of Blocks</h2>
 
-                    {this.state.list.length > 0 ?
-                        <table>
-                            <thead>
-                            <tr>
-                                <th onClick={() => this.sortBy('id')}>Id</th>
-                                <th onClick={() => this.sortBy('blockName')}>Block name</th>
-                                <th onClick={() => this.sortBy('acronym')}>Acronym</th>
-                                <th onClick={() => this.sortBy('residue')}>Residue</th>
-                                <th onClick={() => this.sortBy('blockMass')}>Mass</th>
-                                <th>Losses</th>
-                                <th>Family</th>
-                                <th>SMILES</th>
-                                <th onClick={() => this.sortBy('source')}>Identifier</th>
-                                <th>Actions</th>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th onClick={() => this.sortBy('id')}>Id</th>
+                            <th onClick={() => this.sortBy('blockName')}>Block name</th>
+                            <th onClick={() => this.sortBy('acronym')}>Acronym</th>
+                            <th onClick={() => this.sortBy('residue')}>Residue</th>
+                            <th onClick={() => this.sortBy('blockMass')}>Mass</th>
+                            <th>Losses</th>
+                            <th>Family</th>
+                            <th>SMILES</th>
+                            <th onClick={() => this.sortBy('source')}>Identifier</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_ID}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_NAME}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_ACRONYM}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_FORMULA}/></td>
+                            <td>
+                                <input type={'text'} id={TXT_FILTER_BLOCK_MASS_FROM}/>
+                                <input type={'text'} id={TXT_FILTER_BLOCK_MASS_TO}/>
+                            </td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_LOSSES}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_FAMILY}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_SMILES}/></td>
+                            <td><input type={'text'} id={TXT_FILTER_BLOCK_IDENTIFIER}/></td>
+                            <td>
+                                <button onClick={this.filter}>Filter</button>
+                                <button className={styles.delete} onClick={this.clear}>Clear</button>
+                            </td>
+                        </tr>
+                        {this.state.list.length > 0 && this.state.list.map(block => (
+                            <tr key={block.id}>
+                                <td>{block.id}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME}
+                                               id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.acronym} name={TXT_EDIT_ACRONYM}
+                                               id={TXT_EDIT_ACRONYM}/> : block.acronym}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
+                                               id={TXT_EDIT_FORMULA}/> : block.formula}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()}
+                                               name={TXT_EDIT_MASS}
+                                               id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
+                                               id={TXT_EDIT_LOSSES}/> : block.losses}</td>
+                                <td>{block.family}</td>
+                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                    <TextInput value={block.uniqueSmiles} name={TXT_EDIT_SMILES}
+                                               id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
+                                <td>
+                                    {this.state.editable === block.id
+                                        ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
+                                                            options={ServerEnumHelper.getOptions()}
+                                                            selected={block.source.toString()}/><TextInput
+                                            value={block.identifier} id={TXT_EDIT_IDENTIFIER}
+                                            name={TXT_EDIT_IDENTIFIER}/></div>
+                                        : <a href={ServerEnumHelper.getLink(block.source, block.identifier)}
+                                             target={'_blank'}
+                                             rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(block.source, block.identifier)}</a>}</td>
+                                <td>
+                                    {this.state.editable === block.id ? <button className={styles.update}
+                                                                                onClick={() => this.update(block.id)}>Update</button> :
+                                        <div/>}
+                                    {this.state.editable === block.id ?
+                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                        <div/>}
+                                    <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
+                                    </button>
+                                    <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
+                                    <button onClick={() => {
+                                        document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'
+                                    }}>Usage
+                                    </button>
+                                    <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete
+                                    </button>
+                                </td>
                             </tr>
-                            </thead>
-                            <tbody>
-                            {this.state.list.map(block => (
-                                <tr key={block.id}>
-                                    <td>{block.id}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME}
-                                                   id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.acronym} name={TXT_EDIT_ACRONYM}
-                                                   id={TXT_EDIT_ACRONYM}/> : block.acronym}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
-                                                   id={TXT_EDIT_FORMULA}/> : block.formula}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()}
-                                                   name={TXT_EDIT_MASS}
-                                                   id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
-                                                   id={TXT_EDIT_LOSSES}/> : block.losses}</td>
-                                    <td>{block.family}</td>
-                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput value={block.uniqueSmiles} name={TXT_EDIT_SMILES}
-                                                   id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
-                                    <td>
-                                        {this.state.editable === block.id
-                                            ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
-                                                                options={ServerEnumHelper.getOptions()}
-                                                                selected={block.source.toString()}/><TextInput
-                                                value={block.identifier} id={TXT_EDIT_IDENTIFIER}
-                                                name={TXT_EDIT_IDENTIFIER}/></div>
-                                            : <a href={ServerEnumHelper.getLink(block.source, block.identifier)}
-                                                 target={'_blank'}
-                                                 rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(block.source, block.identifier)}</a>}</td>
-                                    <td>
-                                        {this.state.editable === block.id ? <button className={styles.update}
-                                                                                    onClick={() => this.update(block.id)}>Update</button> :
-                                            <div/>}
-                                        {this.state.editable === block.id ?
-                                            <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                            <div/>}
-                                        <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
-                                        </button>
-                                        <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
-                                        <button onClick={() => {
-                                            document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'
-                                        }}>Usage
-                                        </button>
-                                        <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                        : <div/>
-                    }
+                        ))}
+                        </tbody>
+                    </table>
                 </section>
             </section>
         )
