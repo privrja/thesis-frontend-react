@@ -33,7 +33,7 @@
     "react-scripts": "^3.4.3",
     "react-select": "^3.2.0",
     "sass": "^1.32.8",
-    "smiles-drawer": "git+https://github.com/privrja/smilesDrawer.git#2.0.0",
+    "smiles-drawer": "git+https://github.com/privrja/smilesDrawer.git#master",
     "typescript": "^3.9.9"
   },
   "scripts": {

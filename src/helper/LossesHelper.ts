@@ -3,7 +3,15 @@ import DigitParser from "../parser/DigitParser";
 
 class LossesHelper {
 
-    static removeWaterFromFormula(formula: string) {
+    static removeWaterFromFormula(formula: string): string {
+        return LossesHelper.removeFromFormula(formula, true);
+    }
+
+    static remove2HFromFormula(formula: string): string {
+        return LossesHelper.removeFromFormula(formula, false);
+    }
+
+    static removeFromFormula(formula: string, removeWater: boolean): string {
         let tmpFormula = formula;
         let map = new Map();
         let atomParser = new AtomParser();
@@ -30,16 +38,10 @@ class LossesHelper {
                 formula = atomResult.getReminder();
             }
         }
-        let hydrogens = map.get('H') - 2;
-        if (hydrogens < 0) {
-            hydrogens = 0;
+        LossesHelper.removeAtom('H', 2, map);
+        if (removeWater) {
+            LossesHelper.removeAtom('O', 1, map);
         }
-        map.set('H', hydrogens);
-        let oxygen = map.get('O') - 1;
-        if (oxygen < 0) {
-            oxygen = 0;
-        }
-        map.set('O', oxygen);
         let formulaText = '';
         map.forEach((value: number, key: string) => {
             if (value !== 0) {
@@ -49,8 +51,27 @@ class LossesHelper {
         return formulaText;
     }
 
-    static removeWaterFromMass(mass: number) {
+    private static removeAtom(atom: string, count: number, map: Map<any, any>) {
+        let atoms = map.get(atom) - count;
+        if (atoms < 0) {
+            atoms = 0;
+        }
+        map.set(atom, atoms);
+    }
+
+    public static removeFromMass(mass: number, removeWater: boolean) {
+        if (removeWater) {
+            return LossesHelper.removeWaterFromMass(mass);
+        }
+        return LossesHelper.remove2HFromMass(mass);
+    }
+
+    public static removeWaterFromMass(mass: number) {
         return mass - 15.9949146221 - (2 * 1.0078250321);
+    }
+
+    public static remove2HFromMass(mass: number) {
+        return mass - (2 * 1.0078250321);
     }
 
 }

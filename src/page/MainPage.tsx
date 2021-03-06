@@ -88,6 +88,7 @@ interface BlockStructure {
     smiles: string;
     unique: string | null;
     sameAs: number | null;
+    isPolyketide: boolean;
     block: SingleStructure | null;
 }
 
@@ -407,8 +408,8 @@ class MainPage extends React.Component<any, SequenceState> {
             if (item.sameAs === null && item.block === null) {
                 let block = await finder.findBySmiles(item.smiles).then(data => data[0]).catch(() => undefined);
                 if (block) {
-                    block.formula = LossesHelper.removeWaterFromFormula(block.formula);
-                    block.mass = LossesHelper.removeWaterFromMass(block.mass ?? 0);
+                    block.formula = LossesHelper.removeFromFormula(block.formula, !item.isPolyketide);
+                    block.mass = LossesHelper.removeFromMass(block.mass ?? 0, !item.isPolyketide);
                 }
                 return {
                     id: item.id,
@@ -417,6 +418,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     smiles: item.smiles,
                     unique: item.unique,
                     sameAs: null,
+                    isPolyketide: item.isPolyketide,
                     block: block
                 } as BlockStructure;
             } else {
@@ -428,6 +430,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         smiles: item.smiles,
                         unique: item.unique,
                         sameAs: item.sameAs,
+                        isPolyketide: item.isPolyketide,
                         block: item.block
                     } as BlockStructure;
                 } else {
@@ -438,6 +441,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         smiles: item.smiles,
                         unique: item.unique,
                         sameAs: item.sameAs,
+                        isPolyketide: item.isPolyketide,
                         block: item.block
                     } as BlockStructure;
                 }
@@ -476,20 +480,56 @@ class MainPage extends React.Component<any, SequenceState> {
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)')? '(-2H) ': '') + name,
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
                             }
                         } as BlockStructure;
                     } else {
-                        return item;
+                        if (item.block) {
+                            return {
+                                id: item.id,
+                                databaseId: item.databaseId,
+                                acronym: item.acronym,
+                                smiles: item.smiles,
+                                unique: item.unique,
+                                sameAs: item.sameAs,
+                                block: {
+                                    identifier: item.block.identifier,
+                                    database: item.block.database,
+                                    structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ': '') + item.block.structureName,
+                                    smiles: item.block.smiles,
+                                    formula: item.block.formula,
+                                    mass: item.block.mass
+                                }
+                            } as BlockStructure;
+                        } else {
+                            return {
+                                id: item.id,
+                                databaseId: item.databaseId,
+                                acronym: item.acronym,
+                                smiles: item.smiles,
+                                unique: item.unique,
+                                sameAs: item.sameAs,
+                                block: {
+                                    identifier: '',
+                                    database: -1,
+                                    structureName: (item.isPolyketide ? '(-2H) ': ''),
+                                    smiles: item.smiles,
+                                    formula: '',
+                                    mass: 0
+                                }
+                            } as BlockStructure;
+                        }
                     }
                 }, 2).then(async data => {
+                    console.log(data);
                     if (this.state.sequence) {
                         sequence = this.state.sequence;
                     }
                     data.forEach(e => {
+                        console.log(e);
                         if (e.sameAs !== null) {
                             e.block = data[e.sameAs].block;
                             e.acronym = data[e.sameAs].acronym;
@@ -555,18 +595,14 @@ class MainPage extends React.Component<any, SequenceState> {
         let endpoint = ENDPOINT + 'smiles/unique';
         let init: any = {
             method: 'POST',
-            body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
-                return {smiles: e}
-            }))
+            body: JSON.stringify(blockStructures.blockSmiles)
         };
         if (token) {
             endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles';
             init = {
                 method: 'POST',
                 headers: {'x-auth-token': token},
-                body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
-                    return {smiles: e}
-                }))
+                body: JSON.stringify(blockStructures.blockSmiles)
             };
         }
         fetch(endpoint, init).then(responseUnique => {
@@ -585,15 +621,15 @@ class MainPage extends React.Component<any, SequenceState> {
         });
     }
 
-    transformSmiles(smiles: string[], sequence: SequenceStructure) {
+    transformSmiles(smiles: any[], sequence: SequenceStructure) {
         let data = [];
         for (let index = 0; index < smiles.length; index++) {
             data.push({
                 id: index,
                 databaseId: null,
                 acronym: index.toString(),
-                smiles: smiles[index],
-                unique: smiles[index],
+                smiles: smiles[index].smiles,
+                unique: smiles[index].smiles,
                 sameAs: null,
                 block: null
             } as BlockStructure);
@@ -633,13 +669,14 @@ class MainPage extends React.Component<any, SequenceState> {
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
+        console.log(database);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
         let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
         let response;
         if (search === SearchEnum.SMILES && database === ServerEnum.MASS_SPEC_BLOCKS) {
             let blockStructures = smilesDrawer.buildBlockSmiles();
-            response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles);
+            response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles.map((block: any) => block.smiles));
         } else {
             response = await SearchEnumHelper.find(search, finder, searchParam?.value);
         }
