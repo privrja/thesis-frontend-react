@@ -56,58 +56,53 @@ class BlockUsagePage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-
-                    {this.state.list.length > 0 ? <h2>Usages of {this.state.block?.acronym}</h2> : ''}
-
-                    {this.state.list.length > 0 ?
-                        <table>
-                            <thead>
-                            <tr>
-                                <th onClick={() => this.sortBy('id')}>Id</th>
-                                <th onClick={() => this.sortBy('sequenceName')}>Sequence name</th>
-                                <th onClick={() => this.sortBy('sequenceType')}>Type</th>
-                                <th onClick={() => this.sortBy('sequence')}>Sequence</th>
-                                <th onClick={() => this.sortBy('sequenceFormula')}>Formula</th>
-                                <th onClick={() => this.sortBy('sequenceMass')}>Mass</th>
-                                <th>Family</th>
-                                <th>N</th>
-                                <th>C</th>
-                                <th>Branch</th>
-                                <th>Identifier</th>
-                                <th>Block usages</th>
-                                <th>Actions</th>
+                    <h2>Usages of {this.state.block?.acronym}</h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th onClick={() => this.sortBy('id')}>Id</th>
+                            <th onClick={() => this.sortBy('sequenceName')}>Sequence name</th>
+                            <th onClick={() => this.sortBy('sequenceType')}>Type</th>
+                            <th onClick={() => this.sortBy('sequence')}>Sequence</th>
+                            <th onClick={() => this.sortBy('sequenceFormula')}>Formula</th>
+                            <th onClick={() => this.sortBy('sequenceMass')}>Mass</th>
+                            <th>Family</th>
+                            <th>N</th>
+                            <th>C</th>
+                            <th>Branch</th>
+                            <th>Identifier</th>
+                            <th>Block usages</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {this.state.list.length > 0 && this.state.list.map(sequence => (
+                            <tr key={sequence.id}>
+                                <td>{sequence.id}</td>
+                                <td>{sequence.sequenceName}</td>
+                                <td>{sequence.sequenceType}</td>
+                                <td>{sequence.sequence}</td>
+                                <td>{sequence.formula}</td>
+                                <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
+                                <td>{sequence.family}</td>
+                                <td>{sequence.nModification}</td>
+                                <td>{sequence.cModification}</td>
+                                <td>{sequence.bModification}</td>
+                                <td>{sequence.identifier ?
+                                    <a href={ServerEnumHelper.getLink(sequence.source, sequence.identifier)}
+                                       target={'_blank'}
+                                       rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : ''}
+                                </td>
+                                <td>{sequence.blockUsages}</td>
+                                <td>
+                                    <button className={styles.update}
+                                            onClick={() => this.detail(sequence.id)}>Detail
+                                    </button>
+                                </td>
                             </tr>
-                            </thead>
-                            <tbody>
-                            {this.state.list.map(sequence => (
-                                <tr key={sequence.id}>
-                                    <td>{sequence.id}</td>
-                                    <td>{sequence.sequenceName}</td>
-                                    <td>{sequence.sequenceType}</td>
-                                    <td>{sequence.sequence}</td>
-                                    <td>{sequence.formula}</td>
-                                    <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
-                                    <td>{sequence.family}</td>
-                                    <td>{sequence.nModification}</td>
-                                    <td>{sequence.cModification}</td>
-                                    <td>{sequence.bModification}</td>
-                                    <td>{sequence.identifier ?
-                                        <a href={ServerEnumHelper.getLink(sequence.source, sequence.identifier)}
-                                           target={'_blank'}
-                                           rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : ''}
-                                    </td>
-                                    <td>{sequence.blockUsages}</td>
-                                    <td>
-                                        <button className={styles.update}
-                                                onClick={() => this.detail(sequence.id)}>Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                        : ''
-                    }
+                        ))}
+                        </tbody>
+                    </table>
                 </section>
             </section>
         )
