@@ -524,12 +524,10 @@ class MainPage extends React.Component<any, SequenceState> {
                         }
                     }
                 }, 2).then(async data => {
-                    console.log(data);
                     if (this.state.sequence) {
                         sequence = this.state.sequence;
                     }
                     data.forEach(e => {
-                        console.log(e);
                         if (e.sameAs !== null) {
                             e.block = data[e.sameAs].block;
                             e.acronym = data[e.sameAs].acronym;
