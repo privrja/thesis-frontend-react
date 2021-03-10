@@ -667,7 +667,6 @@ class MainPage extends React.Component<any, SequenceState> {
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
-        console.log(database);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
         let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
