@@ -18,6 +18,7 @@ import Helper from "../helper/Helper";
 import FetchHelper from "../helper/FetchHelper";
 import FlashType from "../component/FlashType";
 import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import ContainerHelper from "../helper/ContainerHelper";
 
 const TXT_FILTER_SEQUENCE_ID = 'txt-filter-sequenceId';
 const TXT_FILTER_SEQUENCE_NAME = 'txt-filter-sequenceName';
@@ -41,7 +42,7 @@ class SequencePage extends ListComponent<any, ListState> {
         this.cloneTransformation = this.cloneTransformation.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id};
+        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
     }
 
     componentDidMount(): void {
@@ -135,7 +136,7 @@ class SequencePage extends ListComponent<any, ListState> {
                 <section className={styles.pageTable}>
                     <PopupYesNo label={"Really want to delete sequence?"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2>List of Sequences</h2>
+                    <h2>List of Sequences - {this.state.selectedContainerName}</h2>
                     <table>
                         <thead>
                         <tr>

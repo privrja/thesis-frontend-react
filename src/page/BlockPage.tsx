@@ -27,6 +27,7 @@ import {SelectInput} from "../component/SelectInput";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
+import ContainerHelper from "../helper/ContainerHelper";
 
 interface State extends ListState {
     list: Block[];
@@ -82,7 +83,7 @@ class BlockPage extends ListComponent<any, State> {
         this.showLargeSmiles = this.showLargeSmiles.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id};
+        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
     }
 
     componentDidMount() {
@@ -303,7 +304,7 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : ''
                     }
 
-                    <h2>List of Blocks</h2>
+                    <h2>List of Blocks - {this.state.selectedContainerName}</h2>
                     <table>
                         <thead>
                         <tr>

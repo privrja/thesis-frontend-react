@@ -10,6 +10,7 @@ import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import BlockMergeImport from "../import/BlockMergeImport";
 import SequenceImport from "../import/SequenceImport";
 import Helper from "../helper/Helper";
+import ContainerHelper from "../helper/ContainerHelper";
 
 const MODIFICATION = 'Modifications';
 const BLOCK = 'Blocks';
@@ -24,7 +25,7 @@ const IMPORT_OPTIONS = [
 ];
 
 interface State {
-    text: string;
+    selectedContainerName?: string;
 }
 
 const SEL_IMPORT_TYPE = 'sel-import-type';
@@ -38,6 +39,7 @@ class ImportPage extends React.Component<any, State> {
         super(props);
         this.flashRef = React.createRef();
         this.changeHandler = this.changeHandler.bind(this);
+        this.state = {selectedContainerName: ContainerHelper.getSelectedContainerName()};
     }
 
     componentDidMount(): void {
@@ -90,7 +92,7 @@ class ImportPage extends React.Component<any, State> {
         return (
             <section className={styles.page}>
                 <section>
-                    <h1>Import</h1>
+                    <h2>Import - {this.state.selectedContainerName}</h2>
                     <Flash textBad='Failure!' textOk='Success' ref={this.flashRef}/>
 
                     <SelectInput id={SEL_IMPORT_TYPE} name={SEL_IMPORT_TYPE} options={IMPORT_OPTIONS}/>

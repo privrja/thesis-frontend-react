@@ -8,6 +8,7 @@ import FetchHelper from "../helper/FetchHelper";
 
 export interface ListState {
     selectedContainer: number;
+    selectedContainerName?: string;
     editable?: number;
     list: any[];
     lastSortParam?: string;

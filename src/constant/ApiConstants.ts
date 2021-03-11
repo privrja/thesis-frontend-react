@@ -6,6 +6,7 @@ export const URL_PREFIX = '/';
 export const TOKEN = 'token';
 export const USER_NAME = 'userName';
 export const CHEMSPIDER_KEY = 'chemspiderKey';
+export const SELECTED_CONTAINER_NAME = 'selectedContainerName';
 export const SELECTED_CONTAINER = 'selectedContainer';
 export const EDITOR_SMILES = 'editorSmiles';
 export const EDITOR_BACK = 'editorBack';

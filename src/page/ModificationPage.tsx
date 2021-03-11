@@ -1,7 +1,13 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SMODIFICATION, TOKEN} from "../constant/ApiConstants";
+import {
+    CONTAINER,
+    DECIMAL_PLACES,
+    ENDPOINT,
+    SMODIFICATION,
+    TOKEN
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
@@ -10,6 +16,7 @@ import NameHelper from "../helper/NameHelper";
 import CheckInput from "../component/CheckInput";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import Helper from "../helper/Helper";
+import ContainerHelper from "../helper/ContainerHelper";
 
 const TXT_EDIT_MODIFICATION_NAME = 'txt-edit-modificationName';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -42,7 +49,7 @@ class ModificationPage extends ListComponent<any, ListState> {
         super(props);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id};
+        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
     }
 
     componentDidMount(): void {
@@ -163,7 +170,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </div> : ''
                     }
 
-                    <h2>List of Modifications</h2>
+                    <h2>List of Modifications - {this.state.selectedContainerName}</h2>
                     <table>
                         <thead>
                         <tr>

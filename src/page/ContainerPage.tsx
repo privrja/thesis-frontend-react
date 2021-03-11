@@ -1,7 +1,14 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, SELECTED_CONTAINER, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
+import {
+    CONTAINER,
+    ENDPOINT,
+    SELECTED_CONTAINER,
+    SELECTED_CONTAINER_NAME,
+    TOKEN,
+    URL_PREFIX
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
@@ -69,9 +76,10 @@ class ContainerPage extends ListComponent<any, State> {
             .then(response => this.setState({freeContainers: response}));
     }
 
-    selectContainer(containerId: number) {
+    selectContainer(containerId: number, containerName: string) {
         this.setState({selectedContainer: containerId});
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
+        localStorage.setItem(SELECTED_CONTAINER_NAME, containerName);
     }
 
     create(values: Values): void {
@@ -196,7 +204,7 @@ class ContainerPage extends ListComponent<any, State> {
                                         <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                         <div/>}
                                     <button onClick={() => {
-                                        this.selectContainer(container.id);
+                                        this.selectContainer(container.id, container.containerName);
                                         window.location.reload();
                                     }}>Select
                                     </button>
@@ -236,7 +244,7 @@ class ContainerPage extends ListComponent<any, State> {
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>
                                     <button onClick={() => {
-                                        this.selectContainer(container.id);
+                                        this.selectContainer(container.id, container.containerName);
                                         window.location.reload();
                                     }}>Select
                                     </button>
