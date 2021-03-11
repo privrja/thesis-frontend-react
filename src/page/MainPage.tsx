@@ -396,7 +396,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.BAD);
                     response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(err => console.log(err));
                 }
-                document.location.href = '#main';
+                document.location.href = '#home';
             });
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
