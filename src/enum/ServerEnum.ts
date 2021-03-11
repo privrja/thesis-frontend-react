@@ -83,8 +83,8 @@ export class ServerEnumHelper {
         }
     }
 
-    static getFullId(database: ServerEnum, identifier: string) {
-        if (identifier === null || identifier === undefined) {
+    static getFullId(database: ServerEnum, identifier: string | null) {
+        if (identifier === null || identifier === undefined || identifier === "") {
             identifier = "0";
         }
         switch (database) {
