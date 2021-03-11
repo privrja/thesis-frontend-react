@@ -196,7 +196,9 @@ class MainPage extends React.Component<any, SequenceState> {
                             nModification: sequence.nModification,
                             cModification: sequence.cModification,
                             bModification: sequence.bModification,
-                            family: sequence.family.map((family: any) => {return { value: family.id, label: family.family}}),
+                            family: sequence.family.map((family: any) => {
+                                return {value: family.id, label: family.family}
+                            }),
                             blocks: sequence.blocks.map((block: any) => {
                                 return {
                                     id: block.originalId,
@@ -480,7 +482,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)')? '(-2H) ': '') + name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + name,
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
@@ -498,7 +500,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                 block: {
                                     identifier: item.block.identifier,
                                     database: item.block.database,
-                                    structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ': '') + item.block.structureName,
+                                    structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + item.block.structureName,
                                     smiles: item.block.smiles,
                                     formula: item.block.formula,
                                     mass: item.block.mass
@@ -515,7 +517,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                 block: {
                                     identifier: '',
                                     database: -1,
-                                    structureName: (item.isPolyketide ? '(-2H) ': ''),
+                                    structureName: (item.isPolyketide ? '(-2H) ' : ''),
                                     smiles: item.smiles,
                                     formula: '',
                                     mass: 0
@@ -637,7 +639,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     similarity(data: any[]) {
-        let filtered : number[] = [];
+        let filtered: number[] = [];
         data.forEach((block: any) => {
             if (block.sameAs === null && block.block) {
                 filtered.push(block.block.databaseId);
@@ -758,7 +760,15 @@ class MainPage extends React.Component<any, SequenceState> {
                 body: JSON.stringify([{smiles: smilesInput.value}])
             }).then(response => {
                 if (response.status === 200) {
-                    response.json().then(data => {smilesInput!.value = data[0].unique ?? data[0].smiles; this.drawSmiles()});
+                    response.json().then(data => {
+                        smilesInput!.value = data[0].unique ?? data[0].smiles;
+                        let molecule = this.state.molecule;
+                        if (molecule) {
+                            molecule.smiles = data[0].unique ?? data[0].smiles;
+                            this.setState({molecule: molecule});
+                        }
+                        this.drawSmiles()
+                    });
                 }
             });
         }
