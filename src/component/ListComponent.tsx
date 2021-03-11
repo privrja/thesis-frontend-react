@@ -5,6 +5,8 @@ import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED, OK_CREATED} from "../constant/FlashConstants";
 import FetchHelper from "../helper/FetchHelper";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
 
 export interface ListState {
     selectedContainer: number;
@@ -45,6 +47,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.delete = this.delete.bind(this);
         this.addFilter = this.addFilter.bind(this);
         this.clearConcreteFilter = this.clearConcreteFilter.bind(this);
+        this.sortIcons = this.sortIcons.bind(this);
     }
 
     componentDidMount(): void {
@@ -64,6 +67,16 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     editEnd(): void {
         this.setState({editable: undefined});
+    }
+
+    sortIcons(param: string) {
+        if (this.state.lastSortParam !== param) {
+            return <FontAwesomeIcon icon={faSort}/>
+        } else {
+            return this.state.lastSortOrder === 'asc'
+                ? <FontAwesomeIcon icon={faSortUp}/>
+                : <FontAwesomeIcon icon={faSortDown}/>
+        }
     }
 
     sortBy(param: string, endpoint?: string, transformationCallback?: (e: any) => void) {

@@ -69,6 +69,16 @@ const TXT_FILTER_BLOCK_LOSSES = 'txt-filter-blockLosses';
 const TXT_FILTER_BLOCK_FAMILY = 'txt-filter-blockFamily';
 const TXT_FILTER_BLOCK_SMILES = 'txt-filter-blockSmiles';
 const TXT_FILTER_BLOCK_IDENTIFIER = 'txt-filter-blockIdentifier';
+const SORT_ID = 'id';
+const SORT_NAME = BLOCK_NAME;
+const SORT_ACRONYM = BLOCK_ACRONYM;
+const SORT_RESIDUE = 'residue';
+const SORT_MASS_FROM = 'blockMassFrom';
+const SORT_MASS_TO = 'blockMassTo';
+const SORT_LOSSES = 'losses';
+const SORT_FAMILY = 'family';
+const SORT_SMILES = 'blockSmiles';
+const SORT_IDENTIFIER = 'identifier';
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
@@ -243,16 +253,16 @@ class BlockPage extends ListComponent<any, State> {
                                     this.addFilter(
                                         this.addFilter(
                                             this.addFilter(
-                                                this.addFilter('', 'id', id.value)
-                                                , 'blockName', name.value)
-                                            , 'acronym', acronym.value)
-                                        , 'residue', formula.value)
-                                    , 'blockMassFrom', massFrom.value)
-                                , 'blockMassTo', massTo.value)
-                            , 'losses', losses.value)
-                        , 'family', family.value)
-                    , 'blockSmiles', smiles.value)
-                , 'identifier', identifier.value);
+                                                this.addFilter('', SORT_ID, id.value)
+                                                , SORT_NAME, name.value)
+                                            , SORT_ACRONYM, acronym.value)
+                                        , SORT_RESIDUE, formula.value)
+                                    , SORT_MASS_FROM, massFrom.value)
+                                , SORT_MASS_TO, massTo.value)
+                            , SORT_LOSSES, losses.value)
+                        , SORT_FAMILY, family.value)
+                    , SORT_SMILES, smiles.value)
+                , SORT_IDENTIFIER, identifier.value);
         this.setState({filter: filter}, this.list);
     }
 
@@ -307,15 +317,15 @@ class BlockPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
-                            <th onClick={() => this.sortBy('blockName')}>Block name</th>
-                            <th onClick={() => this.sortBy('acronym')}>Acronym</th>
-                            <th onClick={() => this.sortBy('residue')}>Residue</th>
-                            <th onClick={() => this.sortBy('blockMass')}>Mass</th>
-                            <th onClick={() => this.sortBy('losses')}>Losses</th>
-                            <th onClick={() => this.sortBy('family')}>Family</th>
-                            <th onClick={() => this.sortBy('blockSmiles')}>SMILES</th>
-                            <th onClick={() => this.sortBy('identifier')}>Identifier</th>
+                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            <th onClick={() => this.sortBy(SORT_NAME)}>Block name {this.sortIcons(SORT_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_ACRONYM)}>Acronym {this.sortIcons(SORT_ACRONYM)}</th>
+                            <th onClick={() => this.sortBy(SORT_RESIDUE)}>Residue {this.sortIcons(SORT_RESIDUE)}</th>
+                            <th onClick={() => this.sortBy('blockMass')}>Mass {this.sortIcons('blockMass')}</th>
+                            <th onClick={() => this.sortBy(SORT_LOSSES)}>Losses {this.sortIcons(SORT_LOSSES)}</th>
+                            <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
+                            <th onClick={() => this.sortBy(SORT_SMILES)}>SMILES {this.sortIcons(SORT_SMILES)}</th>
+                            <th onClick={() => this.sortBy(SORT_IDENTIFIER)}>Identifier {this.sortIcons(SORT_IDENTIFIER)}</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

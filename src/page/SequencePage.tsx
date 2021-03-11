@@ -36,6 +36,20 @@ const TXT_FILTER_SEQUENCE_C_MODIFICATION = 'txt-filter-sequenceCModification';
 const TXT_FILTER_SEQUENCE_B_MODIFICATION = 'txt-filter-sequenceBModification';
 const TXT_FILTER_SEQUENCE_IDENTIFIER = 'txt-filter-sequenceIdentifier';
 
+const SORT_ID = 'id';
+const SORT_SEQUENCE_NAME = 'sequenceName';
+const SORT_SEQUENCE_TYPE = 'sequenceType';
+const SORT_SEQUENCE = 'sequence';
+const SORT_FORMULA = 'sequenceFormula';
+const SORT_MASS_FROM = 'sequenceMassFrom';
+const SORT_MASS_TO = 'sequenceMassTo';
+const SORT_FAMILY = 'family';
+const SORT_N_MODIFICATION = 'nModification';
+const SORT_C_MODIFICATION = 'cModification';
+const SORT_B_MODIFICATION = 'bModification';
+const SORT_IDENTIFIER = 'identifier';
+const SORT_MASS = 'sequenceMass';
+
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
 class SequencePage extends ListComponent<any, ListState> {
@@ -113,18 +127,18 @@ class SequencePage extends ListComponent<any, ListState> {
                                             this.addFilter(
                                                 this.addFilter(
                                                     this.addFilter(
-                                                        this.addFilter('', 'id', id.value)
-                                                        , 'sequenceName', name.value)
-                                                    , 'sequenceType', sequenceType.value)
-                                                , 'sequence', sequence.value)
-                                            , 'sequenceFormula', formula.value)
-                                        , 'sequenceMassFrom', massFrom.value)
-                                    , 'sequenceMassTo', massTo.value)
-                                , 'family', family.value)
-                            , 'nModification', nModification.value)
-                        , 'cModification', cModification.value)
-                    , 'bModification', bModification.value)
-                , 'identifier', identifier.value);
+                                                        this.addFilter('', SORT_ID, id.value)
+                                                        , SORT_SEQUENCE_NAME, name.value)
+                                                    , SORT_SEQUENCE_TYPE, sequenceType.value)
+                                                , SORT_SEQUENCE, sequence.value)
+                                            , SORT_FORMULA, formula.value)
+                                        , SORT_MASS_FROM, massFrom.value)
+                                    , SORT_MASS_TO, massTo.value)
+                                , SORT_FAMILY, family.value)
+                            , SORT_N_MODIFICATION, nModification.value)
+                        , SORT_C_MODIFICATION, cModification.value)
+                    , SORT_B_MODIFICATION, bModification.value)
+                , SORT_IDENTIFIER, identifier.value);
         this.setState({filter: filter}, this.list);
     }
 
@@ -155,7 +169,6 @@ class SequencePage extends ListComponent<any, ListState> {
         });
     }
 
-
     render() {
         return (
             <section className={styles.page}>
@@ -168,17 +181,17 @@ class SequencePage extends ListComponent<any, ListState> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
-                            <th onClick={() => this.sortBy('sequenceName')}>Sequence name</th>
-                            <th onClick={() => this.sortBy('sequenceType')}>Type</th>
-                            <th onClick={() => this.sortBy('sequence')}>Sequence</th>
-                            <th onClick={() => this.sortBy('sequenceFormula')}>Formula</th>
-                            <th onClick={() => this.sortBy('sequenceMass')}>Mass</th>
-                            <th onClick={() => this.sortBy('family')}>Family</th>
-                            <th onClick={() => this.sortBy('nModification')}>N</th>
-                            <th onClick={() => this.sortBy('cModification')}>C</th>
-                            <th onClick={() => this.sortBy('bModification')}>Branch</th>
-                            <th onClick={() => this.sortBy('identifier')}>Identifier</th>
+                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
+                            <th onClick={() => this.sortBy(SORT_FORMULA)}>Formula {this.sortIcons(SORT_FORMULA)}</th>
+                            <th onClick={() => this.sortBy(SORT_MASS)}>Mass {this.sortIcons(SORT_MASS)}</th>
+                            <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
+                            <th onClick={() => this.sortBy(SORT_N_MODIFICATION)}>N {this.sortIcons(SORT_N_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_C_MODIFICATION)}>C {this.sortIcons(SORT_C_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_B_MODIFICATION)}>Branch {this.sortIcons(SORT_B_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_IDENTIFIER)}>Identifier {this.sortIcons(SORT_IDENTIFIER)}</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

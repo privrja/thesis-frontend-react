@@ -27,14 +27,6 @@ const MODIFICATION_NAME = 'modificationName';
 const MODIFICATION_FORMULA = 'formula';
 const N_TERMINAL = 'nTerminal';
 const C_TERMINAL = 'cTerminal';
-
-interface Values {
-    modificationName: string;
-    formula: string;
-    nTerminal: boolean;
-    cTerminal: boolean;
-}
-
 const TXT_FILTER_MODIFICATION_ID = 'txt-filter-id';
 const TXT_FILTER_MODIFICATION_NAME = 'txt-filter-modificationName';
 const TXT_FILTER_MODIFICATION_FORMULA = 'txt-filter-modificationFormula';
@@ -42,6 +34,19 @@ const TXT_FILTER_MODIFICATION_MASS_FROM = 'txt-filter-modificationMass-from';
 const TXT_FILTER_MODIFICATION_MASS_TO = 'txt-filter-modificationMass-to';
 const TXT_FILTER_MODIFICATION_N_TERMINAL = 'txt-filter-nTerminal';
 const TXT_FILTER_MODIFICATION_C_TERMINAL = 'txt-filter-cTerminal';
+const SORT_ID = 'id';
+const SORT_MODIFICATION_NAME = MODIFICATION_NAME;
+const SORT_MODIFICATION_FORMULA = 'modificationFormula';
+const SORT_MODIFICATION_MASS = 'modificationMass';
+const SORT_C_TERMINAL = C_TERMINAL;
+const SORT_N_TERMINAL = N_TERMINAL;
+
+interface Values {
+    modificationName: string;
+    formula: string;
+    nTerminal: boolean;
+    cTerminal: boolean;
+}
 
 class ModificationPage extends ListComponent<any, ListState> {
 
@@ -100,13 +105,13 @@ class ModificationPage extends ListComponent<any, ListState> {
                         this.addFilter(
                             this.addFilter(
                                 this.addFilter(
-                                    this.addFilter('', 'id', id.value)
-                                    , 'modificationName', name.value)
-                                , 'modificationFormula', formula.value)
+                                    this.addFilter('', SORT_ID, id.value)
+                                    , SORT_MODIFICATION_NAME, name.value)
+                                , SORT_MODIFICATION_FORMULA, formula.value)
                             , 'modificationMassFrom', mass_from.value)
                         , 'modificationMassTo', mass_to.value)
-                    , 'nTerminal', nTerminal.value.toLowerCase())
-                , 'cTerminal', cTerminal.value.toLowerCase());
+                    , SORT_N_TERMINAL, nTerminal.value.toLowerCase())
+                , SORT_C_TERMINAL, cTerminal.value.toLowerCase());
         this.setState({filter: filter}, this.list);
     }
 
@@ -174,12 +179,12 @@ class ModificationPage extends ListComponent<any, ListState> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
-                            <th onClick={() => this.sortBy('modificationName')}>Modification name</th>
-                            <th onClick={() => this.sortBy('modificationFormula')}>Formula</th>
-                            <th onClick={() => this.sortBy('modificationMass')}>Mass</th>
-                            <th onClick={() => this.sortBy('nTerminal')}>N-terminal</th>
-                            <th onClick={() => this.sortBy('cTerminal')}>C-terminal</th>
+                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Modification name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_FORMULA)}>Formula {this.sortIcons(SORT_MODIFICATION_FORMULA)}</th>
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_MASS)}>Mass {this.sortIcons(SORT_MODIFICATION_MASS)}</th>
+                            <th onClick={() => this.sortBy(SORT_N_TERMINAL)}>N-terminal {this.sortIcons(SORT_N_TERMINAL)}</th>
+                            <th onClick={() => this.sortBy(SORT_C_TERMINAL)}>C-terminal {this.sortIcons(SORT_C_TERMINAL)}</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
