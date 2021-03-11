@@ -13,14 +13,14 @@ export enum ServerEnum {
 
 export class ServerEnumHelper {
 
-    static getOptions(): SelectOption[] {
+    static getOptions(containerName?: string): SelectOption[] {
         return [
             new SelectOption(ServerEnum.PUBCHEM.toString(), this.getName(ServerEnum.PUBCHEM)),
             new SelectOption(ServerEnum.CHEMSPIDER.toString(), this.getName(ServerEnum.CHEMSPIDER)),
             new SelectOption(ServerEnum.NORINE.toString(), this.getName(ServerEnum.NORINE)),
             new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
             new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI)),
-            new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS))
+            new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS) + (containerName ? (' - ' + containerName) : ''))
         ];
     }
 
@@ -63,7 +63,7 @@ export class ServerEnumHelper {
             case ServerEnum.CHEBI:
                 return 'ChEBI';
             case ServerEnum.MASS_SPEC_BLOCKS:
-                return 'MassSpecBlocks';
+                return 'MSB';
         }
     }
 

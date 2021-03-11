@@ -72,6 +72,7 @@ interface SequenceState {
     databaseBlockSelect?: number;
     blocksAll: any[],
     blockEdit?: any,
+    selectedContainerName?: string;
 }
 
 interface SequenceStructure {
@@ -138,7 +139,8 @@ class MainPage extends React.Component<any, SequenceState> {
             selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
             sequenceEdit: false,
-            blocksAll: []
+            blocksAll: [],
+            selectedContainerName: ContainerHelper.getSelectedContainerName()
         };
     }
 
@@ -1140,7 +1142,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getOptions()} onChange={this.refreshMolecule}/>
+                                     options={ServerEnumHelper.getOptions(this.state.selectedContainerName)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
