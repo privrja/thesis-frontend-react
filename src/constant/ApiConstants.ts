@@ -28,3 +28,5 @@ export const SFAMILY = '/family';
 export const SMODIFICATION = '/modification';
 export const SBLOCK = '/block';
 export const SSEQUENCE = '/sequence';
+
+export const ELEMENT_LARGE_SMILES = 'popupLargeSmiles';

@@ -14,7 +14,7 @@ import {
     EDITOR_NEW_BLOCK_NAME,
     EDITOR_NEW_BLOCK_ACRONYM,
     EDITOR_NEW_BLOCK_FORMULA,
-    EDITOR_NEW_BLOCK_SMILES
+    EDITOR_NEW_BLOCK_SMILES, ELEMENT_LARGE_SMILES
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
@@ -71,7 +71,6 @@ const TXT_FILTER_BLOCK_SMILES = 'txt-filter-blockSmiles';
 const TXT_FILTER_BLOCK_IDENTIFIER = 'txt-filter-blockIdentifier';
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
-const ELEMENT_LARGE_SMILES = 'popupLargeSmiles';
 
 class BlockPage extends ListComponent<any, State> {
 

@@ -3,7 +3,7 @@ import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
     CONTAINER,
-    DECIMAL_PLACES,
+    DECIMAL_PLACES, ELEMENT_LARGE_SMILES,
     ENDPOINT,
     SEQUENCE_EDIT,
     SEQUENCE_ID,
@@ -19,6 +19,9 @@ import FetchHelper from "../helper/FetchHelper";
 import FlashType from "../component/FlashType";
 import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
+// @ts-ignore
+import * as SmilesDrawer from 'smiles-drawer';
+import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 
 const TXT_FILTER_SEQUENCE_ID = 'txt-filter-sequenceId';
 const TXT_FILTER_SEQUENCE_NAME = 'txt-filter-sequenceName';
@@ -33,10 +36,15 @@ const TXT_FILTER_SEQUENCE_C_MODIFICATION = 'txt-filter-sequenceCModification';
 const TXT_FILTER_SEQUENCE_B_MODIFICATION = 'txt-filter-sequenceBModification';
 const TXT_FILTER_SEQUENCE_IDENTIFIER = 'txt-filter-sequenceIdentifier';
 
+let largeSmilesDrawer: SmilesDrawer.Drawer;
+
 class SequencePage extends ListComponent<any, ListState> {
+
+    popupSmilesRef: React.RefObject<PopupSmilesDrawer>;
 
     constructor(props: any) {
         super(props);
+        this.popupSmilesRef = React.createRef();
         this.detail = this.detail.bind(this);
         this.clone = this.clone.bind(this);
         this.cloneTransformation = this.cloneTransformation.bind(this);
@@ -48,6 +56,12 @@ class SequencePage extends ListComponent<any, ListState> {
     componentDidMount(): void {
         super.componentDidMount();
         Helper.resetStorage();
+        const large = document.getElementById(ELEMENT_LARGE_SMILES);
+        largeSmilesDrawer = new SmilesDrawer.Drawer({
+            width: large!.clientWidth,
+            height: large!.clientHeight,
+            compactDrawing: false,
+        });
     }
 
     findName(key: number): string {
@@ -130,11 +144,25 @@ class SequencePage extends ListComponent<any, ListState> {
         this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
     }
 
+    /**
+     * Show popup with large result
+     * @param smiles
+     */
+    showLargeSmiles(smiles: string) {
+        this.popupSmilesRef.current!.activate();
+        SmilesDrawer.parse(smiles, function (tree: any) {
+            largeSmilesDrawer.draw(tree, ELEMENT_LARGE_SMILES);
+        });
+    }
+
+
     render() {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
                     <PopupYesNo label={"Really want to delete sequence?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
+                                       ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <h2>List of Sequences - {this.state.selectedContainerName}</h2>
                     <table>
@@ -201,6 +229,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                         <div/>}
                                     <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
                                     </button>
+                                    <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>
                                     <button className={styles.create} onClick={() => this.clone(sequence.id)}>Clone
                                     </button>
                                     <button className={styles.delete}
