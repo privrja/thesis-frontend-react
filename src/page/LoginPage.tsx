@@ -5,7 +5,7 @@ import styles from "../main.module.scss"
 import {
     ENDPOINT,
     TOKEN,
-    URL_PREFIX
+    URL_PREFIX, USER_NAME
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
@@ -45,6 +45,7 @@ class LoginPage extends React.Component<any> {
                     const token = response.headers.get('x-auth-token');
                     if (token) {
                         localStorage.setItem(TOKEN, token);
+                        localStorage.setItem(USER_NAME, values.name);
                         this.flashRef.current!.activate(FlashType.OK);
                         Helper.resetUserStorage();
                         if (response.headers.get('x-condition') !== "1") {
