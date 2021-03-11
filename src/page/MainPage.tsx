@@ -817,7 +817,8 @@ class MainPage extends React.Component<any, SequenceState> {
         }
         if (this.state.editSame) {
             let blocksCopy = [...blocks];
-            let sameBlocks = blocksCopy.filter(block => block.sameAs === blockId || block.id === blockId);
+            let sameAs = blocks[blockId].sameAs === null ? blockId : blocks[blockId].sameAs;
+            let sameBlocks = blocksCopy.filter(block => block.sameAs === sameAs || block.id === sameAs);
             sameBlocks.forEach(block => {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
