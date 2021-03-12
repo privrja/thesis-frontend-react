@@ -28,24 +28,8 @@ import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
 import ContainerHelper from "../helper/ContainerHelper";
-
-interface State extends ListState {
-    list: Block[];
-}
-
-interface Block {
-    id: number;
-    blockName: string;
-    acronym: string;
-    formula: string;
-    mass: number;
-    losses: string;
-    smiles: string;
-    uniqueSmiles: string;
-    family: string;
-    source: number;
-    identifier: string;
-}
+import Creatable from "react-select/creatable";
+import FetchHelper from "../helper/FetchHelper";
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
 const TXT_EDIT_ACRONYM = 'txt-edit-acronym';
@@ -80,6 +64,27 @@ const SORT_FAMILY = 'family';
 const SORT_SMILES = 'blockSmiles';
 const SORT_IDENTIFIER = 'identifier';
 
+interface State extends ListState {
+    list: Block[];
+    familyOptions: any[];
+    newFamily: any[];
+}
+
+interface Block {
+    id: number;
+    blockName: string;
+    acronym: string;
+    formula: string;
+    mass: number;
+    losses: string;
+    smiles: string;
+    uniqueSmiles: string;
+    family: string;
+    source: number;
+    identifier: string;
+}
+
+
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
 class BlockPage extends ListComponent<any, State> {
@@ -92,7 +97,15 @@ class BlockPage extends ListComponent<any, State> {
         this.showLargeSmiles = this.showLargeSmiles.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
+        this.fetchFamily = this.fetchFamily.bind(this);
+        this.newFamilyChange = this.newFamilyChange.bind(this);
+        this.state = {
+            list: [],
+            familyOptions: [],
+            newFamily: [],
+            selectedContainer: this.props.match.params.id,
+            selectedContainerName: ContainerHelper.getSelectedContainerName()
+        };
     }
 
     componentDidMount() {
@@ -122,6 +135,7 @@ class BlockPage extends ListComponent<any, State> {
                     this.resetStorage(key);
                 });
             }
+            this.fetchFamily();
         }
         const large = document.getElementById(ELEMENT_LARGE_SMILES);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
@@ -129,6 +143,14 @@ class BlockPage extends ListComponent<any, State> {
             height: large!.clientHeight,
             compactDrawing: false,
         });
+    }
+
+    fetchFamily() {
+        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => this.setState({
+            familyOptions: data.map((family: any) => {
+                return {value: family.id, label: family.family}
+            })
+        }));
     }
 
     resetStorage(key: number) {
@@ -171,7 +193,8 @@ class BlockPage extends ListComponent<any, State> {
             blockName: blockName.value,
             acronym: acronym.value,
             formula: formula.value,
-            smiles: smiles.value
+            smiles: smiles.value,
+            family: this.state.newFamily.map((family: any) => family.value)
         });
     }
 
@@ -280,6 +303,10 @@ class BlockPage extends ListComponent<any, State> {
         this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
     }
 
+    newFamilyChange(newValue: any) {
+        this.setState({newFamily: newValue});
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -308,6 +335,10 @@ class BlockPage extends ListComponent<any, State> {
                             <input type={'text'} id={BLOCK_SMILES} name={BLOCK_SMILES}
                                    placeholder='SMILES'/>
 
+                            <label htmlFor={'cre-new-block-family'}>Family: </label>
+                            <Creatable className={styles.creatable} id={'cre-new-block-family'} isMulti={true}
+                                       options={this.state.familyOptions} onChange={this.newFamilyChange}/>
+
                             <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
                             <button className={styles.create} onClick={this.create}>Create new Block</button>
                         </div> : ''
@@ -331,18 +362,38 @@ class BlockPage extends ListComponent<any, State> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ID} placeholder={'Id'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_NAME} placeholder={'Name'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ACRONYM} placeholder={'Acronym'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_FORMULA} placeholder={'Formula'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ID}
+                                       placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_NAME}
+                                       placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ACRONYM}
+                                       placeholder={'Acronym'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_FORMULA}
+                                       placeholder={'Formula'}/></td>
                             <td>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_MASS_FROM} placeholder={'Mass from'}/>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_MASS_TO} placeholder={'Mass to'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_MASS_FROM}
+                                       placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_MASS_TO}
+                                       placeholder={'Mass to'}/>
                             </td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_LOSSES} placeholder={'Losses'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_FAMILY} placeholder={'Family'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_SMILES} placeholder={'Smiles'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_IDENTIFIER} placeholder={'Identifier'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_LOSSES}
+                                       placeholder={'Losses'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_FAMILY}
+                                       placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_SMILES}
+                                       placeholder={'Smiles'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_BLOCK_IDENTIFIER} placeholder={'Identifier'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
