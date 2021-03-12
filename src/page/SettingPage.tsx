@@ -3,6 +3,7 @@ import styles from "../main.module.scss";
 import PasswordComponent from "../component/PasswordComponent";
 import ChemSpiderKey from "../component/ChemSpiderKey";
 import AdminComponent from "../component/AdminComponent";
+import DeleteAccount from "../component/DeleteAccount";
 
 class SettingPage extends React.Component<any, any> {
 
@@ -11,6 +12,7 @@ class SettingPage extends React.Component<any, any> {
             <section className={styles.page}>
                 <PasswordComponent/>
                 <ChemSpiderKey/>
+                <DeleteAccount/>
                 <AdminComponent/>
             </section>
         );
