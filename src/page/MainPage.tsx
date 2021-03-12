@@ -831,9 +831,7 @@ class MainPage extends React.Component<any, SequenceState> {
         if (sequence) {
             sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value); // blbe musi byt zvlast pro konkretni a zvlast pro vsechny
         }
-        console.log(this.state.editSame);
         if (this.state.editSame) {
-            console.log('not HERE');
             let blocksCopy = [...blocks];
             let sameAs = blocks[blockId].sameAs === null ? blockId : blocks[blockId].sameAs;
             let sameBlocks = blocksCopy.filter(block => block.sameAs === sameAs || block.id === sameAs);
@@ -865,8 +863,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 }
             });
         } else {
-            console.log('HERE');
-            console.log(blocks);
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
             blocks[blockId].unique = smiles.value;
@@ -886,7 +882,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[blockId].block!.database = Number(source.value);
                 blocks[blockId].block!.identifier = identifier.value;
             }
-            console.log(blocks);
             blocks[blockId].block!.losses = losses.value;
             if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
                 blocks[blockId].databaseId = this.state.blockEdit.id;
