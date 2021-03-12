@@ -22,33 +22,30 @@ import ContainerHelper from "../helper/ContainerHelper";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-
-const TXT_FILTER_SEQUENCE_ID = 'txt-filter-sequenceId';
-const TXT_FILTER_SEQUENCE_NAME = 'txt-filter-sequenceName';
-const TXT_FILTER_SEQUENCE_TYPE = 'txt-filter-sequenceType';
-const TXT_FILTER_SEQUENCE = 'txt-filter-sequence';
-const TXT_FILTER_SEQUENCE_FORMULA = 'txt-filter-sequenceFormula';
-const TXT_FILTER_SEQUENCE_MASS_FROM = 'txt-filter-sequenceMassFrom';
-const TXT_FILTER_SEQUENCE_MASS_TO = 'txt-filter-sequenceMassTo';
-const TXT_FILTER_SEQUENCE_FAMILY = 'txt-filter-sequenceFamily';
-const TXT_FILTER_SEQUENCE_N_MODIFICATION = 'txt-filter-sequenceNModification';
-const TXT_FILTER_SEQUENCE_C_MODIFICATION = 'txt-filter-sequenceCModification';
-const TXT_FILTER_SEQUENCE_B_MODIFICATION = 'txt-filter-sequenceBModification';
-const TXT_FILTER_SEQUENCE_IDENTIFIER = 'txt-filter-sequenceIdentifier';
-
-const SORT_ID = 'id';
-const SORT_SEQUENCE_NAME = 'sequenceName';
-const SORT_SEQUENCE_TYPE = 'sequenceType';
-const SORT_SEQUENCE = 'sequence';
-const SORT_FORMULA = 'sequenceFormula';
-const SORT_MASS_FROM = 'sequenceMassFrom';
-const SORT_MASS_TO = 'sequenceMassTo';
-const SORT_FAMILY = 'family';
-const SORT_N_MODIFICATION = 'nModification';
-const SORT_C_MODIFICATION = 'cModification';
-const SORT_B_MODIFICATION = 'bModification';
-const SORT_IDENTIFIER = 'identifier';
-const SORT_MASS = 'sequenceMass';
+import {
+    SORT_B_MODIFICATION,
+    SORT_C_MODIFICATION,
+    SORT_FAMILY,
+    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION,
+    SORT_SEQUENCE,
+    SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
+    SORT_SEQUENCE_MASS_FROM,
+    SORT_SEQUENCE_NAME,
+    SORT_SEQUENCE_TYPE,
+    SORT_SEQUNECE_MASS_TO,
+    TXT_FILTER_SEQUENCE,
+    TXT_FILTER_SEQUENCE_B_MODIFICATION,
+    TXT_FILTER_SEQUENCE_C_MODIFICATION,
+    TXT_FILTER_SEQUENCE_FAMILY,
+    TXT_FILTER_SEQUENCE_FORMULA,
+    TXT_FILTER_SEQUENCE_ID,
+    TXT_FILTER_SEQUENCE_IDENTIFIER,
+    TXT_FILTER_SEQUENCE_MASS_FROM,
+    TXT_FILTER_SEQUENCE_MASS_TO,
+    TXT_FILTER_SEQUENCE_N_MODIFICATION,
+    TXT_FILTER_SEQUENCE_NAME,
+    TXT_FILTER_SEQUENCE_TYPE
+} from "../constant/DefaultConstants";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
@@ -131,9 +128,9 @@ class SequencePage extends ListComponent<any, ListState> {
                                                         , SORT_SEQUENCE_NAME, name.value)
                                                     , SORT_SEQUENCE_TYPE, sequenceType.value)
                                                 , SORT_SEQUENCE, sequence.value)
-                                            , SORT_FORMULA, formula.value)
-                                        , SORT_MASS_FROM, massFrom.value)
-                                    , SORT_MASS_TO, massTo.value)
+                                            , SORT_SEQUENCE_FORMULA, formula.value)
+                                        , SORT_SEQUENCE_MASS_FROM, massFrom.value)
+                                    , SORT_SEQUNECE_MASS_TO, massTo.value)
                                 , SORT_FAMILY, family.value)
                             , SORT_N_MODIFICATION, nModification.value)
                         , SORT_C_MODIFICATION, cModification.value)
@@ -185,8 +182,8 @@ class SequencePage extends ListComponent<any, ListState> {
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
-                            <th onClick={() => this.sortBy(SORT_FORMULA)}>Formula {this.sortIcons(SORT_FORMULA)}</th>
-                            <th onClick={() => this.sortBy(SORT_MASS)}>Mass {this.sortIcons(SORT_MASS)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_MASS)}>Mass {this.sortIcons(SORT_SEQUENCE_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
                             <th onClick={() => this.sortBy(SORT_N_MODIFICATION)}>N {this.sortIcons(SORT_N_MODIFICATION)}</th>
                             <th onClick={() => this.sortBy(SORT_C_MODIFICATION)}>C {this.sortIcons(SORT_C_MODIFICATION)}</th>

@@ -5,6 +5,30 @@ import ListComponent, {ListState} from "../component/ListComponent";
 import Helper from "../helper/Helper";
 import {ServerEnumHelper} from "../enum/ServerEnum";
 import FetchHelper from "../helper/FetchHelper";
+import {
+    SORT_B_MODIFICATION,
+    SORT_C_MODIFICATION,
+    SORT_FAMILY,
+    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION,
+    SORT_SEQUENCE,
+    SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
+    SORT_SEQUENCE_MASS_FROM,
+    SORT_SEQUENCE_NAME,
+    SORT_SEQUENCE_TYPE,
+    SORT_SEQUNECE_MASS_TO, SORT_USAGES,
+    TXT_FILTER_SEQUENCE,
+    TXT_FILTER_SEQUENCE_B_MODIFICATION,
+    TXT_FILTER_SEQUENCE_C_MODIFICATION,
+    TXT_FILTER_SEQUENCE_FAMILY,
+    TXT_FILTER_SEQUENCE_FORMULA,
+    TXT_FILTER_SEQUENCE_ID,
+    TXT_FILTER_SEQUENCE_IDENTIFIER,
+    TXT_FILTER_SEQUENCE_MASS_FROM,
+    TXT_FILTER_SEQUENCE_MASS_TO,
+    TXT_FILTER_SEQUENCE_N_MODIFICATION,
+    TXT_FILTER_SEQUENCE_NAME,
+    TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES
+} from "../constant/DefaultConstants";
 
 interface State extends ListState {
     blockId: number;
@@ -15,6 +39,8 @@ class BlockUsagePage extends ListComponent<any, State> {
 
     constructor(props: any) {
         super(props);
+        this.filter = this.filter.bind(this);
+        this.clear = this.clear.bind(this);
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
@@ -52,6 +78,68 @@ class BlockUsagePage extends ListComponent<any, State> {
         document.location.href = URL_PREFIX;
     }
 
+    filter() {
+        let id = document.getElementById(TXT_FILTER_SEQUENCE_ID) as HTMLInputElement;
+        let name = document.getElementById(TXT_FILTER_SEQUENCE_NAME) as HTMLInputElement;
+        let sequenceType = document.getElementById(TXT_FILTER_SEQUENCE_TYPE) as HTMLInputElement;
+        let sequence = document.getElementById(TXT_FILTER_SEQUENCE) as HTMLInputElement;
+        let formula = document.getElementById(TXT_FILTER_SEQUENCE_FORMULA) as HTMLInputElement;
+        let massFrom = document.getElementById(TXT_FILTER_SEQUENCE_MASS_FROM) as HTMLInputElement;
+        let massTo = document.getElementById(TXT_FILTER_SEQUENCE_MASS_TO) as HTMLInputElement;
+        let family = document.getElementById(TXT_FILTER_SEQUENCE_FAMILY) as HTMLInputElement;
+        let nModification = document.getElementById(TXT_FILTER_SEQUENCE_N_MODIFICATION) as HTMLInputElement;
+        let cModification = document.getElementById(TXT_FILTER_SEQUENCE_C_MODIFICATION) as HTMLInputElement;
+        let bModification = document.getElementById(TXT_FILTER_SEQUENCE_B_MODIFICATION) as HTMLInputElement;
+        let identifier = document.getElementById(TXT_FILTER_SEQUENCE_IDENTIFIER) as HTMLInputElement;
+        let usages = document.getElementById(TXT_FILTER_SEQUENCE_USAGES) as HTMLInputElement;
+
+        let filter =
+            this.addFilter(
+                this.addFilter(
+                    this.addFilter(
+                        this.addFilter(
+                            this.addFilter(
+                                this.addFilter(
+                                    this.addFilter(
+                                        this.addFilter(
+                                            this.addFilter(
+                                                this.addFilter(
+                                                    this.addFilter(
+                                                        this.addFilter(
+                                                            this.addFilter('', SORT_ID, id.value)
+                                                            , SORT_SEQUENCE_NAME, name.value)
+                                                        , SORT_SEQUENCE_TYPE, sequenceType.value)
+                                                    , SORT_SEQUENCE, sequence.value)
+                                                , SORT_SEQUENCE_FORMULA, formula.value)
+                                            , SORT_SEQUENCE_MASS_FROM, massFrom.value)
+                                        , SORT_SEQUNECE_MASS_TO, massTo.value)
+                                    , SORT_FAMILY, family.value)
+                                , SORT_N_MODIFICATION, nModification.value)
+                            , SORT_C_MODIFICATION, cModification.value)
+                        , SORT_B_MODIFICATION, bModification.value)
+                    , SORT_IDENTIFIER, identifier.value)
+                , SORT_USAGES, usages.value);
+        this.setState({filter: filter}, this.list);
+    }
+
+    clear() {
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_ID);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_NAME);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_TYPE);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_FORMULA);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_FROM);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_TO);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_FAMILY);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_N_MODIFICATION);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_C_MODIFICATION);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_B_MODIFICATION);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_IDENTIFIER);
+        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_USAGES);
+        this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
+    }
+
+
     render() {
         return (
             <section className={styles.page}>
@@ -60,22 +148,69 @@ class BlockUsagePage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th>
-                            <th onClick={() => this.sortBy('sequenceName')}>Sequence name {this.sortIcons('sequenceName')}</th>
-                            <th onClick={() => this.sortBy('sequenceType')}>Type {this.sortIcons('sequenceType')}</th>
-                            <th onClick={() => this.sortBy('sequence')}>Sequence {this.sortIcons('sequence')}</th>
-                            <th onClick={() => this.sortBy('sequenceFormula')}>Formula {this.sortIcons('sequenceFormula')}</th>
-                            <th onClick={() => this.sortBy('sequenceMass')}>Mass {this.sortIcons('sequenceMass')}</th>
-                            <th onClick={() => this.sortBy('family')}>Family {this.sortIcons('family')}</th>
-                            <th onClick={() => this.sortBy('nModification')}>N {this.sortIcons('nModification')}</th>
-                            <th onClick={() => this.sortBy('cModification')}>C {this.sortIcons('cModification')}</th>
-                            <th onClick={() => this.sortBy('bModification')}>Branch {this.sortIcons('bModification')}</th>
-                            <th onClick={() => this.sortBy('identifier')}>Identifier {this.sortIcons('identifier')}</th>
-                            <th onClick={() => this.sortBy('usages')}>Block usages {this.sortIcons('usages')}</th>
+                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_MASS)}>Mass {this.sortIcons(SORT_SEQUENCE_MASS)}</th>
+                            <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
+                            <th onClick={() => this.sortBy(SORT_N_MODIFICATION)}>N {this.sortIcons(SORT_N_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_C_MODIFICATION)}>C {this.sortIcons(SORT_C_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_B_MODIFICATION)}>Branch {this.sortIcons(SORT_B_MODIFICATION)}</th>
+                            <th onClick={() => this.sortBy(SORT_IDENTIFIER)}>Identifier {this.sortIcons(SORT_IDENTIFIER)}</th>
+                            <th onClick={() => this.sortBy(SORT_USAGES)}>Block usages {this.sortIcons(SORT_USAGES)}</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
+                        <tr>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
+                                       placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
+                                       placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_TYPE}
+                                       placeholder={'Type'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE}
+                                       placeholder={'Sequence'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_FORMULA} placeholder={'Formula'}/></td>
+                            <td>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_MASS_TO} placeholder={'Mass to'}/>
+                            </td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FAMILY}
+                                       placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_C_MODIFICATION} placeholder={'C Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_B_MODIFICATION} placeholder={'B Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_IDENTIFIER} placeholder={'Identifier'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_USAGES}
+                                       placeholder={'Usages'}/></td>
+                            <td>
+                                <button onClick={this.filter}>Filter</button>
+                                <button className={styles.delete} onClick={this.clear}>Clear</button>
+                            </td>
+                        </tr>
                         {this.state.list.length > 0 && this.state.list.map(sequence => (
                             <tr key={sequence.id}>
                                 <td>{sequence.id}</td>
