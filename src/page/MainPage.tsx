@@ -665,7 +665,8 @@ class MainPage extends React.Component<any, SequenceState> {
             method: 'POST',
             body: JSON.stringify({
                 sequenceName: this.state.molecule?.structureName ?? '',
-                blockLength: filtered.length,
+                blockLengthUnique: filtered.length,
+                blockLength: data.length,
                 blocks: filtered
             })
         }).then(response => {
