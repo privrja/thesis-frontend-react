@@ -7,6 +7,7 @@ import Modification from "../structure/Modification";
 import TextInput from "./TextInput";
 import Creatable from "react-select/creatable";
 import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import CheckInput from "./CheckInput";
 
 interface Props {
     containerId: number;
@@ -19,12 +20,15 @@ interface Props {
     modifications?: Modification[];
     onFamilyChange?: (family: any[]) => void;
     family: any[];
+    editSame: boolean;
+    onEditChange?: (value: boolean) => void;
 }
 
 interface State {
     sequence: string
     familyOptions: any[];
     family: any[];
+    editSame: boolean;
 }
 
 class ModificationComponent extends React.Component<Props, State> {
@@ -38,10 +42,11 @@ class ModificationComponent extends React.Component<Props, State> {
         this.nModificationRef = React.createRef();
         this.cModificationRef = React.createRef();
         this.bModificationRef = React.createRef();
+        this.handleEditChange = this.handleEditChange.bind(this);
         this.family = this.family.bind(this);
         this.handleFamilyChange = this.handleFamilyChange.bind(this);
         this.updateModifications = this.updateModifications.bind(this);
-        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: this.props.family}
+        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: this.props.family, editSame: this.props.editSame}
     }
 
     componentDidMount(): void {
@@ -84,6 +89,9 @@ class ModificationComponent extends React.Component<Props, State> {
         if (prevProps.family !== this.props.family) {
             this.setState({family: this.props.family});
         }
+        if (prevProps.editSame !== this.props.editSame) {
+            this.setState({editSame: this.props.editSame});
+        }
     }
 
     private disable(value: SequenceEnum) {
@@ -125,6 +133,13 @@ class ModificationComponent extends React.Component<Props, State> {
         this.disable(parseInt(txtType.value));
     }
 
+    handleEditChange(newValue: any) {
+        this.setState({editSame: newValue.target.checked});
+        if (this.props.onEditChange) {
+            this.props.onEditChange(newValue.target.checked);
+        }
+    }
+
     render() {
         return (
             <div id="div-sequence">
@@ -140,6 +155,8 @@ class ModificationComponent extends React.Component<Props, State> {
                         <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions} value={this.state.family}
                                    onChange={this.handleFamilyChange} isMulti={true}/>
                     </div>
+                    <CheckInput name={'chck-edit-same'} id={'chck-edit-same'} checked={this.state.editSame} onChange={this.handleEditChange}/>
+                    <label htmlFor={'chck-edit-same'}>Edit all same blocks at time</label>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
                                    ref={this.nModificationRef} modification={this.props.nModification}/>

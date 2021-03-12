@@ -453,7 +453,14 @@ class MainPage extends React.Component<any, SequenceState> {
         }, 2).then(async data => {
             data.forEach(e => {
                 if (e.sameAs) {
-                    e.block = data[e.sameAs].block
+                    e.block = new SingleStructure(
+                        data[e.sameAs].block?.identifier ?? '',
+                        data[e.sameAs].block?.database ?? 0,
+                        data[e.sameAs].block?.structureName ?? '',
+                        data[e.sameAs].block?.smiles ?? '',
+                        data[e.sameAs].block?.formula ?? '',
+                        data[e.sameAs].block?.mass ?? 0
+                    );
                 }
             });
             return data;
@@ -533,7 +540,14 @@ class MainPage extends React.Component<any, SequenceState> {
                     }
                     data.forEach(e => {
                         if (e.sameAs !== null) {
-                            e.block = data[e.sameAs].block;
+                            e.block = new SingleStructure(
+                                data[e.sameAs].block?.identifier ?? '',
+                                data[e.sameAs].block?.database ?? 0,
+                                data[e.sameAs].block?.structureName ?? '',
+                                data[e.sameAs].block?.smiles ?? '',
+                                data[e.sameAs].block?.formula ?? '',
+                                data[e.sameAs].block?.mass ?? 0
+                            );
                             e.acronym = data[e.sameAs].acronym;
                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
                         } else {
@@ -815,9 +829,11 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequence = this.state.sequence;
         let blocks = this.state.blocks;
         if (sequence) {
-            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
+            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value); // blbe musi byt zvlast pro konkretni a zvlast pro vsechny
         }
+        console.log(this.state.editSame);
         if (this.state.editSame) {
+            console.log('not HERE');
             let blocksCopy = [...blocks];
             let sameAs = blocks[blockId].sameAs === null ? blockId : blocks[blockId].sameAs;
             let sameBlocks = blocksCopy.filter(block => block.sameAs === sameAs || block.id === sameAs);
@@ -849,6 +865,8 @@ class MainPage extends React.Component<any, SequenceState> {
                 }
             });
         } else {
+            console.log('HERE');
+            console.log(blocks);
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
             blocks[blockId].unique = smiles.value;
@@ -868,6 +886,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[blockId].block!.database = Number(source.value);
                 blocks[blockId].block!.identifier = identifier.value;
             }
+            console.log(blocks);
             blocks[blockId].block!.losses = losses.value;
             if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
                 blocks[blockId].databaseId = this.state.blockEdit.id;
@@ -1217,6 +1236,8 @@ class MainPage extends React.Component<any, SequenceState> {
                                                cModification={this.state.cModification}
                                                bModification={this.state.bModification}
                                                family={this.state.family}
+                                               editSame={this.state.editSame}
+                                               onEditChange={(newValue: boolean) => this.setState({editSame: newValue})}
                                                onFamilyChange={(family: any[]) => this.setState({family: family})}/>
                         <table>
                             <thead>
