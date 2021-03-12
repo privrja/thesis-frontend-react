@@ -61,8 +61,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.popupRef.current!.activate();
     }
 
-    edit(containerId: number): void {
-        this.setState({editable: containerId});
+    edit(editId: number): void {
+        this.setState({editable: editId});
     }
 
     editEnd(): void {

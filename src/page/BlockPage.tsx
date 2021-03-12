@@ -68,6 +68,8 @@ interface State extends ListState {
     list: Block[];
     familyOptions: any[];
     newFamily: any[];
+    editFamily: any[];
+    lastEditBlockId: number;
 }
 
 interface Block {
@@ -99,12 +101,15 @@ class BlockPage extends ListComponent<any, State> {
         this.clear = this.clear.bind(this);
         this.fetchFamily = this.fetchFamily.bind(this);
         this.newFamilyChange = this.newFamilyChange.bind(this);
+        this.familyEditChange = this.familyEditChange.bind(this);
         this.state = {
             list: [],
             familyOptions: [],
             newFamily: [],
+            editFamily: [],
             selectedContainer: this.props.match.params.id,
-            selectedContainerName: ContainerHelper.getSelectedContainerName()
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
+            lastEditBlockId: -1
         };
     }
 
@@ -220,7 +225,8 @@ class BlockPage extends ListComponent<any, State> {
                     losses: losses.value,
                     smiles: smiles.value,
                     source: source.value,
-                    identifier: identifier.value
+                    identifier: identifier.value,
+                    family: this.state.editFamily.map((family: any) => family.value)
                 })
             }).then(response => {
                 if (response.status === 204) {
@@ -305,6 +311,26 @@ class BlockPage extends ListComponent<any, State> {
 
     newFamilyChange(newValue: any) {
         this.setState({newFamily: newValue});
+    }
+
+    familyEditChange(newValue: any) {
+        this.setState({editFamily: newValue});
+    }
+
+    familyEditValue(family: string) {
+        this.setState({editFamily: family.split(',').map(familyName => this.state.familyOptions.find(family => family.label === familyName))});
+    }
+
+    edit(blockId: number, family?: string): void {
+        if (family && this.state.lastEditBlockId !== blockId) {
+            this.setState({
+                editFamily: family.split(',').map(familyName => this.state.familyOptions.find(family => family.label === familyName)),
+                editable: blockId,
+                lastEditBlockId: blockId
+            });
+        } else {
+            this.setState({editable: blockId, lastEditBlockId: blockId});
+        }
     }
 
     render() {
@@ -402,24 +428,28 @@ class BlockPage extends ListComponent<any, State> {
                         {this.state.list.length > 0 && this.state.list.map(block => (
                             <tr key={block.id}>
                                 <td>{block.id}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME}
                                                id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.acronym} name={TXT_EDIT_ACRONYM}
                                                id={TXT_EDIT_ACRONYM}/> : block.acronym}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
                                                id={TXT_EDIT_FORMULA}/> : block.formula}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()}
                                                name={TXT_EDIT_MASS}
                                                id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
                                                id={TXT_EDIT_LOSSES}/> : block.losses}</td>
-                                <td>{block.family}</td>
-                                <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
+                                    <Creatable className={styles.creatable} isMulti={true} id={'cre-edit-family'}
+                                               options={this.state.familyOptions}
+                                               value={this.state.editFamily}
+                                               onChange={this.familyEditChange}/> : block.family}</td>
+                                <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.uniqueSmiles} name={TXT_EDIT_SMILES}
                                                id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
                                 <td>
