@@ -86,7 +86,6 @@ interface Block {
     identifier: string;
 }
 
-
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
 class BlockPage extends ListComponent<any, State> {
