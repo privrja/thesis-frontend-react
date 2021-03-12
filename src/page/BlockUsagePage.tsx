@@ -60,18 +60,18 @@ class BlockUsagePage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
-                            <th onClick={() => this.sortBy('sequenceName')}>Sequence name</th>
-                            <th onClick={() => this.sortBy('sequenceType')}>Type</th>
-                            <th onClick={() => this.sortBy('sequence')}>Sequence</th>
-                            <th onClick={() => this.sortBy('sequenceFormula')}>Formula</th>
-                            <th onClick={() => this.sortBy('sequenceMass')}>Mass</th>
-                            <th>Family</th>
-                            <th>N</th>
-                            <th>C</th>
-                            <th>Branch</th>
-                            <th>Identifier</th>
-                            <th>Block usages</th>
+                            <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th>
+                            <th onClick={() => this.sortBy('sequenceName')}>Sequence name {this.sortIcons('sequenceName')}</th>
+                            <th onClick={() => this.sortBy('sequenceType')}>Type {this.sortIcons('sequenceType')}</th>
+                            <th onClick={() => this.sortBy('sequence')}>Sequence {this.sortIcons('sequence')}</th>
+                            <th onClick={() => this.sortBy('sequenceFormula')}>Formula {this.sortIcons('sequenceFormula')}</th>
+                            <th onClick={() => this.sortBy('sequenceMass')}>Mass {this.sortIcons('sequenceMass')}</th>
+                            <th onClick={() => this.sortBy('family')}>Family {this.sortIcons('family')}</th>
+                            <th onClick={() => this.sortBy('nModification')}>N {this.sortIcons('nModification')}</th>
+                            <th onClick={() => this.sortBy('cModification')}>C {this.sortIcons('cModification')}</th>
+                            <th onClick={() => this.sortBy('bModification')}>Branch {this.sortIcons('bModification')}</th>
+                            <th onClick={() => this.sortBy('identifier')}>Identifier {this.sortIcons('identifier')}</th>
+                            <th onClick={() => this.sortBy('usages')}>Block usages {this.sortIcons('usages')}</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
