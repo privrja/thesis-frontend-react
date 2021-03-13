@@ -59,6 +59,7 @@ class ContainerPage extends ListComponent<any, State> {
         super(props);
         this.popupExportRef = React.createRef();
         this.freeContainers = this.freeContainers.bind(this);
+        this.clone = this.clone.bind(this);
         this.state = {list: [], freeContainers: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
 
@@ -126,6 +127,25 @@ class ContainerPage extends ListComponent<any, State> {
 
     getEndpoint(): string {
         return ENDPOINT + CONTAINER;
+    }
+
+    clone(containerId: number) {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(this.getEndpointWithId(containerId) + '/clone', {
+                method: 'POST',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 201) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.list();
+                } else {
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+                }
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
     }
 
     render() {
@@ -248,7 +268,7 @@ class ContainerPage extends ListComponent<any, State> {
                                         window.location.reload();
                                     }}>Select
                                     </button>
-                                    <button>Clone</button>
+                                    <button onClick={() => this.clone(container.id)}>Clone</button>
                                     <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
                                     </button>
                                 </td>
