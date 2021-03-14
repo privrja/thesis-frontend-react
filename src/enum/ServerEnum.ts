@@ -6,6 +6,7 @@ import PdbFinder from "../finder/PdbFinder";
 import ChemSpiderFinder from "../finder/ChemSpiderFinder";
 import MassSpecBlocksFinder from "../finder/MassSpecBlocksFinder";
 import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import ChebiFinder from "../finder/ChebiFinder";
 
 export enum ServerEnum {
     PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES, MASS_SPEC_BLOCKS
@@ -38,7 +39,7 @@ export class ServerEnumHelper {
             case ServerEnum.PDB:
                 return new PdbFinder();
             case ServerEnum.CHEBI:
-                break;
+                return new ChebiFinder();
             case ServerEnum.MASS_SPEC_BLOCKS:
                 let token = localStorage.getItem(TOKEN);
                 let container = localStorage.getItem(SELECTED_CONTAINER);
