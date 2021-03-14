@@ -52,10 +52,11 @@ class LossesHelper {
     }
 
     private static removeAtom(atom: string, count: number, map: Map<any, any>) {
-        let atoms = map.get(atom) - count;
-        if (atoms < 0) {
+        let atoms = map.get(atom);
+        if (isNaN(atoms)) {
             atoms = 0;
         }
+        atoms -= count;
         map.set(atom, atoms);
     }
 

@@ -5,7 +5,8 @@ import Helmet from "react-helmet";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
 import {
-    OPTION_DRAW_DECAY_POINTS, OPTION_DRAW_DECAY_POINTS_SOURCE,
+    OPTION_DRAW_DECAY_POINTS,
+    OPTION_DRAW_DECAY_POINTS_SOURCE,
     OPTION_THEMES
 } from "../constant/SmilesDrawerConstants";
 import {SelectInput, SelectOption} from "../component/SelectInput";
@@ -396,7 +397,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         localStorage.removeItem(TOKEN);
                     }
                     this.flashRef.current!.activate(FlashType.BAD);
-                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(err => console.log(err));
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
                 }
                 document.location.href = '#home';
             });
