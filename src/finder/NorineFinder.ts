@@ -3,7 +3,7 @@ import SingleStructure from "./SingleStructure";
 import Sleep from "../helper/Sleep";
 import {ServerEnum} from "../enum/ServerEnum";
 
-const ENDPOINT_URI = "https://bioinfo.cristal.univ-lille.fr/norine/rest/";
+const ENDPOINT_URI = 'https://thingproxy.freeboard.io/fetch/https://bioinfo.cristal.univ-lille.fr/norine/rest/';
 
 interface Peptide {
     cite: string[];
