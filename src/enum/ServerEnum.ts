@@ -88,6 +88,9 @@ export class ServerEnumHelper {
         if (identifier === null || identifier === undefined || identifier === "") {
             identifier = "0";
         }
+        if (identifier.includes('ChEBI')) {
+            return identifier;
+        }
         switch (database) {
             default:
             case ServerEnum.PUBCHEM:
@@ -99,7 +102,7 @@ export class ServerEnumHelper {
             case ServerEnum.PDB:
                 return 'PDB: ' + identifier;
             case ServerEnum.CHEBI:
-                return 'ChEBI: ' + identifier;
+                return 'ChEBI:' + identifier;
             case ServerEnum.MASS_SPEC_BLOCKS:
                 return 'MSB: ' + identifier;
         }
