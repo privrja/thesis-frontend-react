@@ -1,8 +1,9 @@
 import React from "react";
 import Flash from "./Flash";
 import styles from "../main.module.scss";
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 
 class ChemSpiderKey extends React.Component<any, any> {
 
@@ -15,17 +16,23 @@ class ChemSpiderKey extends React.Component<any, any> {
     }
 
     setupKey() {
-        let apiKey = document.getElementById('txt-key') as HTMLInputElement;
-        fetch(ENDPOINT + 'chemspider/key', {
-            method: 'POST',
-            body: JSON.stringify({apiKey: apiKey.value})
-        }).then(response => {
-            if (response.status === 204) {
-                this.flashRef.current!.activate(FlashType.OK);
-            } else {
-                response.json().then((data: any) => this.flashRef.current!.activate(FlashType.BAD, data.message));
-            }
-        });
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            let apiKey = document.getElementById('txt-key') as HTMLInputElement;
+            fetch(ENDPOINT + 'chemspider/key', {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({apiKey: apiKey.value})
+            }).then(response => {
+                if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                } else {
+                    response.json().then((data: any) => this.flashRef.current!.activate(FlashType.BAD, data.message));
+                }
+            });
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
     }
 
     enterCall(e: any, call: () => void) {
