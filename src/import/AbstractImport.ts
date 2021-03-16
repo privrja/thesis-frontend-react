@@ -48,7 +48,7 @@ abstract class AbstractImport {
                 body: JSON.stringify(this.okStack),
             }).then(async response => {
                 if (response.status !== 200) {
-                    this.errorStack = this.errorStack.concat(this.okStack.map((e: any) => 'Something Bad happen' + this.parseObject(e)));
+                    this.errorStack = this.errorStack.concat(this.okStack.map((e: any) => (response.status === 403 ? 'You don\'t have enough permissions' : 'Something Bad happen') + this.parseObject(e)));
                     return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
                 } else {
                     await response.json().then(data => this.errorStack = this.errorStack.concat(data.map((e: any) => this.parseObject(e))));
