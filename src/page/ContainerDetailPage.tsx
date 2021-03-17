@@ -3,6 +3,7 @@ import styles from "../main.module.scss";
 import Collaborator from "./Collaborator";
 import Family from "./Family";
 import Helper from "../helper/Helper";
+import OrganismComponent from "../component/OrganismComponent";
 
 class ContainerDetailPage extends React.Component<any, any> {
 
@@ -16,6 +17,7 @@ class ContainerDetailPage extends React.Component<any, any> {
                 <Collaborator containerId={this.props.match.params.id}/>
                 <Family type={'block'} containerId={this.props.match.params.id}/>
                 <Family type={'sequence'} containerId={this.props.match.params.id}/>
+                <OrganismComponent/>
             </section>
         )
     }
