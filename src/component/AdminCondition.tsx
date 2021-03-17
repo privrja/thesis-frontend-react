@@ -16,12 +16,27 @@ class AdminCondition extends React.Component<any> {
         this.reset = this.reset.bind(this);
     }
 
+    componentDidMount(): void {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'setup/condition', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => (document.getElementById('txt-condition') as HTMLTextAreaElement).value = data.text);
+                }
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        }
+    }
+
     reset() {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             FetchHelper.fetchSetup(ENDPOINT + 'setup/condition', {
                 method: 'POST',
-                headers: {'x-auth-token': token}
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({text: (document.getElementById('txt-condition') as HTMLTextAreaElement).value})
             }, this.flashRef);
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
@@ -31,8 +46,9 @@ class AdminCondition extends React.Component<any> {
     render() {
         return (
             <section>
-                <h3>Conditions</h3>
+                <h2>Conditions</h2>
                 <Flash ref={this.flashRef}/>
+                <textarea id={'txt-condition'} className={styles.area}/><br/>
                 <label htmlFor={'btn-reset'}>Reset conditions agreements:</label>
                 <button id={'btn-reset'} className={styles.update} onClick={this.reset}>Reset</button>
             </section>

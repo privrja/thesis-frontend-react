@@ -41,7 +41,7 @@ class AdminSimilarity extends React.Component<any, any>{
     render() {
         return (
             <section>
-                <h3>Similarity setup</h3>
+                <h2>Similarity setup</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={SEL_SIMILARITY}>Similarity:</label>
                 <SelectInput options={SIMILARITY_OPTIONS} id={SEL_SIMILARITY} name={SEL_SIMILARITY} />

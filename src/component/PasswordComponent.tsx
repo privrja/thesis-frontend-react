@@ -53,7 +53,7 @@ class PasswordComponent extends React.Component<any, any> {
     render() {
         return (
             <section>
-                <h3>Change Password</h3>
+                <h2>Change Password</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={TXT_PASSWORD}>Password:</label>
                 <input type={PASSWORD} id={TXT_PASSWORD} onKeyDown={(e) => this.enterCall(e, this.changePassword)}/>

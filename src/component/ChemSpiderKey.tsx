@@ -44,7 +44,7 @@ class ChemSpiderKey extends React.Component<any, any> {
     render() {
         return (
             <section>
-                <h3>Set ChemSpider Key</h3>
+                <h2>Set ChemSpider Key</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'txt-key'}>API Key:</label>
                 <input type={'text'} id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)}/>

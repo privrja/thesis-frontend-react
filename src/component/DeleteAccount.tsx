@@ -36,7 +36,7 @@ class DeleteAccount extends React.Component<any, any> {
     render() {
         return (
             <section>
-                <h3>Delete account</h3>
+                <h2>Delete account</h2>
                 <Flash ref={this.flashRef}/>
                 <button className={styles.delete} onClick={this.delete}>Delete</button>
             </section>
