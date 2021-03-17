@@ -7,9 +7,13 @@ import styles from "../main.module.scss";
 import TextInput from "./TextInput";
 import React from "react";
 
-class OrganismComponent extends ListComponent<any, ListState> {
+interface Props {
+    containerId: number;
+}
 
-    constructor(props: any) {
+class OrganismComponent extends ListComponent<Props, ListState> {
+
+    constructor(props: Props) {
         super(props);
         this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
@@ -24,7 +28,7 @@ class OrganismComponent extends ListComponent<any, ListState> {
     }
 
     getEndpoint(): string {
-        return ENDPOINT + 'container/' + this.state.selectedContainer + '/organism';
+        return ENDPOINT + 'container/' + this.props.containerId + '/organism';
     }
 
     update(key: number): void {

@@ -17,7 +17,7 @@ class ContainerDetailPage extends React.Component<any, any> {
                 <Collaborator containerId={this.props.match.params.id}/>
                 <Family type={'block'} containerId={this.props.match.params.id}/>
                 <Family type={'sequence'} containerId={this.props.match.params.id}/>
-                <OrganismComponent/>
+                <OrganismComponent containerId={this.props.match.params.id}/>
             </section>
         )
     }

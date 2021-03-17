@@ -52,7 +52,14 @@ class ModificationComponent extends React.Component<Props, State> {
         this.handleFamilyChange = this.handleFamilyChange.bind(this);
         this.handleOrganismChange = this.handleOrganismChange.bind(this);
         this.updateModifications = this.updateModifications.bind(this);
-        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: this.props.family, editSame: this.props.editSame, organismOptions: [], organism: this.props.organism}
+        this.state = {
+            sequence: props.sequence ?? '',
+            familyOptions: [],
+            family: this.props.family,
+            editSame: this.props.editSame,
+            organismOptions: [],
+            organism: this.props.organism
+        }
     }
 
     componentDidMount(): void {
@@ -101,16 +108,24 @@ class ModificationComponent extends React.Component<Props, State> {
     }
 
     handleFamilyChange(newValue: any) {
-        this.setState({family: newValue});
+        let fam = [];
+        if (newValue) {
+            fam = newValue;
+        }
+        this.setState({family: fam});
         if (this.props.onFamilyChange) {
-            this.props.onFamilyChange(newValue);
+            this.props.onFamilyChange(fam);
         }
     }
 
     handleOrganismChange(newValue: any) {
-        this.setState({organism: newValue});
+        let org = [];
+        if (newValue) {
+            org = newValue;
+        }
+        this.setState({organism: org});
         if (this.props.onOrganismChange) {
-            this.props.onOrganismChange(newValue);
+            this.props.onOrganismChange(org);
         }
     }
 
@@ -184,20 +199,24 @@ class ModificationComponent extends React.Component<Props, State> {
                     <TextInput id="txt-sequence" name="sequence" size={60} value={this.state.sequence}/>
                     <div className={styles.padding}>
                         <label htmlFor={'cre-family'}>Family</label>
-                        <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions} value={this.state.family}
+                        <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions}
+                                   value={this.state.family}
                                    onChange={this.handleFamilyChange} isMulti={true}/>
                         <label htmlFor={'cre-organism'}>Organism</label>
-                        <Creatable className={styles.creatable} id={'cre-organism'} options={this.state.organismOptions} value={this.state.organism}
+                        <Creatable className={styles.creatable} id={'cre-organism'} options={this.state.organismOptions}
+                                   value={this.state.organism}
                                    onChange={this.handleOrganismChange} isMulti={true}/>
                     </div>
-                    <CheckInput name={'chck-edit-same'} id={'chck-edit-same'} checked={this.state.editSame} onChange={this.handleEditChange}/>
+                    <CheckInput name={'chck-edit-same'} id={'chck-edit-same'} checked={this.state.editSame}
+                                onChange={this.handleEditChange}/>
                     <label htmlFor={'chck-edit-same'}>Edit all same blocks at time</label>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
                                    ref={this.nModificationRef} modification={this.props.nModification}/>
                 <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications}
                                    ref={this.cModificationRef} modification={this.props.cModification}/>
-                <ModificationInput type='b' title='Branch-terminal modification' modifications={this.props.modifications}
+                <ModificationInput type='b' title='Branch-terminal modification'
+                                   modifications={this.props.modifications}
                                    ref={this.bModificationRef} modification={this.props.bModification}/>
             </div>
         );

@@ -130,6 +130,7 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     clone(containerId: number) {
+        this.flashRef.current!.activate(FlashType.PENDING);
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(this.getEndpointWithId(containerId) + '/clone', {
