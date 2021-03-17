@@ -26,13 +26,13 @@ import {
     SORT_B_MODIFICATION,
     SORT_C_MODIFICATION,
     SORT_FAMILY,
-    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION,
+    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION, SORT_ORGANISM,
     SORT_SEQUENCE,
     SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
     SORT_SEQUENCE_MASS_FROM,
     SORT_SEQUENCE_NAME,
     SORT_SEQUENCE_TYPE,
-    SORT_SEQUNECE_MASS_TO,
+    SORT_SEQUNECE_MASS_TO, TXT_FILTER_ORGANISM,
     TXT_FILTER_SEQUENCE,
     TXT_FILTER_SEQUENCE_B_MODIFICATION,
     TXT_FILTER_SEQUENCE_C_MODIFICATION,
@@ -107,6 +107,7 @@ class SequencePage extends ListComponent<any, ListState> {
         let massFrom = document.getElementById(TXT_FILTER_SEQUENCE_MASS_FROM) as HTMLInputElement;
         let massTo = document.getElementById(TXT_FILTER_SEQUENCE_MASS_TO) as HTMLInputElement;
         let family = document.getElementById(TXT_FILTER_SEQUENCE_FAMILY) as HTMLInputElement;
+        let organism = document.getElementById(TXT_FILTER_ORGANISM) as HTMLInputElement;
         let nModification = document.getElementById(TXT_FILTER_SEQUENCE_N_MODIFICATION) as HTMLInputElement;
         let cModification = document.getElementById(TXT_FILTER_SEQUENCE_C_MODIFICATION) as HTMLInputElement;
         let bModification = document.getElementById(TXT_FILTER_SEQUENCE_B_MODIFICATION) as HTMLInputElement;
@@ -124,6 +125,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                             this.addFilter(
                                                 this.addFilter(
                                                     this.addFilter(
+                                                    this.addFilter(
                                                         this.addFilter('', SORT_ID, id.value)
                                                         , SORT_SEQUENCE_NAME, name.value)
                                                     , SORT_SEQUENCE_TYPE, sequenceType.value)
@@ -132,6 +134,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                         , SORT_SEQUENCE_MASS_FROM, massFrom.value)
                                     , SORT_SEQUNECE_MASS_TO, massTo.value)
                                 , SORT_FAMILY, family.value)
+                                , SORT_ORGANISM, organism.value)
                             , SORT_N_MODIFICATION, nModification.value)
                         , SORT_C_MODIFICATION, cModification.value)
                     , SORT_B_MODIFICATION, bModification.value)
@@ -148,6 +151,7 @@ class SequencePage extends ListComponent<any, ListState> {
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_FROM);
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_TO);
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_FAMILY);
+        this.clearConcreteFilter(TXT_FILTER_ORGANISM);
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_N_MODIFICATION);
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_C_MODIFICATION);
         this.clearConcreteFilter(TXT_FILTER_SEQUENCE_B_MODIFICATION);
@@ -185,6 +189,7 @@ class SequencePage extends ListComponent<any, ListState> {
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_MASS)}>Mass {this.sortIcons(SORT_SEQUENCE_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
+                            <th onClick={() => this.sortBy(SORT_ORGANISM)}>Organism {this.sortIcons(SORT_ORGANISM)}</th>
                             <th onClick={() => this.sortBy(SORT_N_MODIFICATION)}>N {this.sortIcons(SORT_N_MODIFICATION)}</th>
                             <th onClick={() => this.sortBy(SORT_C_MODIFICATION)}>C {this.sortIcons(SORT_C_MODIFICATION)}</th>
                             <th onClick={() => this.sortBy(SORT_B_MODIFICATION)}>Branch {this.sortIcons(SORT_B_MODIFICATION)}</th>
@@ -204,6 +209,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                 <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_MASS_TO} placeholder={'Mass to'}/>
                             </td>
                             <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FAMILY} placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_ORGANISM} placeholder={'Organism'}/></td>
                             <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
                             <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_C_MODIFICATION} placeholder={'C Modification'}/></td>
                             <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_B_MODIFICATION} placeholder={'B Modification'}/></td>
@@ -222,6 +228,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                 <td>{sequence.formula}</td>
                                 <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
                                 <td>{sequence.family}</td>
+                                <td>{sequence.organism}</td>
                                 <td>{sequence.nModification}</td>
                                 <td>{sequence.cModification}</td>
                                 <td>{sequence.bModification}</td>

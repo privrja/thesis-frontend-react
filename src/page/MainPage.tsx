@@ -68,6 +68,7 @@ interface SequenceState {
     title: string;
     editorBlockId?: number;
     family: any[];
+    organism: any[];
     sequenceId?: number;
     sequenceEdit: boolean;
     databaseBlockSelect?: number;
@@ -139,6 +140,7 @@ class MainPage extends React.Component<any, SequenceState> {
             title: PAGE_TITLE,
             selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
+            organism: [],
             sequenceEdit: false,
             blocksAll: [],
             selectedContainerName: ContainerHelper.getSelectedContainerName()
@@ -201,6 +203,9 @@ class MainPage extends React.Component<any, SequenceState> {
                             bModification: sequence.bModification,
                             family: sequence.family.map((family: any) => {
                                 return {value: family.id, label: family.family}
+                            }),
+                            organism: sequence.organism.map((organism: any) => {
+                                return {value: organism.id, label: organism.organism}
                             }),
                             blocks: sequence.blocks.map((block: any) => {
                                 return {
@@ -359,6 +364,9 @@ class MainPage extends React.Component<any, SequenceState> {
                 bModification: bModification,
                 family: this.state.family.map(family => {
                     return family.value
+                }),
+                organism: this.state.organism.map(organism => {
+                    return organism.value
                 }),
                 blocks: this.state.blocks.map(block => {
                     return {
@@ -681,7 +689,7 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({results: [], blocks: [], family: []});
+        this.setState({results: [], blocks: [], family: [], organism: []});
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
@@ -1235,7 +1243,9 @@ class MainPage extends React.Component<any, SequenceState> {
                                                family={this.state.family}
                                                editSame={this.state.editSame}
                                                onEditChange={(newValue: boolean) => this.setState({editSame: newValue})}
-                                               onFamilyChange={(family: any[]) => this.setState({family: family})}/>
+                                               onFamilyChange={(family: any[]) => this.setState({family: family})}
+                                               onOrganismChange={(organism: any[]) => this.setState({organism: organism})}
+                                               organism={this.state.organism}/>
                         <table>
                             <thead>
                             <tr>
