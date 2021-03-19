@@ -3,7 +3,7 @@ import Flash from "./Flash";
 import styles from "../main.module.scss";
 import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
-import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 
 class PassReset extends React.Component<any, any> {
 
@@ -25,7 +25,7 @@ class PassReset extends React.Component<any, any> {
                 if (response.status === 200) {
                     response.json().then(data => this.flashRef.current!.activate(FlashType.OK, data.message));
                 } else {
-                    this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG);
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
                 }
             });
         } else {
