@@ -10,15 +10,36 @@ interface Values {
     password: string;
     password2: string;
     conditions: boolean;
+    cap: string;
 }
 
-class RegisterPage extends React.Component<any> {
+const BAD_CAP = 'Something bad happen with Cap';
+
+interface State {
+    regToken: string;
+    question: string;
+}
+
+class RegisterPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
 
     constructor(props: any) {
         super(props);
         this.flashRef = React.createRef();
+        this.state = {question: '', regToken: ''}
+    }
+
+    componentDidMount(): void {
+        fetch(ENDPOINT + 'cap', {
+            method: 'GET'
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    this.setState({regToken: response.headers.get('reg-token') ?? '', question: data.question});
+                }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
+            }
+        }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
     }
 
     checkEmpty(value: string, message: string) {
@@ -50,7 +71,8 @@ class RegisterPage extends React.Component<any> {
         if (check) {
             fetch(ENDPOINT + 'register', {
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password})
+                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap}),
+                headers: {'reg-token': this.state.regToken}
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -78,7 +100,8 @@ class RegisterPage extends React.Component<any> {
                             name: '',
                             password: '',
                             password2: '',
-                            conditions: false
+                            conditions: false,
+                            cap: ''
                         }}
                         onSubmit={(
                             values: Values,
@@ -102,6 +125,9 @@ class RegisterPage extends React.Component<any> {
 
                             <label htmlFor="password">Password check:</label>
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
+
+                            <label htmlFor={'cap'}>Write three letter code for {this.state.question}</label>
+                            <Field id={'cap'} name={'cap'}/>
 
                             <label htmlFor="conditions">
                                 <Field id="conditions" name="conditions" type="checkbox"/>
