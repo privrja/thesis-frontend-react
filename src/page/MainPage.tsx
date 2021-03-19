@@ -418,7 +418,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let finder = new PubChemFinder();
         Parallel.map(data, async (item: any) => {
             if (item.sameAs === null && item.block === null) {
-                let block = await finder.findBySmiles(item.smiles).then(data => data[0]).catch(() => undefined);
+                let block = await finder.findBySmiles(item.smiles).then(blcData => blcData[0]).catch(() => undefined);
                 if (block) {
                     block.formula = LossesHelper.removeFromFormula(block.formula, !item.isPolyketide);
                     block.mass = LossesHelper.removeFromMass(block.mass ?? 0, !item.isPolyketide);
