@@ -88,7 +88,7 @@ class Helper {
                 , SORT_IDENTIFIER, identifier.value);
         if (isUsages) {
             let usages = document.getElementById(TXT_FILTER_SEQUENCE_USAGES) as HTMLInputElement;
-            component.addFilter(filter, SORT_USAGES, usages.value)
+            filter = component.addFilter(filter, SORT_USAGES, usages.value)
 
         }
         component.setState({filter: filter}, component.list);
