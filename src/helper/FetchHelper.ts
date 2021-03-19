@@ -1,6 +1,7 @@
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
 import FlashType from "../component/FlashType";
 import Flash from "../component/Flash";
+import Sleep from "./Sleep";
 
 class FetchHelper {
 
@@ -46,6 +47,59 @@ class FetchHelper {
             } else {
                 response.json().then(data => flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => flashRef.current!.activate(FlashType.BAD));
             }
+        });
+    }
+
+    static conditions(component: any) {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT, {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 204) {
+                    if (response.headers.get('x-condition') !== "1") {
+                        component.popupRef.current!.activate();
+                    } else {
+                        window.location.href = URL_PREFIX;
+                    }
+                }
+            });
+        }
+    }
+
+    static conditionsOk() {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'condition', {
+                method: 'POST',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 204) {
+                    FetchHelper.refresh();
+                } else {
+                    FetchHelper.conditionsKo();
+                }
+            })
+        } else {
+            FetchHelper.conditionsKo();
+        }
+    }
+
+    static conditionsKo() {
+        localStorage.removeItem(TOKEN);
+        FetchHelper.refreshLogout();
+    }
+
+    static refreshLogout() {
+        Sleep.sleep(500).then(() => {
+            window.location.href = '/logout'
+        });
+    }
+
+    static refresh() {
+        Sleep.sleep(500).then(() => {
+            window.location.href = URL_PREFIX
         });
     }
 
