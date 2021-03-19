@@ -458,23 +458,23 @@ class MainPage extends React.Component<any, SequenceState> {
                     } as BlockStructure;
                 }
             }
-        }, 2).then(async data => {
-            data.forEach(e => {
+        }, 2).then(async blockData => {
+            blockData.forEach(e => {
                 if (e.sameAs) {
                     e.block = new SingleStructure(
-                        data[e.sameAs].block?.identifier ?? '',
-                        data[e.sameAs].block?.database ?? 0,
-                        data[e.sameAs].block?.structureName ?? '',
-                        data[e.sameAs].block?.smiles ?? '',
-                        data[e.sameAs].block?.formula ?? '',
-                        data[e.sameAs].block?.mass ?? 0
+                        blockData[e.sameAs].block?.identifier ?? '',
+                        blockData[e.sameAs].block?.database ?? 0,
+                        blockData[e.sameAs].block?.structureName ?? '',
+                        blockData[e.sameAs].block?.smiles ?? '',
+                        blockData[e.sameAs].block?.formula ?? '',
+                        blockData[e.sameAs].block?.mass ?? 0
                     );
                 }
             });
-            return data;
-        }).then(data => {
+            return blockData;
+        }).then(blcSeqData => {
             let sequence = this.state.sequence;
-            data.forEach((block: BlockStructure) => {
+            blcSeqData.forEach((block: BlockStructure) => {
                     if (block.sameAs !== null) {
                         if (sequence) {
                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
@@ -482,11 +482,11 @@ class MainPage extends React.Component<any, SequenceState> {
                     }
                 }
             );
-            this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
-            return data;
-        }).then(data => {
+            this.setState({editable: undefined, results: [], blocks: blcSeqData, sequence: sequence});
+            return blcSeqData;
+        }).then(parData => {
                 let nameHelper = new NameHelper();
-                Parallel.map(data, async (item: BlockStructure) => {
+                Parallel.map(parData, async (item: BlockStructure) => {
                     if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
                         let name = await finder.findName(item.block.identifier, item.block.structureName);
                         return {
@@ -542,27 +542,27 @@ class MainPage extends React.Component<any, SequenceState> {
                             } as BlockStructure;
                         }
                     }
-                }, 2).then(async data => {
+                }, 2).then(async sameAsData => {
                     if (this.state.sequence) {
                         sequence = this.state.sequence;
                     }
-                    data.forEach(e => {
+                    sameAsData.forEach(e => {
                         if (e.sameAs !== null) {
                             e.block = new SingleStructure(
-                                data[e.sameAs].block?.identifier ?? '',
-                                data[e.sameAs].block?.database ?? 0,
-                                data[e.sameAs].block?.structureName ?? '',
-                                data[e.sameAs].block?.smiles ?? '',
-                                data[e.sameAs].block?.formula ?? '',
-                                data[e.sameAs].block?.mass ?? 0
+                                sameAsData[e.sameAs].block?.identifier ?? '',
+                                sameAsData[e.sameAs].block?.database ?? 0,
+                                sameAsData[e.sameAs].block?.structureName ?? '',
+                                sameAsData[e.sameAs].block?.smiles ?? '',
+                                sameAsData[e.sameAs].block?.formula ?? '',
+                                sameAsData[e.sameAs].block?.mass ?? 0
                             );
-                            e.acronym = data[e.sameAs].acronym;
-                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
+                            e.acronym = sameAsData[e.sameAs].acronym;
+                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', sameAsData[e.sameAs].acronym, e.acronym);
                         } else {
                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', e.id.toString(), e.acronym);
                         }
                     });
-                    return data;
+                    return sameAsData;
                 }).then(data => {
                     this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
