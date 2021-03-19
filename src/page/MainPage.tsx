@@ -415,7 +415,6 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     async blockFinder(data: any[], sequence: SequenceStructure) {
-        document.location.href = '#results';
         let finder = new PubChemFinder();
         Parallel.map(data, async (item: any) => {
             if (item.sameAs === null && item.block === null) {
@@ -567,6 +566,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 }).then(data => {
                     this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
+                    document.location.href = '#results';
                     return data;
                 });
             }
@@ -1166,7 +1166,8 @@ class MainPage extends React.Component<any, SequenceState> {
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getOptions(this.state.selectedContainerName)} onChange={this.refreshMolecule}/>
+                                     options={ServerEnumHelper.getOptions(this.state.selectedContainerName)}
+                                     onChange={this.refreshMolecule}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
