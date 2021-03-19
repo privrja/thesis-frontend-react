@@ -16,7 +16,6 @@ interface Values {
 const BAD_CAP = 'Something bad happen with Cap';
 
 interface State {
-    regToken: string;
     question: string;
 }
 
@@ -27,16 +26,17 @@ class RegisterPage extends React.Component<any, State> {
     constructor(props: any) {
         super(props);
         this.flashRef = React.createRef();
-        this.state = {question: '', regToken: ''}
+        this.state = {question: ''}
     }
 
     componentDidMount(): void {
         fetch(ENDPOINT + 'cap', {
+            credentials: 'include',
             method: 'GET'
         }).then(response => {
             if (response.status === 200) {
                 response.json().then(data => {
-                    this.setState({regToken: response.headers.get('reg-token') ?? '', question: data.question});
+                    this.setState({question: data.question});
                 }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
             }
         }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
@@ -70,9 +70,9 @@ class RegisterPage extends React.Component<any, State> {
         check = check && this.checkPasswords(values.password, values.password2, 'Password aren\'t the same');
         if (check) {
             fetch(ENDPOINT + 'register', {
+                credentials: "include",
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap}),
-                headers: {'reg-token': this.state.regToken}
+                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap})
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -126,7 +126,7 @@ class RegisterPage extends React.Component<any, State> {
                             <label htmlFor="password">Password check:</label>
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
 
-                            <label htmlFor={'cap'}>Write three letter code for {this.state.question}</label>
+                            <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
                             <Field id={'cap'} name={'cap'}/>
 
                             <label htmlFor="conditions">
