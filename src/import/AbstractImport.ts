@@ -24,13 +24,13 @@ abstract class AbstractImport {
         this.errorStack = [];
         this.okStack = [];
         let rows = this.text.split('\n');
-        for (let i = 0; i < rows.length; ++i) {
-            if (rows[i] === '') {
+        for (let row of rows) {
+            if (row === '') {
                 continue;
             }
-            let parts = rows[i].split('\t');
+            let parts = row.split('\t');
             if (parts.length !== this.getLineLength()) {
-                this.errorStack.push('ERROR: Bad number of items on line\t'.concat(rows[i]));
+                this.errorStack.push('ERROR: Bad number of items on line\t'.concat(row));
                 continue;
             }
             this.transformation(parts);
