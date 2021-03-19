@@ -336,7 +336,7 @@ class BlockPage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <PopupYesNo label={"Realy want to delete block?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>

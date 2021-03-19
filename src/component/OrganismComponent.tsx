@@ -39,7 +39,7 @@ class OrganismComponent extends ListComponent<Props, ListState> {
     render() {
         return (
             <section>
-                <PopupYesNo label={"Really want to remove organism from container?"} onYes={this.delete} ref={this.popupRef}/>
+                <PopupYesNo label={"Really want to remove"} onYes={this.delete} ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                 <h2>Create new Organism</h2>

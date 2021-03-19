@@ -58,7 +58,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     popup(key: number): void {
         this.popupRef.current!.key = key;
-        this.popupRef.current!.activate();
+        this.popupRef.current!.activate(this.findName(key) + '?');
     }
 
     edit(editId: number): void {

@@ -9,6 +9,7 @@ interface Props {
 
 interface State {
     isActive: boolean;
+    text: string;
 }
 
 class PopupYesNo extends React.Component<Props, State> {
@@ -19,13 +20,13 @@ class PopupYesNo extends React.Component<Props, State> {
         super(props);
 
         this.key = -1;
-        this.state = {isActive: false};
+        this.state = {isActive: false, text: ''};
         this.yes = this.yes.bind(this);
         this.no = this.no.bind(this);
     }
 
-    activate() {
-        this.setState({isActive: true});
+    activate(text: string = '') {
+        this.setState({isActive: true, text: text});
     }
 
     no() {
@@ -43,7 +44,7 @@ class PopupYesNo extends React.Component<Props, State> {
     render() {
         if (this.state.isActive) {
             return (
-                <div className={styles.popup}>{this.props.label}
+                <div className={styles.popup}>{this.props.label} {this.state.text}
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.yes}>Yes</button>
                     <button className={styles.popupNo + ' ' + styles.popupButton} onClick={this.no}>No</button>
                 </div>

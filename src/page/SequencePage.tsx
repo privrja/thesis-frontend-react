@@ -76,7 +76,7 @@ class SequencePage extends ListComponent<any, ListState> {
     }
 
     findName(key: number): string {
-        return this.find(key).modificationName;
+        return this.find(key).sequenceName;
     }
 
     getEndpoint() {
@@ -174,7 +174,7 @@ class SequencePage extends ListComponent<any, ListState> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <PopupYesNo label={"Really want to delete sequence?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>

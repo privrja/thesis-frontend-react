@@ -153,7 +153,7 @@ class ContainerPage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
                     <PopupExport label={'Export'}
                                  onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')}
                                  ref={this.popupExportRef}/>

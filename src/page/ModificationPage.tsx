@@ -130,7 +130,7 @@ class ModificationPage extends ListComponent<any, ListState> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <PopupYesNo label={"Really want to delete modification?"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?

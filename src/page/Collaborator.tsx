@@ -48,7 +48,7 @@ class Collaborator extends ListComponent<Props, State> {
     }
 
     findName(key: number): string {
-        return this.find(key).user;
+        return this.find(key).nick;
     }
 
     getEndpoint(): string {
@@ -137,7 +137,7 @@ class Collaborator extends ListComponent<Props, State> {
         return (
             <section>
                 <h1>Container {this.state.container ? this.containerH() : ''}</h1>
-                <PopupYesNo label={"Really want to remove user from container?"} onYes={this.delete}
+                <PopupYesNo label={"Really want to remove"} onYes={this.delete}
                             ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
