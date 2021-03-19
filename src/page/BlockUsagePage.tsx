@@ -12,10 +12,9 @@ import {
     SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION,
     SORT_SEQUENCE,
     SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
-    SORT_SEQUENCE_MASS_FROM,
     SORT_SEQUENCE_NAME,
     SORT_SEQUENCE_TYPE,
-    SORT_SEQUNECE_MASS_TO, SORT_USAGES,
+    SORT_USAGES,
     TXT_FILTER_SEQUENCE,
     TXT_FILTER_SEQUENCE_B_MODIFICATION,
     TXT_FILTER_SEQUENCE_C_MODIFICATION,
@@ -79,66 +78,12 @@ class BlockUsagePage extends ListComponent<any, State> {
     }
 
     filter() {
-        let id = document.getElementById(TXT_FILTER_SEQUENCE_ID) as HTMLInputElement;
-        let name = document.getElementById(TXT_FILTER_SEQUENCE_NAME) as HTMLInputElement;
-        let sequenceType = document.getElementById(TXT_FILTER_SEQUENCE_TYPE) as HTMLInputElement;
-        let sequence = document.getElementById(TXT_FILTER_SEQUENCE) as HTMLInputElement;
-        let formula = document.getElementById(TXT_FILTER_SEQUENCE_FORMULA) as HTMLInputElement;
-        let massFrom = document.getElementById(TXT_FILTER_SEQUENCE_MASS_FROM) as HTMLInputElement;
-        let massTo = document.getElementById(TXT_FILTER_SEQUENCE_MASS_TO) as HTMLInputElement;
-        let family = document.getElementById(TXT_FILTER_SEQUENCE_FAMILY) as HTMLInputElement;
-        let nModification = document.getElementById(TXT_FILTER_SEQUENCE_N_MODIFICATION) as HTMLInputElement;
-        let cModification = document.getElementById(TXT_FILTER_SEQUENCE_C_MODIFICATION) as HTMLInputElement;
-        let bModification = document.getElementById(TXT_FILTER_SEQUENCE_B_MODIFICATION) as HTMLInputElement;
-        let identifier = document.getElementById(TXT_FILTER_SEQUENCE_IDENTIFIER) as HTMLInputElement;
-        let usages = document.getElementById(TXT_FILTER_SEQUENCE_USAGES) as HTMLInputElement;
-
-        let filter =
-            this.addFilter(
-                this.addFilter(
-                    this.addFilter(
-                        this.addFilter(
-                            this.addFilter(
-                                this.addFilter(
-                                    this.addFilter(
-                                        this.addFilter(
-                                            this.addFilter(
-                                                this.addFilter(
-                                                    this.addFilter(
-                                                        this.addFilter(
-                                                            this.addFilter('', SORT_ID, id.value)
-                                                            , SORT_SEQUENCE_NAME, name.value)
-                                                        , SORT_SEQUENCE_TYPE, sequenceType.value)
-                                                    , SORT_SEQUENCE, sequence.value)
-                                                , SORT_SEQUENCE_FORMULA, formula.value)
-                                            , SORT_SEQUENCE_MASS_FROM, massFrom.value)
-                                        , SORT_SEQUNECE_MASS_TO, massTo.value)
-                                    , SORT_FAMILY, family.value)
-                                , SORT_N_MODIFICATION, nModification.value)
-                            , SORT_C_MODIFICATION, cModification.value)
-                        , SORT_B_MODIFICATION, bModification.value)
-                    , SORT_IDENTIFIER, identifier.value)
-                , SORT_USAGES, usages.value);
-        this.setState({filter: filter}, this.list);
+        Helper.sequenceFilter(this, true);
     }
 
     clear() {
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_ID);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_NAME);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_TYPE);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_FORMULA);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_FROM);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_MASS_TO);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_FAMILY);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_N_MODIFICATION);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_C_MODIFICATION);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_B_MODIFICATION);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_IDENTIFIER);
-        this.clearConcreteFilter(TXT_FILTER_SEQUENCE_USAGES);
-        this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
+        Helper.sequenceClear(this, true);
     }
-
 
     render() {
         return (
