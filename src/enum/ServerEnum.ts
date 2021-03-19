@@ -88,7 +88,7 @@ export class ServerEnumHelper {
         if (identifier === null || identifier === undefined || identifier === "") {
             identifier = "0";
         }
-        if (identifier.includes('ChEBI')) {
+        if (identifier.toUpperCase().includes('CHEBI:')) {
             return identifier;
         }
         switch (database) {
