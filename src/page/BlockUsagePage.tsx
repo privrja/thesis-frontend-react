@@ -9,12 +9,12 @@ import {
     SORT_B_MODIFICATION,
     SORT_C_MODIFICATION,
     SORT_FAMILY,
-    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION,
+    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION, SORT_ORGANISM,
     SORT_SEQUENCE,
     SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
     SORT_SEQUENCE_NAME,
     SORT_SEQUENCE_TYPE,
-    SORT_USAGES,
+    SORT_USAGES, TXT_FILTER_ORGANISM,
     TXT_FILTER_SEQUENCE,
     TXT_FILTER_SEQUENCE_B_MODIFICATION,
     TXT_FILTER_SEQUENCE_C_MODIFICATION,
@@ -94,12 +94,14 @@ class BlockUsagePage extends ListComponent<any, State> {
                         <thead>
                         <tr>
                             <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
-                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
+                                name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_MASS)}>Mass {this.sortIcons(SORT_SEQUENCE_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_FAMILY)}>Family {this.sortIcons(SORT_FAMILY)}</th>
+                            <th onClick={() => this.sortBy(SORT_ORGANISM)}>Organism {this.sortIcons(SORT_ORGANISM)}</th>
                             <th onClick={() => this.sortBy(SORT_N_MODIFICATION)}>N {this.sortIcons(SORT_N_MODIFICATION)}</th>
                             <th onClick={() => this.sortBy(SORT_C_MODIFICATION)}>C {this.sortIcons(SORT_C_MODIFICATION)}</th>
                             <th onClick={() => this.sortBy(SORT_B_MODIFICATION)}>Branch {this.sortIcons(SORT_B_MODIFICATION)}</th>
@@ -137,6 +139,9 @@ class BlockUsagePage extends ListComponent<any, State> {
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FAMILY}
                                        placeholder={'Family'}/></td>
                             <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_ORGANISM}
+                                       placeholder={'Organism'}/></td>
+                            <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)}
                                        id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
                             <td><input className={styles.filter} type={'text'}
@@ -165,6 +170,7 @@ class BlockUsagePage extends ListComponent<any, State> {
                                 <td>{sequence.formula}</td>
                                 <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
                                 <td>{sequence.family}</td>
+                                <td>{sequence.organism}</td>
                                 <td>{sequence.nModification}</td>
                                 <td>{sequence.cModification}</td>
                                 <td>{sequence.bModification}</td>

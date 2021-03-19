@@ -60,7 +60,11 @@ class SequencePage extends ListComponent<any, ListState> {
         this.cloneTransformation = this.cloneTransformation.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
+        this.state = {
+            list: [],
+            selectedContainer: this.props.match.params.id,
+            selectedContainerName: ContainerHelper.getSelectedContainerName()
+        };
     }
 
     componentDidMount(): void {
@@ -129,7 +133,8 @@ class SequencePage extends ListComponent<any, ListState> {
                         <thead>
                         <tr>
                             <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
-                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
+                                name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
@@ -145,21 +150,47 @@ class SequencePage extends ListComponent<any, ListState> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID} placeholder={'Id'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME} placeholder={'Name'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_TYPE} placeholder={'Type'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE} placeholder={'Sequence'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FORMULA} placeholder={'Formula'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
+                                       placeholder={'Id'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
+                                       placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_TYPE}
+                                       placeholder={'Type'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE}
+                                       placeholder={'Sequence'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_FORMULA} placeholder={'Formula'}/></td>
                             <td>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_MASS_FROM} placeholder={'Mass from'}/>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_MASS_TO} placeholder={'Mass to'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_MASS_TO} placeholder={'Mass to'}/>
                             </td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FAMILY} placeholder={'Family'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_ORGANISM} placeholder={'Organism'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_C_MODIFICATION} placeholder={'C Modification'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_B_MODIFICATION} placeholder={'B Modification'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_IDENTIFIER} placeholder={'Identifier'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_FAMILY}
+                                       placeholder={'Family'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_ORGANISM}
+                                       placeholder={'Organism'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_N_MODIFICATION} placeholder={'N Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_C_MODIFICATION} placeholder={'C Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_B_MODIFICATION} placeholder={'B Modification'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_SEQUENCE_IDENTIFIER} placeholder={'Identifier'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
