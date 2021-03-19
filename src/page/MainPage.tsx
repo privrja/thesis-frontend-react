@@ -680,7 +680,7 @@ class MainPage extends React.Component<any, SequenceState> {
             })
         }).then(response => {
             if (response.status === 200) {
-                response.json().then(data => this.setState({family: data}));
+                response.json().then(simData => this.setState({family: simData}));
             }
         });
     }
@@ -1128,7 +1128,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     blockDbChange(newValue: any) {
-        let block = this.state.blocksAll.find(block => block.id === newValue.value);
+        let block = this.state.blocksAll.find(blc => blc.id === newValue.value);
         if (block) {
             let editBlock = {
                 id: block.id,
