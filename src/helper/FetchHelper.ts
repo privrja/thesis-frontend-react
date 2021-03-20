@@ -60,8 +60,6 @@ class FetchHelper {
                 if (response.status === 204) {
                     if (response.headers.get('x-condition') !== "1") {
                         component.popupRef.current!.activate();
-                    } else {
-                        window.location.href = URL_PREFIX;
                     }
                 }
             });
@@ -75,9 +73,7 @@ class FetchHelper {
                 method: 'POST',
                 headers: {'x-auth-token': token}
             }).then(response => {
-                if (response.status === 204) {
-                    FetchHelper.refresh();
-                } else {
+                if (response.status !== 204) {
                     FetchHelper.conditionsKo();
                 }
             })
