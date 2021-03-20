@@ -56,7 +56,7 @@ class PopupExport extends React.Component<Props, State> {
         this.getFile('/block/export/merge')
     }
 
-    getFile(url: string, fileName: string = 'data,txt') {
+    getFile(url: string, fileName: string = 'data.txt') {
         let token = localStorage.getItem(TOKEN);
         let headers: any = {method: 'GET'};
         if (token) {
