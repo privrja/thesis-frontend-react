@@ -188,61 +188,64 @@ class ContainerPage extends ListComponent<any, State> {
                                     <button type="submit" className={styles.create}>Create new container</button>
                                 </Form>
                             </Formik>
-                        </div> : <div/>
+
+                            <h2>Your containers</h2>
+
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th onClick={() => this.sortBy('id')}>Id</th>
+                                    <th onClick={() => this.sortBy('containerName')}>Container name</th>
+                                    <th onClick={() => this.sortBy('visibility')}>Visibility</th>
+                                    <th onClick={() => this.sortBy('mode')}>Mode</th>
+                                    <th>Is selected</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {this.state.list.map(container => (
+                                    <tr key={container.id}>
+                                        <td>{container.id}</td>
+                                        <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                            <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
+                                                       id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
+                                        <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                            <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
+                                                         options={visibilityOptions}
+                                                         selected={container.visibility}/> : container.visibility}</td>
+                                        <td>{container.mode}</td>
+                                        <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
+                                        <td>
+                                            {this.state.editable === container.id ? <button className={styles.update}
+                                                                                            onClick={() => this.update(container.id)}>Update</button> :
+                                                <div/>}
+                                            {this.state.editable === container.id ?
+                                                <button className={styles.delete}
+                                                        onClick={this.editEnd}>Cancel</button> :
+                                                <div/>}
+                                            <button onClick={() => {
+                                                this.selectContainer(container.id, container.containerName);
+                                                window.location.reload();
+                                            }}>Select
+                                            </button>
+                                            <button
+                                                onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
+                                            </button>
+                                            <button>Go on</button>
+                                            <button>Clone</button>
+                                            <button
+                                                onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
+                                            </button>
+                                            <button className={styles.delete}
+                                                    onClick={() => this.popup(container.id)}>Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div> : ''
                     }
-
-                    <h2>Your containers</h2>
-
-                    <table>
-                        <thead>
-                        <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
-                            <th onClick={() => this.sortBy('containerName')}>Container name</th>
-                            <th onClick={() => this.sortBy('visibility')}>Visibility</th>
-                            <th onClick={() => this.sortBy('mode')}>Mode</th>
-                            <th>Is selected</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.list.map(container => (
-                            <tr key={container.id}>
-                                <td>{container.id}</td>
-                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
-                                               id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
-                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
-                                                 options={visibilityOptions}
-                                                 selected={container.visibility}/> : container.visibility}</td>
-                                <td>{container.mode}</td>
-                                <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
-                                <td>
-                                    {this.state.editable === container.id ? <button className={styles.update}
-                                                                                    onClick={() => this.update(container.id)}>Update</button> :
-                                        <div/>}
-                                    {this.state.editable === container.id ?
-                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                        <div/>}
-                                    <button onClick={() => {
-                                        this.selectContainer(container.id, container.containerName);
-                                        window.location.reload();
-                                    }}>Select
-                                    </button>
-                                    <button
-                                        onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
-                                    </button>
-                                    <button>Go on</button>
-                                    <button>Clone</button>
-                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
-                                    </button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
 
                     <h2>Public containers</h2>
 
