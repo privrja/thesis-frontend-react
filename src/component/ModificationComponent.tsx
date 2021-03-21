@@ -209,7 +209,7 @@ class ModificationComponent extends React.Component<Props, State> {
                     </div>
                     <CheckInput name={'chck-edit-same'} id={'chck-edit-same'} checked={this.state.editSame}
                                 onChange={this.handleEditChange}/>
-                    <label htmlFor={'chck-edit-same'}>Edit all same blocks at time</label>
+                    <label htmlFor={'chck-edit-same'}>Edit same blocks together</label>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
                                    ref={this.nModificationRef} modification={this.props.nModification}/>

@@ -38,7 +38,7 @@ class PassReset extends React.Component<any, any> {
             <section>
             <h2>Reset Password</h2>
             <Flash ref={this.flashRef}/>
-            <label htmlFor={'mail'}>We generate you new password a send it vie email.</label>
+            <label htmlFor={'mail'}>We generate you new password a send it via email.</label>
             <button className={styles.update} onClick={this.mail}>Generate</button>
         </section>
         );
