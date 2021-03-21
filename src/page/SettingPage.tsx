@@ -5,6 +5,7 @@ import ChemSpiderKey from "../component/ChemSpiderKey";
 import AdminComponent from "../component/AdminComponent";
 import DeleteAccount from "../component/DeleteAccount";
 import PassReset from "../component/PassReset";
+import MailReset from "../component/MailReset";
 
 class SettingPage extends React.Component<any, any> {
 
@@ -13,6 +14,7 @@ class SettingPage extends React.Component<any, any> {
             <section className={styles.page}>
                 <PasswordComponent/>
                 <PassReset/>
+                <MailReset/>
                 <ChemSpiderKey/>
                 <DeleteAccount/>
                 <AdminComponent/>
