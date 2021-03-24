@@ -153,6 +153,8 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     componentDidUpdate() {
+        this.initializeSmilesDrawers();
+        this.drawSmiles();
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 1) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
@@ -688,7 +690,7 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({results: [], blocks: [], family: [], organism: []});
+        this.setState({results: [], blocks: [], family: [], organism: [], sequenceEdit: false, sequenceId: undefined, sequence: undefined});
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;

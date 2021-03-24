@@ -108,7 +108,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         this.addFilter(
                             this.addFilter(
                                 this.addFilter(
-                                    this.addFilter('', SORT_ID, id.value)
+                                    SHOW_ID ? this.addFilter('', SORT_ID, id.value) : ''
                                     , SORT_MODIFICATION_NAME, name.value)
                                 , SORT_MODIFICATION_FORMULA, formula.value)
                             , 'modificationMassFrom', mass_from.value)

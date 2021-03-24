@@ -131,7 +131,7 @@ class RegisterPage extends React.Component<any, State> {
 
                             <label htmlFor="conditions">
                                 <Field id="conditions" name="conditions" type="checkbox"/>
-                                I'm agree with <a href={URL_PREFIX + 'condition'} target="_blank"
+                                I agree with <a href={URL_PREFIX + 'condition'} target="_blank"
                                                   rel={'noopener noreferrer'}>terms and conditions</a></label>
                             <button type="submit">Register</button>
                         </Form>

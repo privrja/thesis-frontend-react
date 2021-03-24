@@ -279,7 +279,7 @@ class BlockPage extends ListComponent<any, State> {
                                     this.addFilter(
                                         this.addFilter(
                                             this.addFilter(
-                                                this.addFilter('', SORT_ID, id.value)
+                                                SHOW_ID ? this.addFilter('', SORT_ID, id.value) : ''
                                                 , SORT_NAME, name.value)
                                             , SORT_ACRONYM, acronym.value)
                                         , SORT_RESIDUE, formula.value)

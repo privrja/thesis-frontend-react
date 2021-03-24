@@ -31,6 +31,7 @@ import {
     TXT_FILTER_SEQUENCE_TYPE,
     TXT_FILTER_SEQUENCE_USAGES
 } from "../constant/DefaultConstants";
+import {SHOW_ID} from "../constant/Constants";
 
 class Helper {
 
@@ -76,7 +77,7 @@ class Helper {
                                                 component.addFilter(
                                                     component.addFilter(
                                                         component.addFilter(
-                                                            component.addFilter('', SORT_ID, id.value)
+                                                            SHOW_ID ? component.addFilter('', SORT_ID, id.value) : ''
                                                             , SORT_SEQUENCE_NAME, name.value)
                                                         , SORT_SEQUENCE_TYPE, sequenceType.value)
                                                     , SORT_SEQUENCE, sequence.value)
