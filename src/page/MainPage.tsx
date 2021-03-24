@@ -1164,6 +1164,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                     <div className={styles.drawerInput}>
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+                        <h2>{this.state.selectedContainerName}</h2>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
                                      options={ServerEnumHelper.getOptions(this.state.selectedContainerName)}

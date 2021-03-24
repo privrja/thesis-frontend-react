@@ -234,7 +234,6 @@ class ContainerPage extends ListComponent<any, State> {
                                             <button
                                                 onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
                                             </button>
-                                            <button>Go on</button>
                                             <button onClick={() => this.clone(container.id)}>Clone</button>
                                             <button
                                                 onClick={() => this.popupExportRef.current!.activate(container.id)}>Export

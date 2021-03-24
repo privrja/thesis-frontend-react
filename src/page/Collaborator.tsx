@@ -136,7 +136,7 @@ class Collaborator extends ListComponent<Props, State> {
     render() {
         return (
             <section>
-                <h1>Container {this.state.container ? this.containerH() : ''}</h1>
+                <h2>Container {this.state.container ? this.containerH() : ''}</h2>
                 <PopupYesNo label={"Really want to remove"} onYes={this.delete}
                             ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>

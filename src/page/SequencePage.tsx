@@ -128,7 +128,7 @@ class SequencePage extends ListComponent<any, ListState> {
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2>List of Sequences - {this.state.selectedContainerName}</h2>
+                    <h2>List of Sequences - {this.state.selectedContainerName} - {this.state.list ? this.state.list.length : 0} rows</h2>
                     <table>
                         <thead>
                         <tr>
