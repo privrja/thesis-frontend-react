@@ -165,7 +165,7 @@ class ContainerPage extends ListComponent<any, State> {
                             <Formik
                                 initialValues={{
                                     containerName: '',
-                                    visibility: 'PRIVATE'
+                                    visibility: ''
                                 }}
                                 onSubmit={(
                                     values: Values,
@@ -183,7 +183,10 @@ class ContainerPage extends ListComponent<any, State> {
                                            placeholder='Your new Container Name'/>
 
                                     <label htmlFor="visibility">Container visibility:</label>
-                                    <SelectInput id="visibility" name="visibility" options={visibilityOptions}/>
+                                    <Field name={'visibility'} id={'visibility'} as={'select'}>
+                                        <option value={'PRIVATE'}>PRIVATE</option>
+                                        <option value={'PUBLIC'}>PUBLIC</option>
+                                    </Field>
 
                                     <button type="submit" className={styles.create}>Create new container</button>
                                 </Form>

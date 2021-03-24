@@ -94,8 +94,7 @@ class LoginPage extends React.Component<any> {
                         </Form>
                     </Formik>
 
-                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here.</a>
-
+                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here</a> <a href={URL_PREFIX + 'forgot'}>Reset password</a>
                 </section>
             </section>
         )
