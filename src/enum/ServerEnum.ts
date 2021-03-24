@@ -9,7 +9,7 @@ import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import ChebiFinder from "../finder/ChebiFinder";
 
 export enum ServerEnum {
-    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, SMILES, MASS_SPEC_BLOCKS
+    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, MASS_SPEC_BLOCKS
 }
 
 export class ServerEnumHelper {

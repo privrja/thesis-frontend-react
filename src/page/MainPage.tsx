@@ -18,13 +18,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {
-    CHEMSPIDER_KEY,
-    CONTAINER,
-    SEQUENCE_EDIT,
-    SEQUENCE_ID,
-    TOKEN
-} from "../constant/ApiConstants";
+import {CHEMSPIDER_KEY, CONTAINER, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -74,6 +68,7 @@ interface SequenceState {
     blocksAll: any[],
     blockEdit?: any,
     selectedContainerName?: string;
+    source: ServerEnum;
 }
 
 interface SequenceStructure {
@@ -142,7 +137,8 @@ class MainPage extends React.Component<any, SequenceState> {
             organism: [],
             sequenceEdit: false,
             blocksAll: [],
-            selectedContainerName: ContainerHelper.getSelectedContainerName()
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
+            source: ServerEnum.PUBCHEM
         };
     }
 
@@ -962,7 +958,7 @@ class MainPage extends React.Component<any, SequenceState> {
             formulaInput.value,
             Number(massInput.value)
         );
-        this.setState({molecule: molecule});
+        this.setState({molecule: molecule, source: search});
     }
 
     removeBlock(key: number) {
@@ -1173,7 +1169,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
-                                     options={SearchEnumHelper.getOptions()} onChange={this.refreshMolecule}/>
+                                     options={SearchEnumHelper.getOptionsBySource(this.state.source)} onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
                         <TextInput name={'name'} id={'name'} value={this.state.molecule?.structureName ?? ''}
