@@ -1,7 +1,8 @@
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import ContainerHelper from "../helper/ContainerHelper";
+import {ENDPOINT} from "../constant/Constants";
 
 abstract class AbstractImport {
 

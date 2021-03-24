@@ -1,11 +1,11 @@
 import ListComponent, {ListState} from "./ListComponent";
-import {ENDPOINT} from "../constant/ApiConstants";
 import ContainerHelper from "../helper/ContainerHelper";
 import PopupYesNo from "./PopupYesNo";
 import Flash from "./Flash";
 import styles from "../main.module.scss";
 import TextInput from "./TextInput";
 import React from "react";
+import {ENDPOINT, SHOW_ID} from "../constant/Constants";
 
 interface Props {
     containerId: number;
@@ -51,7 +51,7 @@ class OrganismComponent extends ListComponent<Props, ListState> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id')}>Id</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
                             <th onClick={() => this.sortBy('organism')}>Organism</th>
                             <th>Actions</th>
                         </tr>
@@ -59,7 +59,7 @@ class OrganismComponent extends ListComponent<Props, ListState> {
                         <tbody>
                         {this.state.list.map(organism => (
                             <tr>
-                                <td>{organism.id}</td>
+                                {SHOW_ID ? <td>{organism.id}</td> : ''}
                                 <td onClick={() => this.edit(organism.id)}>{this.state.editable === organism.id ? <TextInput id={'txt-edit-organism'} name={'txt-edit-organism'} value={organism.organism} /> : organism.organism}</td>
                                 <td>
                                     {this.state.editable === organism.id ? <button className={styles.update} onClick={() => this.update(organism.id)}>Update</button> : <div/>}

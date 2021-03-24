@@ -1,9 +1,10 @@
 import React from "react";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import Flash from "./Flash";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import styles from "../main.module.scss";
+import {ENDPOINT} from "../constant/Constants";
 
 class DeleteAccount extends React.Component<any, any> {
 

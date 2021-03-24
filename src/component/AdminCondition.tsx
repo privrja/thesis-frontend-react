@@ -1,10 +1,11 @@
 import React from "react";
 import Flash from "./Flash";
 import styles from "../main.module.scss";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import FetchHelper from "../helper/FetchHelper";
+import {ENDPOINT} from "../constant/Constants";
 
 class AdminCondition extends React.Component<any> {
 

@@ -16,10 +16,10 @@ import ModificationPage from "./page/ModificationPage";
 import EditorPage from "./page/EditorPage";
 import ReferencePage from "./page/ReferencePage";
 import SequencePage from "./page/SequencePage";
-import {URL_PREFIX} from "./constant/ApiConstants";
 import ImportPage from "./page/ImportPage";
 import BlockUsagePage from "./page/BlockUsagePage";
 import SettingPage from "./page/SettingPage";
+import {URL_PREFIX} from "./constant/Constants";
 
 function App() {
 

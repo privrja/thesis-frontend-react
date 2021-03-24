@@ -2,7 +2,8 @@ import * as React from "react";
 // @ts-ignore
 import {Jsme} from 'jsme-react';
 import styles from "../main.module.scss";
-import {EDITOR_BACK, EDITOR_SMILES, ENDPOINT} from "../constant/ApiConstants";
+import {EDITOR_BACK, EDITOR_SMILES} from "../constant/ApiConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 interface State {
     smiles: string;

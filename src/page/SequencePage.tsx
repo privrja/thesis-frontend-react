@@ -3,12 +3,10 @@ import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
     CONTAINER,
-    DECIMAL_PLACES, ELEMENT_LARGE_SMILES,
-    ENDPOINT,
+    ELEMENT_LARGE_SMILES,
     SEQUENCE_EDIT,
     SEQUENCE_ID,
-    SSEQUENCE,
-    URL_PREFIX
+    SSEQUENCE
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
@@ -45,6 +43,7 @@ import {
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE
 } from "../constant/DefaultConstants";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
@@ -128,11 +127,12 @@ class SequencePage extends ListComponent<any, ListState> {
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2>List of Sequences - {this.state.selectedContainerName} - {this.state.list ? this.state.list.length : 0} rows</h2>
+                    <h2>List of Sequences
+                        - {this.state.selectedContainerName} - {this.state.list ? this.state.list.length : 0} rows</h2>
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
                                 name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
@@ -150,9 +150,10 @@ class SequencePage extends ListComponent<any, ListState> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input className={styles.filter} type={'text'}
-                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
-                                       placeholder={'Id'}/></td>
+                            {SHOW_ID ?
+                                <td><input className={styles.filter} type={'text'}
+                                           onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
+                                           placeholder={'Id'}/></td> : ''}
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
                                        placeholder={'Name'}/></td>
@@ -198,7 +199,7 @@ class SequencePage extends ListComponent<any, ListState> {
                         </tr>
                         {this.state.list.length > 0 && this.state.list.map(sequence => (
                             <tr key={sequence.id}>
-                                <td>{sequence.id}</td>
+                                {SHOW_ID ? <td>{sequence.id}</td> : ''}
                                 <td>{sequence.sequenceName}</td>
                                 <td>{sequence.sequenceType}</td>
                                 <td>{sequence.sequence}</td>

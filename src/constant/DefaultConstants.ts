@@ -29,4 +29,3 @@ export const SORT_B_MODIFICATION = 'bModification';
 export const SORT_IDENTIFIER = 'identifier';
 export const SORT_SEQUENCE_MASS = 'sequenceMass';
 export const SORT_USAGES = 'usages';
-

@@ -1,9 +1,10 @@
 import * as React from "react";
 import HeaderTile from "./HeaderTile";
 import styles from "../main.module.scss"
-import {SELECTED_CONTAINER, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
+import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import PopupYesNo from "../component/PopupYesNo";
 import FetchHelper from "../helper/FetchHelper";
+import {URL_PREFIX} from "../constant/Constants";
 
 class Header extends React.Component {
 

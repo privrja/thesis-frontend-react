@@ -6,8 +6,9 @@ import * as React from "react";
 import Modification from "../structure/Modification";
 import TextInput from "./TextInput";
 import Creatable from "react-select/creatable";
-import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, TOKEN} from "../constant/ApiConstants";
 import CheckInput from "./CheckInput";
+import {ENDPOINT} from "../constant/Constants";
 
 interface Props {
     containerId: number;

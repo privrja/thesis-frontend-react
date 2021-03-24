@@ -1,9 +1,10 @@
 import React from "react";
 import Flash from "./Flash";
 import styles from "../main.module.scss";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 class ChemSpiderKey extends React.Component<any, any> {
 

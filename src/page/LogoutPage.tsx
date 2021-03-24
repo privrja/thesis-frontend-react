@@ -3,10 +3,11 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import {
     TOKEN,
-    URL_PREFIX, USER_NAME
+    USER_NAME
 } from "../constant/ApiConstants";
 import Sleep from "../helper/Sleep";
 import Helper from "../helper/Helper";
+import {URL_PREFIX} from "../constant/Constants";
 
 class LogoutPage extends React.Component<any> {
 

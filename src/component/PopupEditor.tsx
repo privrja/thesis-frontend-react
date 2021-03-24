@@ -2,7 +2,7 @@ import * as React from "react";
 import styles from "../main.module.scss";
 // @ts-ignore
 import {Jsme} from 'jsme-react';
-import {ENDPOINT} from "../constant/ApiConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 interface Props {
     id: string;

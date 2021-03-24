@@ -1,6 +1,6 @@
 import * as React from "react";
 import styles from "../main.module.scss"
-import {CONTAINER, DECIMAL_PLACES, ENDPOINT, SEQUENCE_EDIT, SEQUENCE_ID, URL_PREFIX} from "../constant/ApiConstants";
+import {CONTAINER, SEQUENCE_EDIT, SEQUENCE_ID} from "../constant/ApiConstants";
 import ListComponent, {ListState} from "../component/ListComponent";
 import Helper from "../helper/Helper";
 import {ServerEnumHelper} from "../enum/ServerEnum";
@@ -28,6 +28,7 @@ import {
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES
 } from "../constant/DefaultConstants";
+import {DECIMAL_PLACES, ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 interface State extends ListState {
     blockId: number;

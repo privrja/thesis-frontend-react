@@ -3,11 +3,9 @@ import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
     CONTAINER,
-    ENDPOINT,
     SELECTED_CONTAINER,
     SELECTED_CONTAINER_NAME,
-    TOKEN,
-    URL_PREFIX
+    TOKEN
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
@@ -20,6 +18,7 @@ import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import PopupExport from "../component/PopupExport";
 import ContainerHelper from "../helper/ContainerHelper";
 import Helper from "../helper/Helper";
+import {ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
 
 interface Container {
     id: number,
@@ -197,7 +196,7 @@ class ContainerPage extends ListComponent<any, State> {
                             <table>
                                 <thead>
                                 <tr>
-                                    <th onClick={() => this.sortBy('id')}>Id</th>
+                                    {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
                                     <th onClick={() => this.sortBy('containerName')}>Container name</th>
                                     <th onClick={() => this.sortBy('visibility')}>Visibility</th>
                                     <th onClick={() => this.sortBy('mode')}>Mode</th>
@@ -208,7 +207,7 @@ class ContainerPage extends ListComponent<any, State> {
                                 <tbody>
                                 {this.state.list.map(container => (
                                     <tr key={container.id}>
-                                        <td>{container.id}</td>
+                                        {SHOW_ID ? <td>{container.id}</td> : ''}
                                         <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
                                             <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
                                                        id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
@@ -254,7 +253,7 @@ class ContainerPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th> : ''}
                             <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container
                                 Name
                             </th>
@@ -265,7 +264,7 @@ class ContainerPage extends ListComponent<any, State> {
                         <tbody>
                         {this.state.freeContainers.map(container => (
                             <tr key={container.id}>
-                                <td>{container.id}</td>
+                                {SHOW_ID ? <td>{container.id}</td> : ''}
                                 <td>{container.containerName}</td>
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>

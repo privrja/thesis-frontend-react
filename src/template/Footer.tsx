@@ -1,5 +1,5 @@
 import * as React from "react";
-import {URL_PREFIX} from "../constant/ApiConstants";
+import {URL_PREFIX} from "../constant/Constants";
 
 class Footer extends React.Component {
 

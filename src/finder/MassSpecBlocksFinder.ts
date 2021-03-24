@@ -1,8 +1,8 @@
 import IFinder from "./IFinder";
-import {ENDPOINT} from "../constant/ApiConstants";
 import Sleep from "../helper/Sleep";
 import SingleStructure from "./SingleStructure";
 import {ServerEnum} from "../enum/ServerEnum";
+import {ENDPOINT} from "../constant/Constants";
 
 const ENDPOINT_URI = ENDPOINT + 'container/';
 

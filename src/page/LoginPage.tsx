@@ -3,15 +3,15 @@ import "react-app-polyfill/ie11";
 import {Field, Form, Formik, FormikHelpers} from "formik/dist";
 import styles from "../main.module.scss"
 import {
-    ENDPOINT,
     TOKEN,
-    URL_PREFIX, USER_NAME
+    USER_NAME
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Helper from "../helper/Helper";
 import PopupYesNo from "../component/PopupYesNo";
 import FetchHelper from "../helper/FetchHelper";
+import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 interface Values {
     name: string;

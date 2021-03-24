@@ -1,8 +1,4 @@
 
-/* API URIs */
-export const ENDPOINT = 'https://localhost:8000/rest/';
-export const URL_PREFIX = '/';
-
 export const TOKEN = 'token';
 export const USER_NAME = 'userName';
 export const CHEMSPIDER_KEY = 'chemspiderKey';
@@ -20,8 +16,6 @@ export const ADMIN = 'admin';
 
 export const SEQUENCE_ID = 'sequenceId';
 export const SEQUENCE_EDIT = 'sequenceEdit';
-
-export const DECIMAL_PLACES = 6;
 
 export const CONTAINER = 'container';
 export const SFAMILY = '/family';

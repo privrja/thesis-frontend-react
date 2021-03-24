@@ -4,13 +4,10 @@ import styles from "../main.module.scss"
 import {
     SBLOCK,
     CONTAINER,
-    ENDPOINT,
     TOKEN,
     EDITOR_BACK,
     EDITOR_ITEM,
     EDITOR_SMILES,
-    URL_PREFIX,
-    DECIMAL_PLACES,
     EDITOR_NEW_BLOCK_NAME,
     EDITOR_NEW_BLOCK_ACRONYM,
     EDITOR_NEW_BLOCK_FORMULA,
@@ -30,6 +27,7 @@ import * as SmilesDrawer from 'smiles-drawer';
 import ContainerHelper from "../helper/ContainerHelper";
 import Creatable from "react-select/creatable";
 import FetchHelper from "../helper/FetchHelper";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
 const TXT_EDIT_ACRONYM = 'txt-edit-acronym';
@@ -373,7 +371,7 @@ class BlockPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
                             <th onClick={() => this.sortBy(SORT_NAME)}>Block name {this.sortIcons(SORT_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_ACRONYM)}>Acronym {this.sortIcons(SORT_ACRONYM)}</th>
                             <th onClick={() => this.sortBy(SORT_RESIDUE)}>Residue {this.sortIcons(SORT_RESIDUE)}</th>
@@ -387,9 +385,9 @@ class BlockPage extends ListComponent<any, State> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input className={styles.filter} type={'text'}
+                            {SHOW_ID ? <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ID}
-                                       placeholder={'Id'}/></td>
+                                       placeholder={'Id'}/></td> : ''}
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_NAME}
                                        placeholder={'Name'}/></td>
@@ -426,7 +424,7 @@ class BlockPage extends ListComponent<any, State> {
                         </tr>
                         {this.state.list.length > 0 && this.state.list.map(block => (
                             <tr key={block.id}>
-                                <td>{block.id}</td>
+                                {SHOW_ID ? <td>{block.id}</td> : ''}
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME}
                                                id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>

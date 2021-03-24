@@ -21,8 +21,6 @@ import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 import {
     CHEMSPIDER_KEY,
     CONTAINER,
-    DECIMAL_PLACES,
-    ENDPOINT,
     SEQUENCE_EDIT,
     SEQUENCE_ID,
     TOKEN
@@ -41,6 +39,7 @@ import TextArea from "../component/TextArea";
 import Sleep from "../helper/Sleep";
 import Creatable from "react-select/creatable";
 import LossesHelper from "../helper/LossesHelper";
+import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;

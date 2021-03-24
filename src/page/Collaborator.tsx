@@ -1,5 +1,5 @@
 import ListComponent, {ListState} from "../component/ListComponent";
-import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, TOKEN} from "../constant/ApiConstants";
 import PopupYesNo from "../component/PopupYesNo";
 import Flash from "../component/Flash";
 import styles from "../main.module.scss";
@@ -10,6 +10,7 @@ import Creatable from "react-select/creatable";
 import FlashType from "../component/FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
+import {ENDPOINT} from "../constant/Constants";
 
 const SEL_EDIT_MODE = 'sel-edit-mode';
 

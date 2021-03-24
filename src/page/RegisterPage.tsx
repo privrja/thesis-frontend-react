@@ -3,7 +3,7 @@ import styles from "../main.module.scss";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import FlashType from "../component/FlashType";
-import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
+import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 interface Values {
     name: string;

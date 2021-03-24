@@ -1,7 +1,8 @@
-import {ENDPOINT, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "../component/FlashType";
 import Flash from "../component/Flash";
 import Sleep from "./Sleep";
+import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 class FetchHelper {
 

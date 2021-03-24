@@ -2,8 +2,9 @@ import React from "react";
 import styles from "../main.module.scss";
 import Flash from "./Flash";
 import FlashType from "./FlashType";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 const TXT_PASSWORD_2 = 'txt-password2';
 const TXT_PASSWORD = 'txt-password';

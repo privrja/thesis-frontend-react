@@ -3,8 +3,6 @@ import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
     CONTAINER,
-    DECIMAL_PLACES,
-    ENDPOINT,
     SMODIFICATION,
     TOKEN
 } from "../constant/ApiConstants";
@@ -17,6 +15,7 @@ import CheckInput from "../component/CheckInput";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import Helper from "../helper/Helper";
 import ContainerHelper from "../helper/ContainerHelper";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 
 const TXT_EDIT_MODIFICATION_NAME = 'txt-edit-modificationName';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -54,7 +53,11 @@ class ModificationPage extends ListComponent<any, ListState> {
         super(props);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
-        this.state = {list: [], selectedContainer: this.props.match.params.id, selectedContainerName: ContainerHelper.getSelectedContainerName()};
+        this.state = {
+            list: [],
+            selectedContainer: this.props.match.params.id,
+            selectedContainerName: ContainerHelper.getSelectedContainerName()
+        };
     }
 
     componentDidMount(): void {
@@ -179,8 +182,9 @@ class ModificationPage extends ListComponent<any, ListState> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
-                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Modification name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Modification
+                                name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_FORMULA)}>Formula {this.sortIcons(SORT_MODIFICATION_FORMULA)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_MASS)}>Mass {this.sortIcons(SORT_MODIFICATION_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_N_TERMINAL)}>N-terminal {this.sortIcons(SORT_N_TERMINAL)}</th>
@@ -190,15 +194,29 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_ID} placeholder={'Id'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_NAME} placeholder={'Name'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_FORMULA} placeholder={'Formula'}/></td>
+                            {SHOW_ID ? <td><input className={styles.filter} type={'text'}
+                                                  onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                                  id={TXT_FILTER_MODIFICATION_ID} placeholder={'Id'}/></td> : ''}
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_NAME} placeholder={'Name'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_FORMULA} placeholder={'Formula'}/></td>
                             <td>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_MASS_FROM} placeholder={'Mass from'}/>
-                                <input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_MASS_TO} placeholder={'Mass to'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_MASS_FROM} placeholder={'Mass from'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_MASS_TO} placeholder={'Mass to'}/>
                             </td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_N_TERMINAL} placeholder={'N terminal'}/></td>
-                            <td><input className={styles.filter} type={'text'} onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_MODIFICATION_C_TERMINAL} placeholder={'C terminal'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_N_TERMINAL} placeholder={'N terminal'}/></td>
+                            <td><input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                       id={TXT_FILTER_MODIFICATION_C_TERMINAL} placeholder={'C terminal'}/></td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
@@ -206,7 +224,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </tr>
                         {this.state.list.length > 0 && this.state.list.map(modification => (
                             <tr key={modification.id}>
-                                <td>{modification.id}</td>
+                                {SHOW_ID ? <td>{modification.id}</td> : ''}
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
                                     <TextInput value={modification.modificationName}
                                                name={TXT_EDIT_MODIFICATION_NAME}

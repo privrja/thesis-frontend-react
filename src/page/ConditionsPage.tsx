@@ -1,6 +1,7 @@
 import * as React from "react";
 import styles from "../main.module.scss";
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 class ConditionsPage extends React.Component<any> {
 
