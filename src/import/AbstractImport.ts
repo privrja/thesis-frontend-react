@@ -23,7 +23,8 @@ abstract class AbstractImport {
     async import(): Promise<any[]> {
         this.errorStack = [];
         this.okStack = [];
-        let rows = this.text.split('\n');
+        let lineSeparator = this.text.includes('\r\n') ? '\r\n' : '\n';
+        let rows = this.text.split(lineSeparator);
         for (let row of rows) {
             if (row === '') {
                 continue;

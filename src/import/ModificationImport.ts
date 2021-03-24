@@ -10,7 +10,7 @@ class ModificationImport extends AbstractImport {
         return 5;
     }
 
-    transformation(parts: any) {
+    transformation(parts: string[]) {
         this.okStack.push({
             modificationName: parts[0],
             formula: parts[1],
