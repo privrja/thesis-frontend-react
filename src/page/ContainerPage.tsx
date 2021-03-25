@@ -90,7 +90,7 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     delete(key: number) {
-        this.defaultDelete(this.getEndpointWithId(key), key, this.list);
+        this.defaultDelete(this.getEndpointWithId(key), key, this.freeContainers);
     }
 
     update(key: number) {
