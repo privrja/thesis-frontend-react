@@ -6,11 +6,11 @@ import styles from "../main.module.scss";
 import React from "react";
 import {SelectInput} from "../component/SelectInput";
 import {PermissionEnum, PermissionEnumHelper} from "../enum/PermissionEnum";
-import Creatable from "react-select/creatable";
 import FlashType from "../component/FlashType";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
 import {ENDPOINT} from "../constant/Constants";
+import TextInput from "../component/TextInput";
 
 const SEL_EDIT_MODE = 'sel-edit-mode';
 
@@ -29,8 +29,7 @@ interface Props {
     containerId: number;
 }
 
-const CRE_USER_ID = 'cre-user';
-
+const TXT_USER_ID = 'cre-user';
 const SEL_NEW_MODE = 'sel-new-mode';
 
 class Collaborator extends ListComponent<Props, State> {
@@ -38,7 +37,6 @@ class Collaborator extends ListComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.users = this.users.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
         this.transformation = this.transformation.bind(this);
         this.state = {
             list: [],
@@ -76,17 +74,18 @@ class Collaborator extends ListComponent<Props, State> {
 
     create(): void {
         let mode = document.getElementById(SEL_NEW_MODE) as HTMLSelectElement;
-        if (isNaN(Number(this.state.userId))) {
-            this.flashRef.current!.activate(FlashType.BAD, 'User is empty or not exist');
+        let user = document.getElementById(TXT_USER_ID) as HTMLInputElement;
+        if (!user.value) {
+            this.flashRef.current!.activate(FlashType.BAD, 'User is empty');
         } else if (!mode.value) {
             this.flashRef.current!.activate(FlashType.BAD, 'Mode have bad format or is empty');
         } else {
             let token = localStorage.getItem(TOKEN);
             if (token) {
-                fetch(this.getEndpoint() + '/collaborator/' + this.state.userId, {
+                fetch(this.getEndpoint() + '/collaborator', {
                     method: 'POST',
                     headers: {'x-auth-token': token},
-                    body: JSON.stringify({mode: mode.value}),
+                    body: JSON.stringify({user: user.value, mode: mode.value}),
                 }).then(response => {
                     if (response.status === 201) {
                         this.flashRef.current!.activate(FlashType.OK);
@@ -130,10 +129,6 @@ class Collaborator extends ListComponent<Props, State> {
         }
     }
 
-    handleInputChange(newValue: any) {
-        this.setState({userId: Number(newValue.value)});
-    }
-
     render() {
         return (
             <section>
@@ -145,8 +140,7 @@ class Collaborator extends ListComponent<Props, State> {
                 {localStorage.getItem(TOKEN) !== null ?
                     <div>
                         <h2>Add new user to container</h2>
-                        <Creatable className={styles.creatable} id={CRE_USER_ID} options={this.state.users}
-                                   onChange={this.handleInputChange}/>
+                        <TextInput name={TXT_USER_ID} id={TXT_USER_ID} value={''} />
                         <label htmlFor={SEL_NEW_MODE}>Mode</label>
                         <SelectInput id={SEL_NEW_MODE} name={SEL_NEW_MODE} options={PermissionEnumHelper.getOptions()}
                                      selected={PermissionEnumHelper.getName(PermissionEnum.RW)}/>
