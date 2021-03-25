@@ -216,12 +216,6 @@ class SequencePage extends ListComponent<any, ListState> {
                                        rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : ''}
                                 </td>
                                 <td>
-                                    {this.state.editable === sequence.id ? <button className={styles.update}
-                                                                                   onClick={() => this.update(sequence.id)}>Update</button> :
-                                        <div/>}
-                                    {this.state.editable === sequence.id ?
-                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                        <div/>}
                                     <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>

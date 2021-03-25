@@ -24,7 +24,7 @@ class FetchHelper {
             method: method,
             headers: {'x-auth-token': token}
         } : {
-            method: 'GET'
+            method: method
         }).then(response => {
             if (response.status === 401) {
                 localStorage.removeItem(TOKEN);

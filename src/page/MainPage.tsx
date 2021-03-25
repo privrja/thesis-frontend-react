@@ -158,7 +158,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     initializeChemSpider() {
-        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => localStorage.setItem(CHEMSPIDER_KEY, data.apiKey));
+        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => localStorage.setItem(CHEMSPIDER_KEY, data.apiKey), () => {this.flashRef.current!.activate(FlashType.WARNING, 'ChemSpider apikey not found')});
     }
 
     getSequenceId() {

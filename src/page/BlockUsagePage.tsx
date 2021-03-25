@@ -1,6 +1,6 @@
 import * as React from "react";
 import styles from "../main.module.scss"
-import {CONTAINER, SEQUENCE_EDIT, SEQUENCE_ID} from "../constant/ApiConstants";
+import {CONTAINER, ELEMENT_LARGE_SMILES, SEQUENCE_EDIT, SEQUENCE_ID, SSEQUENCE} from "../constant/ApiConstants";
 import ListComponent, {ListState} from "../component/ListComponent";
 import Helper from "../helper/Helper";
 import {ServerEnumHelper} from "../enum/ServerEnum";
@@ -29,18 +29,32 @@ import {
     TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES
 } from "../constant/DefaultConstants";
 import {DECIMAL_PLACES, ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import FlashType from "../component/FlashType";
+import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+// @ts-ignore
+import * as SmilesDrawer from 'smiles-drawer';
+import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
+import PopupYesNo from "../component/PopupYesNo";
+import Flash from "../component/Flash";
 
 interface State extends ListState {
     blockId: number;
     block?: any;
 }
 
+let largeSmilesDrawer: SmilesDrawer.Drawer;
+
 class BlockUsagePage extends ListComponent<any, State> {
+
+    popupSmilesRef: React.RefObject<PopupSmilesDrawer>;
 
     constructor(props: any) {
         super(props);
+        this.popupSmilesRef = React.createRef();
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
+        this.clone = this.clone.bind(this);
+        this.cloneTransformation = this.cloneTransformation.bind(this);
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
@@ -54,6 +68,12 @@ class BlockUsagePage extends ListComponent<any, State> {
             FetchHelper.fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block/' + this.state.blockId, 'GET', (response) => this.setState({block: response}));
         }
         Helper.resetStorage();
+        const large = document.getElementById(ELEMENT_LARGE_SMILES);
+        largeSmilesDrawer = new SmilesDrawer.Drawer({
+            width: large!.clientWidth,
+            height: large!.clientHeight,
+            compactDrawing: false,
+        });
     }
 
     findName(key: number): string {
@@ -78,6 +98,19 @@ class BlockUsagePage extends ListComponent<any, State> {
         document.location.href = URL_PREFIX;
     }
 
+    clone(key: number) {
+        FetchHelper.fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SSEQUENCE + '/' + key + '/clone', 'POST', this.cloneTransformation, () => this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG));
+    }
+
+    delete(key: number): void {
+        this.defaultDelete(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + SSEQUENCE + '/' + key, key);
+    }
+
+    cloneTransformation() {
+        this.flashRef.current!.activate(FlashType.OK);
+        this.list();
+    }
+
     filter() {
         Helper.sequenceFilter(this, true);
     }
@@ -86,10 +119,25 @@ class BlockUsagePage extends ListComponent<any, State> {
         Helper.sequenceClear(this, true);
     }
 
+    /**
+     * Show popup with large result
+     * @param smiles
+     */
+    showLargeSmiles(smiles: string) {
+        this.popupSmilesRef.current!.activate();
+        SmilesDrawer.parse(smiles, function (tree: any) {
+            largeSmilesDrawer.draw(tree, ELEMENT_LARGE_SMILES);
+        });
+    }
+
     render() {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
+                                       ref={this.popupSmilesRef}/>
+                    <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <h2>Usages of {this.state.block?.acronym}</h2>
                     <table>
                         <thead>
@@ -182,8 +230,13 @@ class BlockUsagePage extends ListComponent<any, State> {
                                 </td>
                                 <td>{sequence.blockUsages}</td>
                                 <td>
-                                    <button className={styles.update}
-                                            onClick={() => this.detail(sequence.id)}>Detail
+                                    <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
+                                    </button>
+                                    <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>
+                                    <button className={styles.create} onClick={() => this.clone(sequence.id)}>Clone
+                                    </button>
+                                    <button className={styles.delete}
+                                            onClick={() => this.popup(sequence.id)}>Delete
                                     </button>
                                 </td>
                             </tr>
