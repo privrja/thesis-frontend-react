@@ -269,9 +269,11 @@ class MainPage extends React.Component<any, SequenceState> {
         });
     }
 
-    drawSmiles() {
-        let input = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
-        SmilesDrawer.parse(input.value, function (tree: any) {
+    drawSmiles(smiles?: string) {
+        if (!smiles) {
+            smiles = (document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement).value;
+        }
+        SmilesDrawer.parse(smiles, function (tree: any) {
             smilesDrawer.draw(tree, ELEMENT_CANVAS);
         });
     }
@@ -724,7 +726,7 @@ class MainPage extends React.Component<any, SequenceState> {
             let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
+        let smilesInput: HTMLTextAreaElement = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
         smilesInput!.value = molecule.smiles ?? '';
         let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
         formulaInput!.value = molecule.formula ?? '';
@@ -738,8 +740,7 @@ class MainPage extends React.Component<any, SequenceState> {
         } else {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
-        this.drawSmiles();
-        this.setState({results: [], molecule: molecule});
+        this.setState({results: [], molecule: molecule}, () => this.drawSmiles(molecule.smiles));
         document.location.href = '#home';
     }
 
@@ -760,13 +761,15 @@ class MainPage extends React.Component<any, SequenceState> {
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
-            smilesInput.value = Canonical.getCanonicalSmiles(smilesInput.value);
+            let smiles = Canonical.getCanonicalSmiles(smilesInput.value);
+            smilesInput.value = smiles;
             let molecule = this.state.molecule;
             if (molecule) {
-                molecule.smiles = smilesInput.value;
-                this.setState({molecule: molecule});
+                molecule.smiles = smiles;
+                this.setState({molecule: molecule}, () => this.drawSmiles(smiles));
+            } else {
+                this.drawSmiles(smiles);
             }
-            this.drawSmiles();
         }
     }
 
@@ -790,7 +793,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             molecule.smiles = data[0].unique ?? data[0].smiles;
                             this.setState({molecule: molecule});
                         }
-                        this.drawSmiles()
+                        this.drawSmiles(data[0].unique ?? data[0].smiles)
                     });
                 }
             });
