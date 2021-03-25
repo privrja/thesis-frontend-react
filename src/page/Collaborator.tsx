@@ -153,40 +153,38 @@ class Collaborator extends ListComponent<Props, State> {
                         <button type="submit" className={styles.create} onClick={this.create}>Add new user</button>
                     </div> : ''}
 
-                {this.state.container ? <h2 id='collaborators'>Collaborators</h2> : ''}
-                {this.state.container ?
-                    <table>
-                        <thead>
+                <h2 id='collaborators'>Collaborators - {this.state.list.length} rows</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th onClick={() => this.sortBy('nick', this.getEndpoint(), this.transformation)}>User name</th>
+                        <th onClick={() => this.sortBy('mode', this.getEndpoint(), this.transformation)}>Mode</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.list.map(collaborator => (
                         <tr>
-                            <th onClick={() => this.sortBy('nick', this.getEndpoint(), this.transformation)}>User name</th>
-                            <th onClick={() => this.sortBy('mode', this.getEndpoint(), this.transformation)}>Mode</th>
-                            <th>Actions</th>
+                            <td>{collaborator.nick}</td>
+                            <td onClick={() => this.edit(collaborator.id)}>{this.state.editable === collaborator.id ?
+                                <SelectInput id={SEL_EDIT_MODE} name={SEL_EDIT_MODE}
+                                             options={PermissionEnumHelper.getOptions()}
+                                             selected={collaborator.mode}/> : collaborator.mode}</td>
+                            <td>
+                                {this.state.editable === collaborator.id ? <button className={styles.update}
+                                                                                   onClick={() => this.update(collaborator.id)}>Update</button> :
+                                    <div/>}
+                                {this.state.editable === collaborator.id ?
+                                    <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                    <div/>}
+                                <button className={styles.delete}
+                                        onClick={() => this.popup(collaborator.id)}>Delete
+                                </button>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.list.map(collaborator => (
-                            <tr>
-                                <td>{collaborator.nick}</td>
-                                <td onClick={() => this.edit(collaborator.id)}>{this.state.editable === collaborator.id ?
-                                    <SelectInput id={SEL_EDIT_MODE} name={SEL_EDIT_MODE}
-                                                 options={PermissionEnumHelper.getOptions()}
-                                                 selected={collaborator.mode}/> : collaborator.mode}</td>
-                                <td>
-                                    {this.state.editable === collaborator.id ? <button className={styles.update}
-                                                                                       onClick={() => this.update(collaborator.id)}>Update</button> :
-                                        <div/>}
-                                    {this.state.editable === collaborator.id ?
-                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                        <div/>}
-                                    <button className={styles.delete}
-                                            onClick={() => this.popup(collaborator.id)}>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                    : ''}
+                    ))}
+                    </tbody>
+                </table>
             </section>
         );
     }

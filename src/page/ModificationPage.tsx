@@ -178,7 +178,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </div> : ''
                     }
 
-                    <h2>List of Modifications - {this.state.selectedContainerName}</h2>
+                    <h2>List of Modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table>
                         <thead>
                         <tr>
@@ -222,7 +222,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
                             </td>
                         </tr>
-                        {this.state.list.length > 0 && this.state.list.map(modification => (
+                        {this.state.list.map(modification => (
                             <tr key={modification.id}>
                                 {SHOW_ID ? <td>{modification.id}</td> : ''}
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?

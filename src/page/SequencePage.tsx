@@ -128,7 +128,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <h2>List of Sequences
-                        - {this.state.selectedContainerName} - {this.state.list ? this.state.list.length : 0} rows</h2>
+                        - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table>
                         <thead>
                         <tr>
@@ -197,7 +197,7 @@ class SequencePage extends ListComponent<any, ListState> {
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
                             </td>
                         </tr>
-                        {this.state.list.length > 0 && this.state.list.map(sequence => (
+                        {this.state.list.map(sequence => (
                             <tr key={sequence.id}>
                                 {SHOW_ID ? <td>{sequence.id}</td> : ''}
                                 <td>{sequence.sequenceName}</td>

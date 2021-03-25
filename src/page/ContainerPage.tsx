@@ -191,8 +191,7 @@ class ContainerPage extends ListComponent<any, State> {
                                 </Form>
                             </Formik>
 
-                            <h2>Your containers</h2>
-
+                            <h2>Your containers - {this.state.list.length} rows</h2>
                             <table>
                                 <thead>
                                 <tr>
@@ -248,8 +247,7 @@ class ContainerPage extends ListComponent<any, State> {
                         </div> : ''
                     }
 
-                    <h2>Public containers</h2>
-
+                    <h2>Public containers - {this.state.freeContainers.length} rows</h2>
                     <table>
                         <thead>
                         <tr>

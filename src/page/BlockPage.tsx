@@ -367,7 +367,7 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : ''
                     }
 
-                    <h2>List of Blocks - {this.state.selectedContainerName}</h2>
+                    <h2>List of Blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table>
                         <thead>
                         <tr>
@@ -422,7 +422,7 @@ class BlockPage extends ListComponent<any, State> {
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
                             </td>
                         </tr>
-                        {this.state.list.length > 0 && this.state.list.map(block => (
+                        {this.state.list.map(block => (
                             <tr key={block.id}>
                                 {SHOW_ID ? <td>{block.id}</td> : ''}
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?

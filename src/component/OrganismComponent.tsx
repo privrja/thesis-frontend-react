@@ -43,34 +43,39 @@ class OrganismComponent extends ListComponent<Props, ListState> {
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                 <h2>Create new Organism</h2>
-                <input type={'text'} id={'txt-new-organism'} onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'New Organism'}/>
+                <input type={'text'} id={'txt-new-organism'} onKeyDown={(e) => this.enterCall(e, this.create)}
+                       placeholder={'New Organism'}/>
                 <button onClick={this.create} className={styles.create}>Create new Family</button>
 
-                { this.state.list.length > 0 ? <h2 id={'Organisms'}>Organisms</h2> : '' }
-                {this.state.list.length > 0 ?
-                    <table>
-                        <thead>
+                <h2 id={'Organisms'}>Organisms - {this.state.list.length} rows</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
+                        <th onClick={() => this.sortBy('organism')}>Organism</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.list.map(organism => (
                         <tr>
-                            {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
-                            <th onClick={() => this.sortBy('organism')}>Organism</th>
-                            <th>Actions</th>
+                            {SHOW_ID ? <td>{organism.id}</td> : ''}
+                            <td onClick={() => this.edit(organism.id)}>{this.state.editable === organism.id ?
+                                <TextInput id={'txt-edit-organism'} name={'txt-edit-organism'}
+                                           value={organism.organism}/> : organism.organism}</td>
+                            <td>
+                                {this.state.editable === organism.id ? <button className={styles.update}
+                                                                               onClick={() => this.update(organism.id)}>Update</button> :
+                                    <div/>}
+                                {this.state.editable === organism.id ?
+                                    <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
+                                <button className={styles.delete} onClick={() => this.popup(organism.id)}>Delete
+                                </button>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.list.map(organism => (
-                            <tr>
-                                {SHOW_ID ? <td>{organism.id}</td> : ''}
-                                <td onClick={() => this.edit(organism.id)}>{this.state.editable === organism.id ? <TextInput id={'txt-edit-organism'} name={'txt-edit-organism'} value={organism.organism} /> : organism.organism}</td>
-                                <td>
-                                    {this.state.editable === organism.id ? <button className={styles.update} onClick={() => this.update(organism.id)}>Update</button> : <div/>}
-                                    {this.state.editable === organism.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
-                                    <button className={styles.delete} onClick={() => this.popup(organism.id)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                    : ''}
+                    ))}
+                    </tbody>
+                </table>
             </section>
         );
     }

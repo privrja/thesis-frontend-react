@@ -35,12 +35,12 @@ class Family extends ListComponent<Props, ListState> {
     }
 
     update(key: number): void {
-        let family  = document.getElementById('txt-edit-' + this.props.type + '-family-name') as HTMLInputElement;
+        let family = document.getElementById('txt-edit-' + this.props.type + '-family-name') as HTMLInputElement;
         this.defaultUpdate(this.getEndpointWithId(key), key, {family: family.value});
     }
 
     getName() {
-       return this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1);
+        return this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1);
     }
 
     render() {
@@ -50,34 +50,39 @@ class Family extends ListComponent<Props, ListState> {
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                 <h2>Create new {this.getName()} Family</h2>
-                <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'} onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'New Family Name'}/>
+                <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'}
+                       onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'New Family Name'}/>
                 <button onClick={this.create} className={styles.create}>Create new Family</button>
 
-                {this.state.list.length > 0 ? <h2 id={this.props.type + 'Families'}>{this.getName()} Families</h2> : ''}
-                {this.state.list.length > 0 ?
-                    <table>
-                        <thead>
+                <h2 id={this.props.type + 'Families'}>{this.getName()} Families - {this.state.list.length} rows</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
+                        <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>Family</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.list.map(family => (
                         <tr>
-                            {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
-                            <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>Family</th>
-                            <th>Actions</th>
+                            {SHOW_ID ? <td>{family.id}</td> : ''}
+                            <td onClick={() => this.edit(family.id)}>{this.state.editable === family.id ?
+                                <TextInput id={'txt-edit-' + this.props.type + '-family-name'}
+                                           name={'txt-edit-' + this.props.type + '-family-name'}
+                                           value={family.family}/> : family.family}</td>
+                            <td>
+                                {this.state.editable === family.id ? <button className={styles.update}
+                                                                             onClick={() => this.update(family.id)}>Update</button> :
+                                    <div/>}
+                                {this.state.editable === family.id ?
+                                    <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
+                                <button className={styles.delete} onClick={() => this.popup(family.id)}>Delete</button>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.list.map(family => (
-                            <tr>
-                                {SHOW_ID ? <td>{family.id}</td> : ''}
-                                <td onClick={() => this.edit(family.id)}>{this.state.editable === family.id ? <TextInput id={'txt-edit-' + this.props.type + '-family-name'} name={'txt-edit-' + this.props.type + '-family-name'} value={family.family} /> : family.family}</td>
-                                <td>
-                                    {this.state.editable === family.id ? <button className={styles.update} onClick={() => this.update(family.id)}>Update</button> : <div/>}
-                                    {this.state.editable === family.id ? <button className={styles.delete} onClick={this.editEnd}>Cancel</button> : <div/>}
-                                    <button className={styles.delete} onClick={() => this.popup(family.id)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                    : ''}
+                    ))}
+                    </tbody>
+                </table>
             </section>
         );
     }
