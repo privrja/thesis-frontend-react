@@ -5,7 +5,7 @@ import {
     CONTAINER,
     SELECTED_CONTAINER,
     SELECTED_CONTAINER_NAME,
-    TOKEN
+    TOKEN, USER_NAME
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
@@ -251,7 +251,8 @@ class ContainerPage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            {SHOW_ID ? <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th> : ''}
+                            {SHOW_ID ?
+                                <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th> : ''}
                             <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container
                                 Name
                             </th>
@@ -272,6 +273,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     }}>Select
                                     </button>
                                     <button onClick={() => this.clone(container.id)}>Clone</button>
+                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details</button> : ''}
                                     <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
                                     </button>
                                 </td>
