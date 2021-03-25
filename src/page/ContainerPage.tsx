@@ -195,10 +195,10 @@ class ContainerPage extends ListComponent<any, State> {
                             <table>
                                 <thead>
                                 <tr>
-                                    {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
-                                    <th onClick={() => this.sortBy('containerName')}>Container name</th>
-                                    <th onClick={() => this.sortBy('visibility')}>Visibility</th>
-                                    <th onClick={() => this.sortBy('mode')}>Mode</th>
+                                    {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
+                                    <th onClick={() => this.sortBy('containerName')}>Container name {this.sortIcons('containerName')}</th>
+                                    <th onClick={() => this.sortBy('visibility')}>Visibility {this.sortIcons('visibility')}</th>
+                                    <th onClick={() => this.sortBy('mode')}>Mode {this.sortIcons('mode')}</th>
                                     <th>Is selected</th>
                                     <th>Actions</th>
                                 </tr>
@@ -252,10 +252,8 @@ class ContainerPage extends ListComponent<any, State> {
                         <thead>
                         <tr>
                             {SHOW_ID ?
-                                <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id</th> : ''}
-                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container
-                                Name
-                            </th>
+                                <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id {this.sortIcons('id')}</th> : ''}
+                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container Name {this.sortIcons('containerName')}</th>
                             <th>Is selected</th>
                             <th>Actions</th>
                         </tr>

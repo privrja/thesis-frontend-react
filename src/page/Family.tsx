@@ -58,8 +58,8 @@ class Family extends ListComponent<Props, ListState> {
                 <table>
                     <thead>
                     <tr>
-                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
-                        <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>Family</th>
+                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
+                        <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>Family {this.sortIcons(this.props.type + 'FamilyName')}</th>
                         <th>Actions</th>
                     </tr>
                     </thead>

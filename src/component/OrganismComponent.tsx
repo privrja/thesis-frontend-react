@@ -51,8 +51,8 @@ class OrganismComponent extends ListComponent<Props, ListState> {
                 <table>
                     <thead>
                     <tr>
-                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id</th> : ''}
-                        <th onClick={() => this.sortBy('organism')}>Organism</th>
+                        {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
+                        <th onClick={() => this.sortBy('organism')}>Organism {this.sortIcons('organism')}</th>
                         <th>Actions</th>
                     </tr>
                     </thead>

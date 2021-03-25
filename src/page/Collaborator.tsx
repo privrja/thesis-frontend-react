@@ -151,8 +151,8 @@ class Collaborator extends ListComponent<Props, State> {
                 <table>
                     <thead>
                     <tr>
-                        <th onClick={() => this.sortBy('nick', this.getEndpoint(), this.transformation)}>User name</th>
-                        <th onClick={() => this.sortBy('mode', this.getEndpoint(), this.transformation)}>Mode</th>
+                        <th onClick={() => this.sortBy('nick', this.getEndpoint(), this.transformation)}>User name {this.sortIcons('nick')}</th>
+                        <th onClick={() => this.sortBy('mode', this.getEndpoint(), this.transformation)}>Mode {this.sortIcons('mode')}</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
