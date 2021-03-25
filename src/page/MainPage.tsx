@@ -669,15 +669,31 @@ class MainPage extends React.Component<any, SequenceState> {
                 filtered.push(block.block.databaseId);
             }
         });
-        fetch(ENDPOINT + 'smiles/similarity', {
-            method: 'POST',
-            body: JSON.stringify({
-                sequenceName: this.state.molecule?.structureName ?? '',
-                blockLengthUnique: filtered.length,
-                blockLength: data.length,
-                blocks: filtered
-            })
-        }).then(response => {
+        let token = localStorage.getItem(TOKEN);
+        let init;
+        if (token) {
+          init = {
+              method: 'POST',
+              headers: {'x-auth-token': token},
+              body: JSON.stringify({
+                  sequencename: this.state.molecule?.structureName ?? '',
+                  blocklengthunique: filtered.length,
+                  blocklength: data.length,
+                  blocks: filtered
+              })
+          };
+        } else {
+            init =  {
+                method: 'post',
+                body: JSON.stringify({
+                    sequencename: this.state.molecule?.structureName ?? '',
+                    blocklengthunique: filtered.length,
+                    blocklength: data.length,
+                    blocks: filtered
+                })
+            };
+        }
+        fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sim', init).then(response => {
             if (response.status === 200) {
                 response.json().then(simData => this.setState({family: simData}));
             }
