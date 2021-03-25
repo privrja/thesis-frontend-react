@@ -1188,7 +1188,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <TextInput name={'mass'} id={'mass'}
-                                   value={this.state.molecule?.mass ? this.state.molecule.mass.toFixed(DECIMAL_PLACES) : ''}
+                                   value={this.state.molecule?.mass ? this.state.molecule.mass.toString() : ''}
                                    className={styles.main} onKeyDown={(e) => this.enterFind(e)}
                                    onChange={this.refreshMolecule}/>
 
