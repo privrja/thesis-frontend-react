@@ -31,7 +31,7 @@ class MassSpecBlocksFinder implements IFinder {
     }
 
     findByMass(mass: number): Promise<SingleStructure[]> {
-        return Sleep.noSleepPromise();
+        return this.prepare('mass', mass.toString(), {mass: mass});
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
@@ -46,7 +46,7 @@ class MassSpecBlocksFinder implements IFinder {
         return fetch(ENDPOINT_URI + this.containerId + param, init).then(response => {
             if (response.status === 200) {
                 return response.json().then(data => data.map((sequence: any) => new SingleStructure(
-                    sequence.id,
+                    sequence.id.toString(),
                     ServerEnum.MASS_SPEC_BLOCKS,
                     sequence.sequenceName,
                     sequence.smiles,

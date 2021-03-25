@@ -70,7 +70,7 @@ class ChemSpiderFinder implements IFinder {
         }).then(response => {
             if (response.status === 200) {
                 return response.json().then(data => data.records.map((peptide: any) => new SingleStructure(
-                    peptide.id,
+                    peptide.id.toString(),
                     ServerEnum.CHEMSPIDER,
                     peptide.commonName,
                     peptide.smiles,
@@ -83,8 +83,23 @@ class ChemSpiderFinder implements IFinder {
         }).catch(() => []);
     }
 
-    findByMass(mass: number): Promise<SingleStructure[]> {
-        return Sleep.noSleepPromise();
+    async findByMass(mass: number): Promise<SingleStructure[]> {
+        let queryId = await fetch(ENDPOINT_URI + 'filter/mass', {
+                method: 'POST',
+                headers: {'apikey': this.apiKey},
+                body: JSON.stringify({mass: mass, range: 0.5})
+            }
+        ).then(response => {
+            if (response.status === 200) {
+                return response.json().then(data => data.queryId).catch(() => -1);
+            } else {
+                return [];
+            }
+        }).catch(() => -1);
+        if (queryId === -1) {
+            return [];
+        }
+        return this.jsonListResult(queryId);
     }
 
     async findByName(name: string): Promise<SingleStructure[]> {
