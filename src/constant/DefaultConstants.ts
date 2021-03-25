@@ -12,7 +12,8 @@ export const TXT_FILTER_SEQUENCE_N_MODIFICATION = 'txt-filter-sequenceNModificat
 export const TXT_FILTER_SEQUENCE_C_MODIFICATION = 'txt-filter-sequenceCModification';
 export const TXT_FILTER_SEQUENCE_B_MODIFICATION = 'txt-filter-sequenceBModification';
 export const TXT_FILTER_SEQUENCE_IDENTIFIER = 'txt-filter-sequenceIdentifier';
-export const TXT_FILTER_SEQUENCE_USAGES = 'txt-filter-usages';
+export const TXT_FILTER_SEQUENCE_USAGES_FROM = 'txt-filter-usages-from';
+export const TXT_FILTER_SEQUENCE_USAGES_TO = 'txt-filter-usages-to';
 
 export const SORT_ID = 'id';
 export const SORT_SEQUENCE_NAME = 'sequenceName';
@@ -29,3 +30,5 @@ export const SORT_B_MODIFICATION = 'bModification';
 export const SORT_IDENTIFIER = 'identifier';
 export const SORT_SEQUENCE_MASS = 'sequenceMass';
 export const SORT_USAGES = 'usages';
+export const SORT_USAGES_FROM = 'usagesFrom';
+export const SORT_USAGES_TO = 'usagesTo';

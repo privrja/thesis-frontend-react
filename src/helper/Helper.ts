@@ -16,7 +16,7 @@ import {
     SORT_SEQUENCE_MASS_FROM,
     SORT_SEQUENCE_NAME,
     SORT_SEQUENCE_TYPE,
-    SORT_SEQUNECE_MASS_TO, SORT_USAGES, TXT_FILTER_ORGANISM,
+    SORT_SEQUNECE_MASS_TO, SORT_USAGES_FROM, SORT_USAGES_TO, TXT_FILTER_ORGANISM,
     TXT_FILTER_SEQUENCE,
     TXT_FILTER_SEQUENCE_B_MODIFICATION,
     TXT_FILTER_SEQUENCE_C_MODIFICATION,
@@ -29,7 +29,7 @@ import {
     TXT_FILTER_SEQUENCE_N_MODIFICATION,
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE,
-    TXT_FILTER_SEQUENCE_USAGES
+    TXT_FILTER_SEQUENCE_USAGES_FROM, TXT_FILTER_SEQUENCE_USAGES_TO
 } from "../constant/DefaultConstants";
 import {SHOW_ID} from "../constant/Constants";
 
@@ -91,9 +91,10 @@ class Helper {
                     , SORT_IDENTIFIER, identifier.value)
                 , SORT_ORGANISM, organism.value);
         if (isUsages) {
-            let usages = document.getElementById(TXT_FILTER_SEQUENCE_USAGES) as HTMLInputElement;
-            filter = component.addFilter(filter, SORT_USAGES, usages.value)
-
+            let usagesFrom = document.getElementById(TXT_FILTER_SEQUENCE_USAGES_FROM) as HTMLInputElement;
+            filter = component.addFilter(filter, SORT_USAGES_FROM, usagesFrom.value);
+            let usagesTo = document.getElementById(TXT_FILTER_SEQUENCE_USAGES_TO) as HTMLInputElement;
+            filter = component.addFilter(filter, SORT_USAGES_TO, usagesTo.value)
         }
         component.setState({filter: filter}, component.list);
     }
@@ -112,7 +113,8 @@ class Helper {
         component.clearConcreteFilter(TXT_FILTER_SEQUENCE_B_MODIFICATION);
         component.clearConcreteFilter(TXT_FILTER_SEQUENCE_IDENTIFIER);
         if (isUsages) {
-            component.clearConcreteFilter(TXT_FILTER_SEQUENCE_USAGES);
+            component.clearConcreteFilter(TXT_FILTER_SEQUENCE_USAGES_FROM);
+            component.clearConcreteFilter(TXT_FILTER_SEQUENCE_USAGES_TO);
         }
         component.setState({lastSortOrder: undefined, lastSortParam: undefined}, component.filter);
 

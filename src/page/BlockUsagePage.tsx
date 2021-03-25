@@ -26,7 +26,7 @@ import {
     TXT_FILTER_SEQUENCE_MASS_TO,
     TXT_FILTER_SEQUENCE_N_MODIFICATION,
     TXT_FILTER_SEQUENCE_NAME,
-    TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES
+    TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES_FROM, TXT_FILTER_SEQUENCE_USAGES_TO
 } from "../constant/DefaultConstants";
 import {DECIMAL_PLACES, ENDPOINT, URL_PREFIX} from "../constant/Constants";
 import FlashType from "../component/FlashType";
@@ -202,9 +202,14 @@ class BlockUsagePage extends ListComponent<any, State> {
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)}
                                        id={TXT_FILTER_SEQUENCE_IDENTIFIER} placeholder={'Identifier'}/></td>
-                            <td><input className={styles.filter} type={'text'}
-                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_USAGES}
-                                       placeholder={'Usages'}/></td>
+                            <td>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_USAGES_FROM}
+                                       placeholder={'Usages from'}/>
+                                <input className={styles.filter} type={'text'}
+                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_USAGES_TO}
+                                       placeholder={'Usages to'}/>
+                            </td>
                             <td>
                                 <button onClick={this.filter}>Filter</button>
                                 <button className={styles.delete} onClick={this.clear}>Clear</button>
