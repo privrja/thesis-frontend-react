@@ -140,7 +140,7 @@ class Collaborator extends ListComponent<Props, State> {
                 {localStorage.getItem(TOKEN) !== null ?
                     <div>
                         <h2>Add new user to container</h2>
-                        <TextInput name={TXT_USER_ID} id={TXT_USER_ID} value={''} />
+                        <TextInput name={TXT_USER_ID} id={TXT_USER_ID} value={''} onKeyDown={(e) => this.enterCall(e, this.create)}/>
                         <label htmlFor={SEL_NEW_MODE}>Mode</label>
                         <SelectInput id={SEL_NEW_MODE} name={SEL_NEW_MODE} options={PermissionEnumHelper.getOptions()}
                                      selected={PermissionEnumHelper.getName(PermissionEnum.RW)}/>

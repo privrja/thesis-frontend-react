@@ -161,7 +161,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                                     <Field id={MODIFICATION_NAME} name={MODIFICATION_NAME}
                                            placeholder='Modification Name'/>
 
-                                    <label htmlFor={MODIFICATION_FORMULA}>Formula name:</label>
+                                    <label htmlFor={MODIFICATION_FORMULA}>Formula:</label>
                                     <Field id={MODIFICATION_FORMULA} name={MODIFICATION_FORMULA}
                                            placeholder='Modification Formula'/>
 
