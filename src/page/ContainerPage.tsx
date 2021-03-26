@@ -77,7 +77,7 @@ class ContainerPage extends ListComponent<any, State> {
     }
 
     selectContainer(containerId: number, containerName: string) {
-        this.setState({selectedContainer: containerId});
+        this.setState({selectedContainer: containerId, selectedContainerName: containerName});
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
         localStorage.setItem(SELECTED_CONTAINER_NAME, containerName);
     }
@@ -86,7 +86,10 @@ class ContainerPage extends ListComponent<any, State> {
         this.defaultCreate(this.getEndpoint(), {
             containerName: values.containerName,
             visibility: values.visibility
-        }, this.freeContainers);
+        }, (response) => {
+            let containerId = response.headers.get('Location').split('/');
+            this.selectContainer(Number(containerId[containerId.length - 1]), values.containerName);
+        });
     }
 
     delete(key: number) {
@@ -215,7 +218,7 @@ class ContainerPage extends ListComponent<any, State> {
                                                          options={visibilityOptions}
                                                          selected={container.visibility}/> : container.visibility}</td>
                                         <td>{container.mode}</td>
-                                        <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
+                                        <td>{container.id.toString() === this.state.selectedContainer.toString() ? 'Yes' : 'No'}</td>
                                         <td>
                                             {this.state.editable === container.id ? <button className={styles.update}
                                                                                             onClick={() => this.update(container.id)}>Update</button> :

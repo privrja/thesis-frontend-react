@@ -114,7 +114,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         FetchHelper.fetch(endpoint, 'GET', transformationCallback);
     }
 
-    defaultCreate(endpoint: string, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {
+    defaultCreate(endpoint: string, body: any, successCallback: (response: any) => void = () => { /* Empty on purpose */ }) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(endpoint, {
@@ -125,7 +125,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK, OK_CREATED);
                     this.list();
-                    successCallback();
+                    successCallback(response);
                 } else {
                     this.badResponse(response);
                 }
@@ -145,8 +145,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, this.findName(key) + ' updated');
-                    this.list();
                     successCallback();
+                    this.list();
                 } else {
                     this.badResponse(response);
                 }
