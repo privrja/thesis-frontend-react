@@ -1292,33 +1292,33 @@ class MainPage extends React.Component<any, SequenceState> {
                                                 onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
                                     </td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput
+                                        <TextInput className={styles.filter}
                                             value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
                                             name={TXT_EDIT_BLOCK_ACRONYM}
                                             id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput
+                                        <TextInput className={styles.filter}
                                             value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
                                             name={TXT_EDIT_BLOCK_SMILES}
                                             id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
+                                        <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.mass.toFixed(DECIMAL_PLACES) : block.block?.mass?.toFixed(DECIMAL_PLACES)) : block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.losses : block.block?.losses) : block.block?.losses ?? ''}/> : block.block?.losses}</td>
                                     <td>
                                         {this.state.editable === block.id
                                             ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                                 options={ServerEnumHelper.getOptions()}
                                                                 selected={this.state.blockEdit ? (this.state.blockEdit.source ? this.state.blockEdit.toString() : '') : block.block?.database.toString()}/>
-                                                <TextInput
+                                                <TextInput className={styles.filter}
                                                     value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
                                                     id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
                                             :
