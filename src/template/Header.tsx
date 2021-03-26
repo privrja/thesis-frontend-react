@@ -22,8 +22,7 @@ class Header extends React.Component {
     render() {
         return (
             <header>
-                <PopupYesNo label={'You need to agree with terms and conditions'} onYes={FetchHelper.conditionsOk}
-                            onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
+                <PopupYesNo label={'You need to agree with'} defaultText={'<a href=\'' + URL_PREFIX + 'condition\'>Terms and conditions</a>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
                 <div className={styles.headerContainer}>
                     <HeaderTile text={'MassSpecBlocks'} url={URL_PREFIX}/>
                     <HeaderTile text={'Containers'} url={URL_PREFIX + 'container'}/>

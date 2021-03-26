@@ -46,7 +46,7 @@ class LoginPage extends React.Component<any> {
                         this.flashRef.current!.activate(FlashType.OK);
                         Helper.resetUserStorage();
                         if (response.headers.get('x-condition') !== "1") {
-                            this.popupRef.current!.activate();
+                            this.popupRef.current!.activateWithoutText();
                         } else {
                             FetchHelper.refresh();
                         }
@@ -64,9 +64,8 @@ class LoginPage extends React.Component<any> {
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
                     <h1>Login</h1>
-
                     <Flash textBad='Login failure!' textOk='Login sucessful!' ref={this.flashRef}/>
-                    <PopupYesNo label={'You need to agree with terms and conditions'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
+                    <PopupYesNo label={'You need to agree with'} defaultText={'<a href=\'' + URL_PREFIX + 'condition\'>Terms and conditions</a>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
 
                     <Formik
                         initialValues={{

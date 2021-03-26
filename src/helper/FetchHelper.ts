@@ -60,7 +60,7 @@ class FetchHelper {
             }).then(response => {
                 if (response.status === 204) {
                     if (response.headers.get('x-condition') !== "1") {
-                        component.popupRef.current!.activate();
+                        component.popupRef.current!.activateWithoutText();
                     }
                 }
             });
