@@ -226,14 +226,14 @@ class ModificationPage extends ListComponent<any, ListState> {
                             <tr key={modification.id}>
                                 {SHOW_ID ? <td>{modification.id}</td> : ''}
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                    <TextInput value={modification.modificationName}
+                                    <TextInput className={styles.filter} value={modification.modificationName}
                                                name={TXT_EDIT_MODIFICATION_NAME}
                                                id={TXT_EDIT_MODIFICATION_NAME}/> : modification.modificationName}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                    <TextInput value={modification.modificationFormula} name={TXT_EDIT_FORMULA}
+                                    <TextInput className={styles.filter} value={modification.modificationFormula} name={TXT_EDIT_FORMULA}
                                                id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                    <TextInput
+                                    <TextInput className={styles.filter}
                                         value={modification.modificationMass.toFixed(DECIMAL_PLACES)}
                                         name={TXT_EDIT_MASS}
                                         id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>

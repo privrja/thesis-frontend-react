@@ -211,7 +211,7 @@ class ContainerPage extends ListComponent<any, State> {
                                     <tr key={container.id}>
                                         {SHOW_ID ? <td>{container.id}</td> : ''}
                                         <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                            <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
+                                            <TextInput className={styles.filter} value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
                                                        id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
                                         <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
                                             <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}

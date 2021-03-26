@@ -61,7 +61,7 @@ class OrganismComponent extends ListComponent<Props, ListState> {
                         <tr>
                             {SHOW_ID ? <td>{organism.id}</td> : ''}
                             <td onClick={() => this.edit(organism.id)}>{this.state.editable === organism.id ?
-                                <TextInput id={'txt-edit-organism'} name={'txt-edit-organism'}
+                                <TextInput className={styles.filter} id={'txt-edit-organism'} name={'txt-edit-organism'}
                                            value={organism.organism}/> : organism.organism}</td>
                             <td>
                                 {this.state.editable === organism.id ? <button className={styles.update}

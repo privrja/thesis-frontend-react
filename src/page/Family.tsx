@@ -68,7 +68,7 @@ class Family extends ListComponent<Props, ListState> {
                         <tr>
                             {SHOW_ID ? <td>{family.id}</td> : ''}
                             <td onClick={() => this.edit(family.id)}>{this.state.editable === family.id ?
-                                <TextInput id={'txt-edit-' + this.props.type + '-family-name'}
+                                <TextInput className={styles.filter} id={'txt-edit-' + this.props.type + '-family-name'}
                                            name={'txt-edit-' + this.props.type + '-family-name'}
                                            value={family.family}/> : family.family}</td>
                             <td>

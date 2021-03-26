@@ -386,8 +386,9 @@ class BlockPage extends ListComponent<any, State> {
                         <tbody>
                         <tr>
                             {SHOW_ID ? <td><input className={styles.filter} type={'text'}
-                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_ID}
-                                       placeholder={'Id'}/></td> : ''}
+                                                  onKeyDown={(e) => this.enterCall(e, this.filter)}
+                                                  id={TXT_FILTER_BLOCK_ID}
+                                                  placeholder={'Id'}/></td> : ''}
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_BLOCK_NAME}
                                        placeholder={'Name'}/></td>
@@ -426,20 +427,22 @@ class BlockPage extends ListComponent<any, State> {
                             <tr key={block.id}>
                                 {SHOW_ID ? <td>{block.id}</td> : ''}
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.blockName} name={TXT_EDIT_BLOCK_NAME}
+                                    <TextInput className={styles.filter} value={block.blockName}
+                                               name={TXT_EDIT_BLOCK_NAME}
                                                id={TXT_EDIT_BLOCK_NAME}/> : block.blockName}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.acronym} name={TXT_EDIT_ACRONYM}
+                                    <TextInput className={styles.filter} value={block.acronym} name={TXT_EDIT_ACRONYM}
                                                id={TXT_EDIT_ACRONYM}/> : block.acronym}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.formula} name={TXT_EDIT_FORMULA}
+                                    <TextInput className={styles.filter} value={block.formula} name={TXT_EDIT_FORMULA}
                                                id={TXT_EDIT_FORMULA}/> : block.formula}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.mass.toFixed(DECIMAL_PLACES).toString()}
+                                    <TextInput className={styles.filter}
+                                               value={block.mass.toFixed(DECIMAL_PLACES).toString()}
                                                name={TXT_EDIT_MASS}
                                                id={TXT_EDIT_MASS}/> : block.mass.toFixed(DECIMAL_PLACES)}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.losses} name={TXT_EDIT_LOSSES}
+                                    <TextInput className={styles.filter} value={block.losses} name={TXT_EDIT_LOSSES}
                                                id={TXT_EDIT_LOSSES}/> : block.losses}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <Creatable className={styles.creatable} isMulti={true} id={'cre-edit-family'}
@@ -447,15 +450,17 @@ class BlockPage extends ListComponent<any, State> {
                                                value={this.state.editFamily}
                                                onChange={this.familyEditChange}/> : block.family}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
-                                    <TextInput value={block.uniqueSmiles} name={TXT_EDIT_SMILES}
+                                    <TextInput className={styles.filter} value={block.uniqueSmiles}
+                                               name={TXT_EDIT_SMILES}
                                                id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
                                 <td>
                                     {this.state.editable === block.id
                                         ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                             options={ServerEnumHelper.getOptions()}
-                                                            selected={block.source?.toString()}/><TextInput
-                                            value={block.identifier} id={TXT_EDIT_IDENTIFIER}
-                                            name={TXT_EDIT_IDENTIFIER}/></div>
+                                                            selected={block.source?.toString()}/>
+                                            <TextInput className={styles.filter}
+                                                value={block.identifier} id={TXT_EDIT_IDENTIFIER}
+                                                name={TXT_EDIT_IDENTIFIER}/></div>
                                         : <a href={ServerEnumHelper.getLink(block.source, block.identifier)}
                                              target={'_blank'}
                                              rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(block.source, block.identifier)}</a>}</td>
