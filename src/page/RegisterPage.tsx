@@ -91,9 +91,9 @@ class RegisterPage extends React.Component<any, State> {
         return (
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
-                    <h1>Registration</h1>
+                    <h2>Registration</h2>
 
-                    <Flash textBad='Registration failure!' textOk='Registration sucessful!' ref={this.flashRef}/>
+                    <Flash textBad='Registration failure!' textOk='Registration successful!' ref={this.flashRef}/>
 
                     <Formik
                         initialValues={{

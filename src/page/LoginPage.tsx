@@ -63,8 +63,8 @@ class LoginPage extends React.Component<any> {
         return (
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
-                    <h1>Login</h1>
-                    <Flash textBad='Login failure!' textOk='Login sucessful!' ref={this.flashRef}/>
+                    <h2>Login</h2>
+                    <Flash textBad='Login failure!' textOk='Login successful!' ref={this.flashRef}/>
                     <PopupYesNo label={'You need to agree with'} defaultText={'<a href=\'' + URL_PREFIX + 'condition\'>Terms and conditions</a>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
 
                     <Formik
