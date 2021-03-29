@@ -158,7 +158,13 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     initializeChemSpider() {
-        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => localStorage.setItem(CHEMSPIDER_KEY, data.apiKey), () => {this.flashRef.current!.activate(FlashType.WARNING, 'ChemSpider apikey not found')});
+        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => {
+            if (data.apiKey) {
+                localStorage.setItem(CHEMSPIDER_KEY, data.apiKey);
+            } else {
+                localStorage.removeItem(CHEMSPIDER_KEY);
+            }
+        });
     }
 
     getSequenceId() {
@@ -672,18 +678,18 @@ class MainPage extends React.Component<any, SequenceState> {
         let token = localStorage.getItem(TOKEN);
         let init;
         if (token) {
-          init = {
-              method: 'POST',
-              headers: {'x-auth-token': token},
-              body: JSON.stringify({
-                  sequencename: this.state.molecule?.structureName ?? '',
-                  blocklengthunique: filtered.length,
-                  blocklength: data.length,
-                  blocks: filtered
-              })
-          };
+            init = {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({
+                    sequencename: this.state.molecule?.structureName ?? '',
+                    blocklengthunique: filtered.length,
+                    blocklength: data.length,
+                    blocks: filtered
+                })
+            };
         } else {
-            init =  {
+            init = {
                 method: 'post',
                 body: JSON.stringify({
                     sequencename: this.state.molecule?.structureName ?? '',
@@ -704,7 +710,15 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({results: [], blocks: [], family: [], organism: [], sequenceEdit: false, sequenceId: undefined, sequence: undefined});
+        this.setState({
+            results: [],
+            blocks: [],
+            family: [],
+            organism: [],
+            sequenceEdit: false,
+            sequenceId: undefined,
+            sequence: undefined
+        });
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
@@ -712,23 +726,31 @@ class MainPage extends React.Component<any, SequenceState> {
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
-        let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
-        let response;
-        if (search === SearchEnum.SMILES && database === ServerEnum.MASS_SPEC_BLOCKS) {
-            let blockStructures = smilesDrawer.buildBlockSmiles();
-            response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles.map((block: any) => block.smiles));
+        let token = localStorage.getItem(TOKEN);
+        console.log(token, apiKey);
+        if (database === ServerEnum.CHEMSPIDER && !token) {
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
+        } else if (database === ServerEnum.CHEMSPIDER && !apiKey && token) {
+            this.flashRef.current!.activate(FlashType.BAD, 'Please setup apikey');
         } else {
-            response = await SearchEnumHelper.find(search, finder, searchParam?.value);
-        }
-        if (response.length === 0) {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
-        } else if (response.length === 1) {
-            this.flashRef.current!.activate(FlashType.OK);
-            this.select(response[0], search);
-        } else {
-            this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
-            this.setState({results: response});
-            document.location.href = '#results';
+            let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
+            let response;
+            if (search === SearchEnum.SMILES && database === ServerEnum.MASS_SPEC_BLOCKS) {
+                let blockStructures = smilesDrawer.buildBlockSmiles();
+                response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles.map((block: any) => block.smiles));
+            } else {
+                response = await SearchEnumHelper.find(search, finder, searchParam?.value);
+            }
+            if (response.length === 0) {
+                this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
+            } else if (response.length === 1) {
+                this.flashRef.current!.activate(FlashType.OK);
+                this.select(response[0], search);
+            } else {
+                this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
+                this.setState({results: response});
+                document.location.href = '#results';
+            }
         }
     }
 
@@ -1188,7 +1210,8 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
-                                     options={SearchEnumHelper.getOptionsBySource(this.state.source)} onChange={this.refreshMolecule}/>
+                                     options={SearchEnumHelper.getOptionsBySource(this.state.source)}
+                                     onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
                         <TextInput name={'name'} id={'name'} value={this.state.molecule?.structureName ?? ''}
@@ -1293,25 +1316,29 @@ class MainPage extends React.Component<any, SequenceState> {
                                     </td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter}
-                                            value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
-                                            name={TXT_EDIT_BLOCK_ACRONYM}
-                                            id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
+                                                   name={TXT_EDIT_BLOCK_ACRONYM}
+                                                   id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter}
-                                            value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
-                                            name={TXT_EDIT_BLOCK_SMILES}
-                                            id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
+                                                   name={TXT_EDIT_BLOCK_SMILES}
+                                                   id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
+                                        <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME}
+                                                   id={TXT_EDIT_BLOCK_NAME}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA}
+                                                   name={TXT_EDIT_BLOCK_FORMULA}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS}
+                                                   name={TXT_EDIT_BLOCK_MASS}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.mass.toFixed(DECIMAL_PLACES) : block.block?.mass?.toFixed(DECIMAL_PLACES)) : block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_LOSSES}
+                                                   name={TXT_EDIT_BLOCK_LOSSES}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.losses : block.block?.losses) : block.block?.losses ?? ''}/> : block.block?.losses}</td>
                                     <td>
                                         {this.state.editable === block.id
@@ -1319,8 +1346,8 @@ class MainPage extends React.Component<any, SequenceState> {
                                                                 options={ServerEnumHelper.getOptions()}
                                                                 selected={this.state.blockEdit ? (this.state.blockEdit.source ? this.state.blockEdit.toString() : '') : block.block?.database.toString()}/>
                                                 <TextInput className={styles.filter}
-                                                    value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
-                                                    id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
+                                                           value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
+                                                           id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
                                             :
                                             <a href={ServerEnumHelper.getLink(Number(block.block?.database), block.block?.identifier ?? '')}
                                                target={'_blank'}
