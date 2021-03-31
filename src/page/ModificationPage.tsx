@@ -119,7 +119,9 @@ class ModificationPage extends ListComponent<any, ListState> {
     }
 
     clear() {
-        this.clearConcreteFilter(TXT_FILTER_MODIFICATION_ID);
+        if (SHOW_ID) {
+            this.clearConcreteFilter(TXT_FILTER_MODIFICATION_ID);
+        }
         this.clearConcreteFilter(TXT_FILTER_MODIFICATION_NAME);
         this.clearConcreteFilter(TXT_FILTER_MODIFICATION_FORMULA);
         this.clearConcreteFilter(TXT_FILTER_MODIFICATION_MASS_FROM);

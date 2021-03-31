@@ -293,7 +293,9 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     clear() {
-        this.clearConcreteFilter(TXT_FILTER_BLOCK_ID);
+        if (SHOW_ID) {
+            this.clearConcreteFilter(TXT_FILTER_BLOCK_ID);
+        }
         this.clearConcreteFilter(TXT_FILTER_BLOCK_NAME);
         this.clearConcreteFilter(TXT_FILTER_BLOCK_ACRONYM);
         this.clearConcreteFilter(TXT_FILTER_BLOCK_FORMULA);

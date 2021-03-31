@@ -100,7 +100,9 @@ class Helper {
     }
 
     static sequenceClear(component: any, isUsages = false) {
-        component.clearConcreteFilter(TXT_FILTER_SEQUENCE_ID);
+        if (SHOW_ID) {
+            component.clearConcreteFilter(TXT_FILTER_SEQUENCE_ID);
+        }
         component.clearConcreteFilter(TXT_FILTER_SEQUENCE_NAME);
         component.clearConcreteFilter(TXT_FILTER_SEQUENCE_TYPE);
         component.clearConcreteFilter(TXT_FILTER_SEQUENCE);
