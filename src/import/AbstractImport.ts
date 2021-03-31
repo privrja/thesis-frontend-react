@@ -1,8 +1,12 @@
-import {TOKEN} from "../constant/ApiConstants";
+import {CHEMSPIDER_KEY, TOKEN} from "../constant/ApiConstants";
 import ReferenceParser, {Reference} from "../parser/ReferenceParser";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import ContainerHelper from "../helper/ContainerHelper";
 import {ENDPOINT} from "../constant/Constants";
+import PubChemFinder from "../finder/PubChemFinder";
+import ChebiFinder from "../finder/ChebiFinder";
+import ChemSpiderFinder from "../finder/ChemSpiderFinder";
+import NorineFinder from "../finder/NorineFinder";
 
 abstract class AbstractImport {
 
@@ -112,6 +116,38 @@ abstract class AbstractImport {
     protected async finder(): Promise<boolean> {
         return true;
     }
+
+    protected async finders(identifiers: string[], chebiIds: string[], chemspiderIds: string[], norineIds: string[]) {
+        let finder = new PubChemFinder();
+        await finder.findByIdentifiers(identifiers).then(blocks => {
+            blocks.forEach(block => {
+                this.find(block.identifier).smiles = block.smiles;
+            });
+        });
+
+        let chebiFinder = new ChebiFinder();
+        await chebiFinder.findByIdentifiers(chebiIds).then(blocks => {
+            blocks.forEach(block => {
+                this.find(block.identifier).smiles = block.smiles;
+            });
+        });
+
+        let apikey = localStorage.getItem(CHEMSPIDER_KEY);
+        let chemSpiderFinder = new ChemSpiderFinder(apikey ?? '');
+        await chemSpiderFinder.findByIdentifiers(chemspiderIds).then(blocks => {
+            blocks.forEach(block => {
+                this.find(block.identifier).smiles = block.smiles;
+            });
+        });
+
+        let norineFinder = new NorineFinder();
+        await norineFinder.findByIdentifiers(norineIds).then(blocks => {
+            blocks.forEach(block => {
+                this.find(block.identifier).smiles = block.smiles;
+            });
+        });
+    }
+
 
 }
 

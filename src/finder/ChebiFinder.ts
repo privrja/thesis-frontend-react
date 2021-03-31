@@ -32,6 +32,9 @@ class ChebiFinder implements IFinder {
     }
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
+        if (id === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI, {
             method: 'POST',
             headers: {'Content-Type': 'text/xml;charset=UTF-8'},
@@ -68,6 +71,9 @@ class ChebiFinder implements IFinder {
     }
 
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
+        if(ids.length === 0) {
+            return Sleep.noSleepPromise();
+        }
         ids.unshift('');
         return fetch(ENDPOINT_URI, {
             method: 'POST',
@@ -117,6 +123,9 @@ class ChebiFinder implements IFinder {
     }
 
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
+        if (smiles === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI, {
             method: 'POST',
             headers: {'Content-Type': 'text/xml;charset=UTF-8'},
@@ -158,6 +167,9 @@ class ChebiFinder implements IFinder {
     }
 
     private getLiteEntity(search: string, category: string): Promise<SingleStructure[]> {
+        if (search === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI, {
             method: 'POST',
             headers: {'Content-Type': 'text/xml;charset=UTF-8'},

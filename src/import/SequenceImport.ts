@@ -1,7 +1,5 @@
 import AbstractImport from "./AbstractImport";
 import {ServerEnum} from "../enum/ServerEnum";
-import PubChemFinder from "../finder/PubChemFinder";
-import NorineFinder from "../finder/NorineFinder";
 
 class SequenceImport extends AbstractImport {
 
@@ -33,30 +31,24 @@ class SequenceImport extends AbstractImport {
     protected async finder(): Promise<boolean> {
         let pubChemIds: string[] = [];
         let norineIds: string[] = [];
+        let chebiIds: string[] = [];
+        let chemspiderIds: string[] = [];
         this.okStack.forEach((item: any) => {
             if (item.smiles === null && item.identifier) {
                 if (item.source === ServerEnum.PUBCHEM) {
                     pubChemIds.push(item.identifier);
                 } else if (item.source === ServerEnum.NORINE) {
                     norineIds.push(item.identifier);
+                } else if (item.source === ServerEnum.CHEBI) {
+                    chebiIds.push(item.identifier);
+                } else if (item.source === ServerEnum.CHEMSPIDER) {
+                    chemspiderIds.push(item.identifier);
                 }
             }
         });
-        let finder = new PubChemFinder();
-        await finder.findByIdentifiers(pubChemIds).then(blocks => {
-            blocks.forEach(block => {
-                this.find(block.identifier).smiles = block.smiles;
-            });
-        });
-        let norineFinder = new NorineFinder();
-        return norineFinder.findByIdentifiers(norineIds).then(async blocks => {
-            blocks.forEach(block => {
-                this.find(block.identifier).smiles = block.smiles;
-            });
-            return true;
-        });
+        await this.finders(pubChemIds, chebiIds, chemspiderIds, norineIds);
+        return true;
     }
-
 
 }
 

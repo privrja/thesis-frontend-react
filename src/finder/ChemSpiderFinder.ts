@@ -14,7 +14,7 @@ class ChemSpiderFinder implements IFinder {
     }
 
     async findByFormula(formula: string): Promise<SingleStructure[]> {
-        if (formula === "") {
+        if (formula === "" || this.apiKey === '') {
             return Sleep.noSleepPromise();
         }
         let queryId = await fetch(ENDPOINT_URI + 'filter/formula', {
@@ -35,7 +35,7 @@ class ChemSpiderFinder implements IFinder {
     }
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
-        if (id === '') {
+        if (id === '' || this.apiKey === '') {
             return Sleep.noSleepPromise();
         }
         return fetch(ENDPOINT_URI + 'records/' + id + '/details?fields=SMILES,Formula,MonoisotopicMass,CommonName', {
@@ -60,7 +60,7 @@ class ChemSpiderFinder implements IFinder {
     }
 
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
-        if (ids.length === 0) {
+        if (ids.length === 0 || this.apiKey === '') {
             return Sleep.noSleepPromise();
         }
         return fetch(ENDPOINT_URI + 'records/batch', {
@@ -84,6 +84,9 @@ class ChemSpiderFinder implements IFinder {
     }
 
     async findByMass(mass: number): Promise<SingleStructure[]> {
+        if (this.apiKey === '') {
+            return Sleep.noSleepPromise();
+        }
         let queryId = await fetch(ENDPOINT_URI + 'filter/mass', {
                 method: 'POST',
                 headers: {'apikey': this.apiKey},
@@ -103,7 +106,7 @@ class ChemSpiderFinder implements IFinder {
     }
 
     async findByName(name: string): Promise<SingleStructure[]> {
-        if (name === "") {
+        if (name === "" || this.apiKey === '') {
             return Sleep.noSleepPromise();
         }
         let queryId = await fetch(ENDPOINT_URI + '/filter/name', {
@@ -124,7 +127,7 @@ class ChemSpiderFinder implements IFinder {
     }
 
     async findBySmiles(smiles: string): Promise<SingleStructure[]> {
-        if (smiles === "") {
+        if (smiles === "" || this.apiKey === '') {
             return Sleep.noSleepPromise();
         }
         let queryId = await fetch(ENDPOINT_URI + 'filter/smiles', {

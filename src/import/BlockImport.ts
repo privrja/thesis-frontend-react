@@ -1,6 +1,5 @@
 import AbstractImport from "./AbstractImport";
 import {ServerEnum} from "../enum/ServerEnum";
-import PubChemFinder from "../finder/PubChemFinder";
 
 class BlockImport extends AbstractImport {
 
@@ -30,20 +29,24 @@ class BlockImport extends AbstractImport {
         }
     }
 
-    protected finder(): Promise<boolean> {
+    protected async finder(): Promise<boolean> {
         let identifiers: string[] = [];
+        let norineIds: string[] = [];
+        let chebiIds: string[] = [];
+        let chemspiderIds: string[] = [];
         this.okStack.forEach((item: any) => {
             if (item.smiles === null && item.source === ServerEnum.PUBCHEM && item.identifier) {
                 identifiers.push(item.identifier);
+            } else if (item.smiles === null && item.source === ServerEnum.CHEMSPIDER && item.identifier) {
+                chemspiderIds.push(item.identifier);
+            } else if (item.smiles === null && item.source === ServerEnum.CHEBI && item.identifier) {
+                chebiIds.push(item.identifier);
+            } else if (item.smiles === null && item.source === ServerEnum.NORINE && item.identifier) {
+                norineIds.push(item.identifier);
             }
         });
-        let finder = new PubChemFinder();
-        return finder.findByIdentifiers(identifiers).then(blocks => {
-            blocks.forEach(block => {
-                this.find(block.identifier).smiles = block.smiles;
-            });
-            return true;
-        });
+        await this.finders(identifiers, chebiIds, chemspiderIds, norineIds);
+        return true;
     }
 
 }

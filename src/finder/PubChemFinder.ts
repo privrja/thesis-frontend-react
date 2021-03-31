@@ -57,6 +57,9 @@ interface ListKeyResponseJson {
 class PubChemFinder implements IFinder {
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
+        if (id === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + CID_CONSTANT + id + PROPERTY_CONSTANT + PROPERTY_VALUES + FORMAT_JSON, {
                 method: 'GET'
             }
@@ -78,12 +81,18 @@ class PubChemFinder implements IFinder {
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
+        if (name === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'name/' + name + CIDS_CONSTANT + FORMAT_JSON + '?name_type=word', {
             method: 'GET',
         }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
     }
 
     findByFormula(formula: string): Promise<SingleStructure[]> {
+        if (formula === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'fastformula/' + formula + CIDS_CONSTANT + FORMAT_JSON, {
             method: 'GET'
         }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
@@ -113,6 +122,9 @@ class PubChemFinder implements IFinder {
     }
 
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
+        if (smiles === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?list_return=listkey', {
             method: 'GET'
         }).then(async response => {
@@ -138,6 +150,9 @@ class PubChemFinder implements IFinder {
     }
 
     findName(id: string, defaultName: string): Promise<string> {
+        if(id === '') {
+            return new Promise(() => defaultName);
+        }
         return fetch(ENDPOINT_URI + 'cid/' + id + '/synonyms/' + FORMAT_JSON, {
             method: 'GET',
         }).then(async response => {
