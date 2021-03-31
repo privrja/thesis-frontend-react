@@ -355,10 +355,6 @@ class MainPage extends React.Component<any, SequenceState> {
             }
             let txtSequence = document.getElementById('txt-sequence') as HTMLInputElement;
             let selSequence = document.getElementById('sel-sequence-type') as HTMLSelectElement;
-            if (!txtSequence) {
-                this.flashRef.current!.activate(FlashType.BAD, 'Building blocks is needed');
-                return;
-            }
             let sequence = {
                 sequenceName: this.state.molecule?.structureName,
                 formula: this.state.molecule?.formula,
@@ -366,10 +362,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 smiles: this.state.molecule?.smiles,
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
-                sequence: txtSequence.value,
+                sequence: txtSequence?.value ?? null,
                 decays: '[' + smilesDrawer.graph.decays.toString() + ']',
                 sequenceOriginal: this.state.sequence?.sequenceOriginal,
-                sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
+                sequenceType: SequenceEnumHelper.getName(Number(selSequence?.value)),
                 nModification: nModification,
                 cModification: cModification,
                 bModification: bModification,
