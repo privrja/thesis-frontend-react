@@ -669,7 +669,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 sameAs: null,
                 block: null
             } as BlockStructure);
-            this.setState({blocks: data}, this.drawSmiles);
+            this.setState({blocks: data});
             this.blockFinder(data, sequence);
         }
     }
