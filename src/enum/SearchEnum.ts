@@ -59,8 +59,6 @@ export class SearchEnumHelper {
                     new SelectOption(SearchEnum.FORMULA.toString(), this.getName(SearchEnum.FORMULA)),
                     new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
                 ];
-            case ServerEnum.CHEMSPIDER:
-                return this.getOptions();
             case ServerEnum.NORINE:
                 return [
                     new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
@@ -72,8 +70,9 @@ export class SearchEnumHelper {
                     new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
                 ];
             case ServerEnum.CHEBI:
-                return this.getOptions();
+            case ServerEnum.CHEMSPIDER:
             case ServerEnum.MASS_SPEC_BLOCKS:
+            default:
                 return this.getOptions();
         }
 

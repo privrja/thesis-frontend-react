@@ -9,7 +9,7 @@ import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import ChebiFinder from "../finder/ChebiFinder";
 
 export enum ServerEnum {
-    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, MASS_SPEC_BLOCKS
+    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, MASS_SPEC_BLOCKS, DOI, SIDEROPHORE_BASE, LIPID_MAPS
 }
 
 export class ServerEnumHelper {
@@ -81,6 +81,12 @@ export class ServerEnumHelper {
                 return "https://www.rcsb.org/ligand/" + identifier;
             case ServerEnum.CHEBI:
                 return "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + identifier;
+            case ServerEnum.DOI:
+                return "https://doi.org/" + identifier;
+            case ServerEnum.SIDEROPHORE_BASE:
+                return "http://bertrandsamuel.free.fr/siderophore_base/siderophore.php?id=" + identifier;
+            case ServerEnum.LIPID_MAPS:
+                return "https://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + identifier;
         }
     }
 
@@ -98,6 +104,7 @@ export class ServerEnumHelper {
             case ServerEnum.CHEMSPIDER:
                 return 'CSID: ' + identifier;
             case ServerEnum.NORINE:
+            case ServerEnum.LIPID_MAPS:
                 return identifier;
             case ServerEnum.PDB:
                 return 'PDB: ' + identifier;
@@ -105,6 +112,10 @@ export class ServerEnumHelper {
                 return 'ChEBI:' + identifier;
             case ServerEnum.MASS_SPEC_BLOCKS:
                 return 'MSB: ' + identifier;
+            case ServerEnum.DOI:
+                return 'DOI: ' + identifier;
+            case ServerEnum.SIDEROPHORE_BASE:
+                return 'SB: ' + identifier;
         }
     }
 
