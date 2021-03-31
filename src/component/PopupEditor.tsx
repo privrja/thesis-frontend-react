@@ -39,7 +39,6 @@ class PopupEditor extends React.Component<Props, State> {
             method: 'POST',
             body: JSON.stringify([{smiles: this.state.smiles}])
         }).then(response => {
-            console.log(response);
             if (response.status === 200) {
                 response.json().then(data => this.props.onClose(data[0].unique));
             } else {

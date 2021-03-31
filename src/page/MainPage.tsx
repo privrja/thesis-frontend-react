@@ -69,6 +69,7 @@ interface SequenceState {
     blockEdit?: any,
     selectedContainerName?: string;
     source: ServerEnum;
+    editorSequence: boolean;
 }
 
 interface SequenceStructure {
@@ -138,7 +139,8 @@ class MainPage extends React.Component<any, SequenceState> {
             sequenceEdit: false,
             blocksAll: [],
             selectedContainerName: ContainerHelper.getSelectedContainerName(),
-            source: ServerEnum.PUBCHEM
+            source: ServerEnum.PUBCHEM,
+            editorSequence: false
         };
     }
 
@@ -945,7 +947,17 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editorClose(smiles: string) {
-        if (this.state.editorBlockId || this.state.editorBlockId === 0) {
+        if (this.state.editorSequence) {
+            let molecule = this.state.molecule;
+            if (molecule) {
+                molecule.smiles = smiles;
+            } else {
+                molecule = this.moleculeData();
+                molecule.smiles = smiles;
+            }
+            this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+        }
+        else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
@@ -986,7 +998,7 @@ class MainPage extends React.Component<any, SequenceState> {
         }
     }
 
-    refreshMolecule() {
+    moleculeData() {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
@@ -994,7 +1006,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
         let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
         let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
-        let molecule = new SingleStructure(
+        return new SingleStructure(
             identifierInput.value,
             search,
             nameInput.value,
@@ -1002,7 +1014,12 @@ class MainPage extends React.Component<any, SequenceState> {
             formulaInput.value,
             Number(massInput.value)
         );
-        this.setState({molecule: molecule, source: search});
+    }
+
+    refreshMolecule() {
+        let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
+        let search = Number(searchInput?.options[searchInput.selectedIndex].value);
+        this.setState({molecule: this.moleculeData(), source: search});
     }
 
     removeBlock(key: number) {
@@ -1244,7 +1261,10 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <div className={styles.buttons}>
                             <button onClick={this.find}>Find</button>
-                            <button>Edit</button>
+                            <button onClick={() => {
+                                this.setState({editorSequence: true});
+                                this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
+                            }}>Edit</button>
                             <button onClick={this.canonical}>Canonical SMILES</button>
                             <button onClick={this.unique}>Unique SMILES</button>
                             <button onClick={this.buildBlocks}>Build Blocks</button>
