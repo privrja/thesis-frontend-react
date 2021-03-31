@@ -353,6 +353,10 @@ class MainPage extends React.Component<any, SequenceState> {
             }
             let txtSequence = document.getElementById('txt-sequence') as HTMLInputElement;
             let selSequence = document.getElementById('sel-sequence-type') as HTMLSelectElement;
+            if (!txtSequence) {
+                this.flashRef.current!.activate(FlashType.BAD, 'Building blocks is needed');
+                return;
+            }
             let sequence = {
                 sequenceName: this.state.molecule?.structureName,
                 formula: this.state.molecule?.formula,
@@ -727,7 +731,6 @@ class MainPage extends React.Component<any, SequenceState> {
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
         let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
         let token = localStorage.getItem(TOKEN);
-        console.log(token, apiKey);
         if (database === ServerEnum.CHEMSPIDER && !token) {
             this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
         } else if (database === ServerEnum.CHEMSPIDER && !apiKey && token) {
