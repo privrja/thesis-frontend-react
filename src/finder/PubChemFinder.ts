@@ -77,7 +77,7 @@ class PubChemFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
@@ -86,7 +86,7 @@ class PubChemFinder implements IFinder {
         }
         return fetch(ENDPOINT_URI + 'name/' + name + CIDS_CONSTANT + FORMAT_JSON + '?name_type=word', {
             method: 'GET',
-        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
+        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []).catch(() => []);
     }
 
     findByFormula(formula: string): Promise<SingleStructure[]> {
@@ -95,14 +95,14 @@ class PubChemFinder implements IFinder {
         }
         return fetch(ENDPOINT_URI + 'fastformula/' + formula + CIDS_CONSTANT + FORMAT_JSON, {
             method: 'GET'
-        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []);
+        }).then(async response => (response.status === 200) ? this.jsonListResult(response) : []).catch(() => []);
     }
 
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {
         if (ids.length === 0) {
             return Sleep.noSleepPromise();
         }
-        return fetch(ENDPOINT_URI + CID_CONSTANT + ids.join(',') + PROPERTY_CONSTANT + PROPERTY_VALUES + FORMAT_JSON, {
+        return fetch(ENDPOINT_URI + CID_CONSTANT + ids.filter((value, index) => index < 100).join(',') + PROPERTY_CONSTANT + PROPERTY_VALUES + FORMAT_JSON, {
             method: 'POST'
         }).then(async response => {
             if (response.status === 200) {
@@ -118,7 +118,7 @@ class PubChemFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
@@ -132,7 +132,7 @@ class PubChemFinder implements IFinder {
                 let json = await response.json() as ListKeyResponseJson;
                 return fetch(ENDPOINT_URI + 'smiles/' + smiles + CIDS_CONSTANT + FORMAT_JSON + '?listkey=' + json.IdentifierList.ListKey + '&listkey_start=' + 0 + '&listkey_count=200', {
                     method: 'GET'
-                }).then(async nextResponse => { return nextResponse.status === 200 ? this.jsonListResult(nextResponse) : []});
+                }).then(async nextResponse => { return nextResponse.status === 200 ? this.jsonListResult(nextResponse) : []}).catch(() => []);
             } else {
                 return [];
             }
@@ -157,7 +157,7 @@ class PubChemFinder implements IFinder {
             method: 'GET',
         }).then(async response => {
             if(response.status === 200) {
-                let json = await response.json() as NameResponse;
+                let json = await response.json().catch(() => {}) as NameResponse;
                 return json.InformationList.Information[0].Synonym[0];
             } else {
                 return defaultName;
@@ -166,7 +166,7 @@ class PubChemFinder implements IFinder {
     }
 
     private async jsonListResult(response: Response): Promise<SingleStructure[]> {
-        let json = await response.json() as ListResponseJson;
+        let json = await response.json().catch(() => {}) as ListResponseJson;
         if (json.IdentifierList.CID.length > 1) {
             return this.findByIdentifiers(json.IdentifierList.CID as []);
         } else {
