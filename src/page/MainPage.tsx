@@ -153,10 +153,6 @@ class MainPage extends React.Component<any, SequenceState> {
     componentDidUpdate() {
         this.initializeSmilesDrawers();
         this.drawSmiles();
-        let small = document.getElementsByClassName(styles.canvasSmall);
-        if (small.length > 1) {
-            SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
-        }
     }
 
     initializeChemSpider() {
@@ -284,6 +280,10 @@ class MainPage extends React.Component<any, SequenceState> {
         SmilesDrawer.parse(smiles, function (tree: any) {
             smilesDrawer.draw(tree, ELEMENT_CANVAS);
         });
+        let small = document.getElementsByClassName(styles.canvasSmall);
+        if (small.length > 0) {
+            SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
+        }
     }
 
     /**
@@ -669,7 +669,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 sameAs: null,
                 block: null
             } as BlockStructure);
-            this.setState({blocks: data});
+            this.setState({blocks: data}, this.drawSmiles);
             this.blockFinder(data, sequence);
         }
     }

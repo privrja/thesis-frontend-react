@@ -389,6 +389,7 @@ td, th {
   background-color: $primaryAColor;
   font-size: 3vh;
   cursor: pointer;
+  z-index: 99999;
 }
 
 #popupLargeSmiles {
@@ -407,6 +408,7 @@ td, th {
   border: 2px solid $colorFlashBad;
   background-color: $primaryAColor;
   font-size: 3vh;
+  z-index: 99999;
 }
 
 .canvasSmall {
