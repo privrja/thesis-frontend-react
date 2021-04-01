@@ -1,13 +1,7 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {
-    CONTAINER,
-    ELEMENT_LARGE_SMILES,
-    SEQUENCE_EDIT,
-    SEQUENCE_ID,
-    SSEQUENCE
-} from "../constant/ApiConstants";
+import {CONTAINER, ELEMENT_LARGE_SMILES, SEQUENCE_EDIT, SEQUENCE_ID, SSEQUENCE, TOKEN} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import PopupYesNo from "../component/PopupYesNo";
 import ListComponent, {ListState} from "../component/ListComponent";
@@ -15,7 +9,7 @@ import {ServerEnumHelper} from "../enum/ServerEnum";
 import Helper from "../helper/Helper";
 import FetchHelper from "../helper/FetchHelper";
 import FlashType from "../component/FlashType";
-import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
@@ -24,9 +18,13 @@ import {
     SORT_B_MODIFICATION,
     SORT_C_MODIFICATION,
     SORT_FAMILY,
-    SORT_ID, SORT_IDENTIFIER, SORT_N_MODIFICATION, SORT_ORGANISM,
+    SORT_ID,
+    SORT_IDENTIFIER,
+    SORT_N_MODIFICATION,
+    SORT_ORGANISM,
     SORT_SEQUENCE,
-    SORT_SEQUENCE_FORMULA, SORT_SEQUENCE_MASS,
+    SORT_SEQUENCE_FORMULA,
+    SORT_SEQUENCE_MASS,
     SORT_SEQUENCE_NAME,
     SORT_SEQUENCE_TYPE,
     TXT_FILTER_ORGANISM,
@@ -44,10 +42,30 @@ import {
     TXT_FILTER_SEQUENCE_TYPE
 } from "../constant/DefaultConstants";
 import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
+import TextInput from "../component/TextInput";
+import Creatable from "react-select/creatable";
+import {SelectInput} from "../component/SelectInput";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
-class SequencePage extends ListComponent<any, ListState> {
+const TXT_EDIT_SEQUENCE_NAME = 'txt-edit-sequence-name';
+const TXT_EDIT_SEQUENCE_TYPE = 'txt-edit-sequence-type';
+const TXT_EDIT_SEQUENCE_FORMULA = 'txt-edit-sequence-formula';
+const TXT_EDIT_SEQUENCE_MASS = 'txt-edit-sequence-mass';
+
+interface State extends ListState {
+    familyOptions: any[];
+    organismOptions: any[];
+    editFamily: any[];
+    editOrganism: any[];
+    lastEditBlockId: number;
+}
+
+const SEL_EDIT_SEQUENCE_SOURCE = 'sel-edit-sequence-source';
+
+const TXT_EDIT_SEQUENCE_IDENTIFIER = 'txt-edit-sequence-identifier';
+
+class SequencePage extends ListComponent<any, State> {
 
     popupSmilesRef: React.RefObject<PopupSmilesDrawer>;
 
@@ -59,15 +77,26 @@ class SequencePage extends ListComponent<any, ListState> {
         this.cloneTransformation = this.cloneTransformation.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
+        this.fetchFamily = this.fetchFamily.bind(this);
+        this.fetchOrganism = this.fetchOrganism.bind(this);
+        this.familyEditChange = this.familyEditChange.bind(this);
+        this.organismEditChange = this.organismEditChange.bind(this);
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
-            selectedContainerName: ContainerHelper.getSelectedContainerName()
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
+            familyOptions: [],
+            editFamily: [],
+            organismOptions: [],
+            editOrganism: [],
+            lastEditBlockId: -1
         };
     }
 
     componentDidMount(): void {
         super.componentDidMount();
+        this.fetchFamily();
+        this.fetchOrganism();
         Helper.resetStorage();
         const large = document.getElementById(ELEMENT_LARGE_SMILES);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
@@ -75,6 +104,32 @@ class SequencePage extends ListComponent<any, ListState> {
             height: large!.clientHeight,
             compactDrawing: false,
         });
+    }
+
+    fetchFamily() {
+        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => {
+            this.setState({
+                familyOptions: data.map((family: any) => {
+                    return {value: family.id, label: family.family}
+                })
+            })
+        });
+    }
+
+    fetchOrganism() {
+        FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism', 'GET', (data: any) => this.setState({
+            organismOptions: data.map((family: any) => {
+                return {value: family.id, label: family.family}
+            })
+        }));
+    }
+
+    familyEditChange(newValue: any) {
+        this.setState({editFamily: newValue});
+    }
+
+    organismEditChange(newValue: any) {
+        this.setState({editOrganism: newValue});
     }
 
     findName(key: number): string {
@@ -117,6 +172,19 @@ class SequencePage extends ListComponent<any, ListState> {
         SmilesDrawer.parse(smiles, function (tree: any) {
             largeSmilesDrawer.draw(tree, ELEMENT_LARGE_SMILES);
         });
+    }
+
+    edit(blockId: number, family?: string, organism?: string): void {
+        if ((organism || family) && this.state.lastEditBlockId !== blockId) {
+                this.setState({
+                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value),
+                editOrganism: (organism ?? '').split(',').map(organismName => this.state.organismOptions.find(org => org.label === organismName)).filter(value => value),
+                editable: blockId,
+                lastEditBlockId: blockId
+            });
+        } else {
+            this.setState({editable: blockId, lastEditBlockId: blockId});
+        }
     }
 
     render() {
@@ -200,22 +268,57 @@ class SequencePage extends ListComponent<any, ListState> {
                         {this.state.list.map(sequence => (
                             <tr key={sequence.id}>
                                 {SHOW_ID ? <td>{sequence.id}</td> : ''}
-                                <td>{sequence.sequenceName}</td>
-                                <td>{sequence.sequenceType}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_NAME}
+                                                 id={TXT_EDIT_SEQUENCE_NAME} value={sequence.sequenceName}/>
+                                    : sequence.sequenceName}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <TextInput className={styles.filter} id={TXT_EDIT_SEQUENCE_TYPE}
+                                                 name={TXT_EDIT_SEQUENCE_TYPE} value={sequence.sequenceType}/>
+                                    : sequence.sequenceType}</td>
                                 <td>{sequence.sequence}</td>
-                                <td>{sequence.formula}</td>
-                                <td>{sequence.mass.toFixed(DECIMAL_PLACES)}</td>
-                                <td>{sequence.family}</td>
-                                <td>{sequence.organism}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_FORMULA}
+                                                 id={TXT_EDIT_SEQUENCE_FORMULA} value={sequence.formula}/>
+                                    : sequence.formula}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_MASS}
+                                                 id={TXT_EDIT_SEQUENCE_MASS}
+                                                 value={sequence.mass.toFixed(DECIMAL_PLACES)}/>
+                                    : sequence.mass.toFixed(DECIMAL_PLACES)}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <Creatable className={styles.creatable} isMulti={true}
+                                                 id={'cre-edit-sequence-family'} options={this.state.familyOptions}
+                                                 value={this.state.editFamily} onChange={this.familyEditChange}/>
+                                    : sequence.family}</td>
+                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                    ? <Creatable className={styles.creatable} isMulti={true}
+                                                 id={'cre-edit-sequence-organism'} options={this.state.organismOptions}
+                                                 value={this.state.editOrganism} onChange={this.organismEditChange}/>
+                                    : sequence.organism}</td>
                                 <td>{sequence.nModification}</td>
                                 <td>{sequence.cModification}</td>
                                 <td>{sequence.bModification}</td>
-                                <td>{sequence.identifier ?
-                                    <a href={ServerEnumHelper.getLink(sequence.source, sequence.identifier)}
-                                       target={'_blank'}
-                                       rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : ''}
+                                <td>{this.state.editable === sequence.id
+                                    ? <div>
+                                        <SelectInput id={SEL_EDIT_SEQUENCE_SOURCE} name={SEL_EDIT_SEQUENCE_SOURCE}
+                                                     options={ServerEnumHelper.getOptions()}
+                                                     selected={sequence.source?.toString()}/>
+                                        <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_IDENTIFIER}
+                                                   id={TXT_EDIT_SEQUENCE_IDENTIFIER} value={sequence.identifier}/>
+                                    </div>
+                                    : sequence.identifier ?
+                                        <a href={ServerEnumHelper.getLink(sequence.source, sequence.identifier)}
+                                           target={'_blank'}
+                                           rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(sequence.source, sequence.identifier)}</a> : ''}
                                 </td>
                                 <td>
+                                    {this.state.editable === sequence.id ? <button className={styles.update}
+                                                                                   onClick={() => this.update(sequence.id)}>Update</button> :
+                                        <div/>}
+                                    {this.state.editable === sequence.id ?
+                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
+                                        <div/>}
                                     <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>
@@ -239,7 +342,41 @@ class SequencePage extends ListComponent<any, ListState> {
     }
 
     update(key: number): void {
-        /* Empty on purpose */
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            let name = document.getElementById(TXT_EDIT_SEQUENCE_NAME) as HTMLInputElement;
+            let type = document.getElementById(TXT_EDIT_SEQUENCE_TYPE) as HTMLInputElement;
+            let fomrula = document.getElementById(TXT_EDIT_SEQUENCE_FORMULA) as HTMLInputElement;
+            let mass = document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement;
+            let source = document.getElementById(SEL_EDIT_SEQUENCE_SOURCE) as HTMLSelectElement;
+            let identifier = document.getElementById(TXT_EDIT_SEQUENCE_IDENTIFIER) as HTMLSelectElement;
+            fetch(this.getEndpointWithId(key), {
+                method: 'PATCH',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({
+                    sequenceName: name.value,
+                    sequenceType: type.value,
+                    formula: fomrula.value,
+                    mass: mass.value === '' ? null : mass.value,
+                    source: source.value,
+                    identifier: identifier.value,
+                    family: this.state.editFamily.map((family: any) => family.value),
+                    organism: this.state.editOrganism.map((org: any) => org.value)
+                })
+            }).then(response => {
+                if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK, 'Sequence ' + this.findName(key) + ' updated');
+                    this.list();
+                } else {
+                    response.json().then(data => {
+                        this.flashRef.current!.activate(FlashType.BAD, data.message);
+                    }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+                }
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
+        this.editEnd();
     }
 
 }
