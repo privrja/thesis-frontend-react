@@ -7,6 +7,7 @@ $colorFlashOk: #72A337;
 $colorFlashBad: #F20915;
 $colorFlashPending: #FF7400;
 $colorFlashWarning: #F9FF1A;
+$colorFlashNotice: $secondaryAColor;
 
 $fontColor: #000000;
 $fontSize: 1.6vh;
@@ -346,6 +347,10 @@ td, th {
 
 .flashWarning {
   background-color: $colorFlashWarning;
+}
+
+.flashNotice {
+  background-color: $colorFlashNotice;
 }
 
 .hidden {

@@ -103,12 +103,14 @@ const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 class MainPage extends React.Component<any, SequenceState> {
 
     flashRef: React.RefObject<Flash>;
+    flashNotice: React.RefObject<Flash>;
     popupRef: React.RefObject<PopupSmilesDrawer>;
     popupEditorRef: React.RefObject<PopupEditor>;
 
     constructor(props: any, context: any) {
         super(props, context);
         this.flashRef = React.createRef();
+        this.flashNotice = React.createRef();
         this.popupRef = React.createRef();
         this.popupEditorRef = React.createRef();
         this.find = this.find.bind(this);
@@ -156,6 +158,12 @@ class MainPage extends React.Component<any, SequenceState> {
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 0) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
+        }
+        console.log(this.state.sequenceId, this.state.sequenceEdit);
+        if (this.state.sequenceEdit) {
+            this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + this.state.molecule?.structureName);
+        } else {
+            this.flashNotice.current!.deactivate();
         }
     }
 
@@ -230,6 +238,8 @@ class MainPage extends React.Component<any, SequenceState> {
                                     )
                                 }
                             }),
+                        }, () => {
+                            this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + sequence.sequenceName);
                         });
                         this.initializeSmilesDrawers(sequence.decays);
                         this.drawSmiles();
@@ -712,15 +722,18 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({
-            results: [],
-            blocks: [],
-            family: [],
-            organism: [],
-            sequenceEdit: false,
-            sequenceId: undefined,
-            sequence: undefined
-        });
+        console.log(this.state.sequence);
+        if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
+            this.setState({
+                results: [],
+                blocks: [],
+                family: [],
+                organism: [],
+                sequenceEdit: false,
+                sequenceId: undefined,
+                sequence: undefined
+            });
+        }
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
@@ -952,8 +965,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 molecule.smiles = smiles;
             }
             this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
-        }
-        else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
+        } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
@@ -1218,6 +1230,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                     <div className={styles.drawerInput}>
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+                        <Flash textBad='Failure!' textOk='Success!' ref={this.flashNotice}/>
                         <h2>{this.state.selectedContainerName}</h2>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
@@ -1260,7 +1273,8 @@ class MainPage extends React.Component<any, SequenceState> {
                             <button onClick={() => {
                                 this.setState({editorSequence: true});
                                 this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
-                            }}>Edit</button>
+                            }}>Edit
+                            </button>
                             <button onClick={this.canonical}>Canonical&nbsp;SMILES</button>
                             <button onClick={this.unique}>Unique&nbsp;SMILES</button>
                             <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
