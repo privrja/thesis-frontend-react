@@ -6,7 +6,7 @@ class LmfaParser implements IParser {
 
     parse(text: string): ParseResult {
         if (text.match('^LMFA[0-9]{8}')) {
-            return new Accept(new Reference(ServerEnum.LIPID_MAPS, text.substring(5, 8)), text.substring(12));
+            return new Accept(new Reference(ServerEnum.LIPID_MAPS, text.substring(0, 12)), text.substring(12));
         }
         return this.reject();
     }
