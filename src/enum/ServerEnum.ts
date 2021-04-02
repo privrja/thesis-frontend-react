@@ -82,9 +82,9 @@ export class ServerEnumHelper {
             case ServerEnum.DOI:
                 return 'DOI';
             case ServerEnum.SIDEROPHORE_BASE:
-                return 'SB';
+                return 'Siderophore Base';
             case ServerEnum.LIPID_MAPS:
-                return 'LMFA';
+                return 'Lipid Maps';
         }
     }
 
