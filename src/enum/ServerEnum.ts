@@ -21,6 +21,20 @@ export class ServerEnumHelper {
             new SelectOption(ServerEnum.NORINE.toString(), this.getName(ServerEnum.NORINE)),
             new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
             new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI)),
+            new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS) + (containerName ? (' - ' + containerName) : '')),
+            new SelectOption(ServerEnum.DOI.toString(), this.getName(ServerEnum.DOI)),
+            new SelectOption(ServerEnum.SIDEROPHORE_BASE.toString(), this.getName(ServerEnum.SIDEROPHORE_BASE)),
+            new SelectOption(ServerEnum.LIPID_MAPS.toString(), this.getName(ServerEnum.LIPID_MAPS))
+        ];
+    }
+
+    static getSearchOptions(containerName?: string) {
+        return [
+            new SelectOption(ServerEnum.PUBCHEM.toString(), this.getName(ServerEnum.PUBCHEM)),
+            new SelectOption(ServerEnum.CHEMSPIDER.toString(), this.getName(ServerEnum.CHEMSPIDER)),
+            new SelectOption(ServerEnum.NORINE.toString(), this.getName(ServerEnum.NORINE)),
+            new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
+            new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI)),
             new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS) + (containerName ? (' - ' + containerName) : ''))
         ];
     }
@@ -65,6 +79,12 @@ export class ServerEnumHelper {
                 return 'ChEBI';
             case ServerEnum.MASS_SPEC_BLOCKS:
                 return 'MSB';
+            case ServerEnum.DOI:
+                return 'DOI';
+            case ServerEnum.SIDEROPHORE_BASE:
+                return 'SB';
+            case ServerEnum.LIPID_MAPS:
+                return 'LMFA';
         }
     }
 

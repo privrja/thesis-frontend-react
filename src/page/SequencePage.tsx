@@ -45,13 +45,17 @@ import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constan
 import TextInput from "../component/TextInput";
 import Creatable from "react-select/creatable";
 import {SelectInput} from "../component/SelectInput";
+import {SequenceEnumHelper} from "../enum/SequenceEnum";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
 const TXT_EDIT_SEQUENCE_NAME = 'txt-edit-sequence-name';
-const TXT_EDIT_SEQUENCE_TYPE = 'txt-edit-sequence-type';
+const SEL_EDIT_SEQUENCE_TYPE = 'txt-edit-sequence-type';
 const TXT_EDIT_SEQUENCE_FORMULA = 'txt-edit-sequence-formula';
 const TXT_EDIT_SEQUENCE_MASS = 'txt-edit-sequence-mass';
+const SEL_EDIT_SEQUENCE_SOURCE = 'sel-edit-sequence-source';
+const TXT_EDIT_SEQUENCE_IDENTIFIER = 'txt-edit-sequence-identifier';
+
 
 interface State extends ListState {
     familyOptions: any[];
@@ -60,10 +64,6 @@ interface State extends ListState {
     editOrganism: any[];
     lastEditBlockId: number;
 }
-
-const SEL_EDIT_SEQUENCE_SOURCE = 'sel-edit-sequence-source';
-
-const TXT_EDIT_SEQUENCE_IDENTIFIER = 'txt-edit-sequence-identifier';
 
 class SequencePage extends ListComponent<any, State> {
 
@@ -273,8 +273,7 @@ class SequencePage extends ListComponent<any, State> {
                                                  id={TXT_EDIT_SEQUENCE_NAME} value={sequence.sequenceName}/>
                                     : sequence.sequenceName}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
-                                    ? <TextInput className={styles.filter} id={TXT_EDIT_SEQUENCE_TYPE}
-                                                 name={TXT_EDIT_SEQUENCE_TYPE} value={sequence.sequenceType}/>
+                                    ? <SelectInput className={styles.filter} id={SEL_EDIT_SEQUENCE_TYPE} name={SEL_EDIT_SEQUENCE_TYPE} options={SequenceEnumHelper.getOptions()} selected={SequenceEnumHelper.getValue(sequence.sequenceType).toString()}/>
                                     : sequence.sequenceType}</td>
                                 <td>{sequence.sequence}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
@@ -345,7 +344,7 @@ class SequencePage extends ListComponent<any, State> {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             let name = document.getElementById(TXT_EDIT_SEQUENCE_NAME) as HTMLInputElement;
-            let type = document.getElementById(TXT_EDIT_SEQUENCE_TYPE) as HTMLInputElement;
+            let type = document.getElementById(SEL_EDIT_SEQUENCE_TYPE) as HTMLSelectElement;
             let fomrula = document.getElementById(TXT_EDIT_SEQUENCE_FORMULA) as HTMLInputElement;
             let mass = document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement;
             let source = document.getElementById(SEL_EDIT_SEQUENCE_SOURCE) as HTMLSelectElement;
@@ -355,7 +354,7 @@ class SequencePage extends ListComponent<any, State> {
                 headers: {'x-auth-token': token},
                 body: JSON.stringify({
                     sequenceName: name.value,
-                    sequenceType: type.value,
+                    sequenceType: SequenceEnumHelper.getName(Number(type.value)),
                     formula: fomrula.value,
                     mass: mass.value === '' ? null : mass.value,
                     source: source.value,

@@ -1221,7 +1221,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <h2>{this.state.selectedContainerName}</h2>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getOptions(this.state.selectedContainerName)}
+                                     options={ServerEnumHelper.getSearchOptions(this.state.selectedContainerName)}
                                      onChange={this.refreshMolecule}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
@@ -1261,9 +1261,9 @@ class MainPage extends React.Component<any, SequenceState> {
                                 this.setState({editorSequence: true});
                                 this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
                             }}>Edit</button>
-                            <button onClick={this.canonical}>Canonical SMILES</button>
-                            <button onClick={this.unique}>Unique SMILES</button>
-                            <button onClick={this.buildBlocks}>Build Blocks</button>
+                            <button onClick={this.canonical}>Canonical&nbsp;SMILES</button>
+                            <button onClick={this.unique}>Unique&nbsp;SMILES</button>
+                            <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
                             <button onClick={this.save}>Save</button>
                         </div>
                     </div>
