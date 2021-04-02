@@ -10,7 +10,9 @@ class ServerNumParser implements  IParser {
         if (text.match('^CID: ')) {
             return new Accept(ServerEnum.PUBCHEM, text.substring(5));
         }
-        console.log(text, text.match('^SB: '));
+        if (text.match('^CHEBI: ')) {
+            return new Accept(ServerEnum.CHEBI, text.substring(7));
+        }
         if (text.match("^SB: ")) {
             return new Accept(ServerEnum.SIDEROPHORE_BASE, text.substring(4))
         }
