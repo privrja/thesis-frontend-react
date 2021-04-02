@@ -22,3 +22,9 @@ test('Lipid maps reference test ok', () => {
     expect(result.isAccepted()).toEqual(true);
     expect(result.getResult()).toEqual(new Reference(ServerEnum.LIPID_MAPS,'LMFA02000002'));
 });
+
+test('Lipid maps reference test bad', () => {
+    let parser = new LmfaParser();
+    let result = parser.parse('LMFA');
+    expect(result.isAccepted()).toEqual(false);
+});
