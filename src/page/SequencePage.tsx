@@ -359,8 +359,8 @@ class SequencePage extends ListComponent<any, State> {
                     mass: mass.value === '' ? null : mass.value,
                     source: source.value,
                     identifier: identifier.value,
-                    family: this.state.editFamily.map((family: any) => family.value),
-                    organism: this.state.editOrganism.map((org: any) => org.value)
+                    family: (this.state.editFamily ?? []).map((family: any) => family.value),
+                    organism: (this.state.editOrganism ?? []).map((org: any) => org.value)
                 })
             }).then(response => {
                 if (response.status === 204) {

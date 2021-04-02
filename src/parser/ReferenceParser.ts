@@ -4,6 +4,8 @@ import ServerNumReferenceParser from "./ServerNumReferenceParser";
 import PdbReferenceParser from "./PdbReferenceParser";
 import SmilesReferenceParser from "./SmilesReferenceParser";
 import NorineReferenceParser from "./NorineReferenceParser";
+import DoiParser from "./DoiParser";
+import LmfaParser from "./LmfaParser";
 
 export class Reference {
     source: ServerEnum | null = null;
@@ -41,6 +43,18 @@ class ReferenceParser implements IParser {
         let norineResult = norineParser.parse(text);
         if (norineResult.isAccepted()) {
             return norineResult;
+        }
+
+        let doiParser = new DoiParser();
+        let doiResult = doiParser.parse(text);
+        if (doiResult.isAccepted()) {
+            return doiResult;
+        }
+
+        let lmfaParser = new LmfaParser();
+        let lfmaResult = lmfaParser.parse(text);
+        if (lfmaResult.isAccepted()) {
+            return lfmaResult;
         }
         return this.reject();
     }
