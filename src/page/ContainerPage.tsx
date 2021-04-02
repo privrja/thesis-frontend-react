@@ -101,7 +101,6 @@ class ContainerPage extends ListComponent<any, State> {
         if (token) {
             let name = document.getElementById(TXT_EDIT_CONTAINER_NAME) as HTMLInputElement;
             let visibility = document.getElementById(SEL_EDIT_VISIBILITY) as HTMLSelectElement;
-
             fetch(this.getEndpointWithId(key), {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
@@ -109,6 +108,8 @@ class ContainerPage extends ListComponent<any, State> {
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Updated');
+                    this.list();
+                    this.freeContainers();
                 } else {
                     response.json().then(data => {
                         this.flashRef.current!.activate(FlashType.BAD, data.message);
@@ -116,8 +117,6 @@ class ContainerPage extends ListComponent<any, State> {
                 }
             });
             this.editEnd();
-            this.list();
-            this.freeContainers();
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
