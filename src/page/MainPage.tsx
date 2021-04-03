@@ -159,7 +159,6 @@ class MainPage extends React.Component<any, SequenceState> {
         if (small.length > 0) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
         }
-        console.log(this.state.sequenceId, this.state.sequenceEdit);
         if (this.state.sequenceEdit) {
             this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + this.state.molecule?.structureName);
         } else {
@@ -634,7 +633,7 @@ class MainPage extends React.Component<any, SequenceState> {
             decays: '[' + blockStructures.decays?.toString() + ']',
         } as SequenceStructure;
         let token = localStorage.getItem(TOKEN);
-        let endpoint = ENDPOINT + 'smiles/unique';
+        let endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles';
         let init: any = {
             method: 'POST',
             body: JSON.stringify(blockStructures.blockSmiles)
@@ -722,7 +721,6 @@ class MainPage extends React.Component<any, SequenceState> {
      * Find structures on third party databases, by data in form
      */
     async find() {
-        console.log(this.state.sequence);
         if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
             this.setState({
                 results: [],
