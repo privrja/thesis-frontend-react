@@ -150,6 +150,7 @@ class MainPage extends React.Component<any, SequenceState> {
         this.initializeSmilesDrawers();
         this.getSequenceId();
         FetchHelper.initializeChemSpider();
+        this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
     }
 
     componentDidUpdate() {
@@ -162,7 +163,7 @@ class MainPage extends React.Component<any, SequenceState> {
         if (this.state.sequenceEdit) {
             this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + this.state.molecule?.structureName);
         } else {
-            this.flashNotice.current!.deactivate();
+            this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
         }
     }
 
