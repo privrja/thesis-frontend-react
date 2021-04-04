@@ -1,8 +1,8 @@
-import {TOKEN} from "../constant/ApiConstants";
+import {CHEMSPIDER_KEY, TOKEN} from "../constant/ApiConstants";
 import FlashType from "../component/FlashType";
 import Flash from "../component/Flash";
 import Sleep from "./Sleep";
-import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import {CHEMSPIDER_ONE_KEY, ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 class FetchHelper {
 
@@ -99,6 +99,21 @@ class FetchHelper {
             window.location.href = URL_PREFIX
         });
     }
+
+    static initializeChemSpider() {
+        if (CHEMSPIDER_ONE_KEY && CHEMSPIDER_ONE_KEY.length > 0) {
+            localStorage.setItem(CHEMSPIDER_KEY, CHEMSPIDER_ONE_KEY);
+        } else {
+            FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => {
+                if (data.apiKey) {
+                    localStorage.setItem(CHEMSPIDER_KEY, data.apiKey);
+                } else {
+                    localStorage.removeItem(CHEMSPIDER_KEY);
+                }
+            });
+        }
+    }
+
 
 }
 

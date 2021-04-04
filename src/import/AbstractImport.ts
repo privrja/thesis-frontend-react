@@ -7,6 +7,7 @@ import PubChemFinder from "../finder/PubChemFinder";
 import ChebiFinder from "../finder/ChebiFinder";
 import ChemSpiderFinder from "../finder/ChemSpiderFinder";
 import NorineFinder from "../finder/NorineFinder";
+import FetchHelper from "../helper/FetchHelper";
 
 abstract class AbstractImport {
 
@@ -133,6 +134,10 @@ abstract class AbstractImport {
         });
 
         let apikey = localStorage.getItem(CHEMSPIDER_KEY);
+        if (!apikey) {
+            FetchHelper.initializeChemSpider();
+            apikey = localStorage.getItem(CHEMSPIDER_KEY);
+        }
         let chemSpiderFinder = new ChemSpiderFinder(apikey ?? '');
         await chemSpiderFinder.findByIdentifiers(chemspiderIds).then(blocks => {
             blocks.forEach(block => {

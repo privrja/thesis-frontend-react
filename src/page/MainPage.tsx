@@ -149,7 +149,7 @@ class MainPage extends React.Component<any, SequenceState> {
     componentDidMount() {
         this.initializeSmilesDrawers();
         this.getSequenceId();
-        this.initializeChemSpider();
+        FetchHelper.initializeChemSpider();
     }
 
     componentDidUpdate() {
@@ -164,16 +164,6 @@ class MainPage extends React.Component<any, SequenceState> {
         } else {
             this.flashNotice.current!.deactivate();
         }
-    }
-
-    initializeChemSpider() {
-        FetchHelper.fetch(ENDPOINT + 'chemspider/key', 'GET', (data: any) => {
-            if (data.apiKey) {
-                localStorage.setItem(CHEMSPIDER_KEY, data.apiKey);
-            } else {
-                localStorage.removeItem(CHEMSPIDER_KEY);
-            }
-        });
     }
 
     getSequenceId() {

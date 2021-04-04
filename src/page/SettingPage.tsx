@@ -6,6 +6,7 @@ import AdminComponent from "../component/AdminComponent";
 import DeleteAccount from "../component/DeleteAccount";
 import PassReset from "../component/PassReset";
 import MailReset from "../component/MailReset";
+import {CHEMSPIDER_ONE_KEY} from "../constant/Constants";
 
 class SettingPage extends React.Component<any, any> {
 
@@ -15,7 +16,8 @@ class SettingPage extends React.Component<any, any> {
                 <PasswordComponent/>
                 <PassReset/>
                 <MailReset/>
-                <ChemSpiderKey/>
+                {console.log()}
+                {CHEMSPIDER_ONE_KEY && CHEMSPIDER_ONE_KEY.length > 0 ? '' : <ChemSpiderKey/> }
                 <DeleteAccount/>
                 <AdminComponent/>
             </section>
