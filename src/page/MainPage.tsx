@@ -795,6 +795,7 @@ class MainPage extends React.Component<any, SequenceState> {
      * Convert Isomeric SMILES to canonical
      */
     canonical() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
@@ -811,10 +812,21 @@ class MainPage extends React.Component<any, SequenceState> {
         }
     }
 
+    decaysReset() {
+        if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
+            let sequence = this.state.sequence;
+            sequence.decays = '';
+            this.setState({
+                sequence: sequence
+            });
+        }
+    }
+
     /**
      * Convert SMILES to Unique SMILES
      */
     unique() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
