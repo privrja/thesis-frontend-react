@@ -641,8 +641,6 @@ class MainPage extends React.Component<any, SequenceState> {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
                         this.setState({results: [], blocks: data, sequence: sequence}, () => {this.blockFinder(data, sequence); this.similarity(data)});
-                        // this.blockFinder(data, sequence);
-                        // this.similarity(data);
                     }
                 );
             } else {
@@ -666,7 +664,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 block: null
             } as BlockStructure);
             this.setState({blocks: data, sequence: sequence}, () => this.blockFinder(data, sequence));
-            // this.blockFinder(data, sequence);
         }
     }
 
@@ -880,7 +877,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequence = this.state.sequence;
         let blocks = this.state.blocks;
         if (sequence) {
-            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value); // blbe musi byt zvlast pro konkretni a zvlast pro vsechny
+            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
         }
         if (this.state.editSame) {
             let blocksCopy = [...blocks];
