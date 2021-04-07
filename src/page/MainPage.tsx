@@ -154,7 +154,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     componentDidUpdate() {
-        this.initializeSmilesDrawers();
+        this.initializeSmilesDrawers(this.state.sequence?.decays);
         this.drawSmiles();
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 0) {
@@ -640,9 +640,9 @@ class MainPage extends React.Component<any, SequenceState> {
         fetch(endpoint, init).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
-                        this.setState({results: [], blocks: data, sequence: sequence});
-                        this.blockFinder(data, sequence);
-                        this.similarity(data);
+                        this.setState({results: [], blocks: data, sequence: sequence}, () => {this.blockFinder(data, sequence); this.similarity(data)});
+                        // this.blockFinder(data, sequence);
+                        // this.similarity(data);
                     }
                 );
             } else {
@@ -654,7 +654,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     transformSmiles(smiles: any[], sequence: SequenceStructure) {
-        let data = [];
+        let data: any[] = [];
         for (let index = 0; index < smiles.length; index++) {
             data.push({
                 id: index,
@@ -665,8 +665,8 @@ class MainPage extends React.Component<any, SequenceState> {
                 sameAs: null,
                 block: null
             } as BlockStructure);
-            this.setState({blocks: data});
-            this.blockFinder(data, sequence);
+            this.setState({blocks: data, sequence: sequence}, () => this.blockFinder(data, sequence));
+            // this.blockFinder(data, sequence);
         }
     }
 
