@@ -140,7 +140,6 @@ class ComputeHelper {
         while (formula !== '') {
             let atomResult = atomParser.parse(formula);
             if (!atomResult.isAccepted()) {
-                console.log(atomResult);
                 throw new Error('Invalid formula input');
             }
             let digitResult = digitParser.parse(atomResult.getReminder());
@@ -152,7 +151,6 @@ class ComputeHelper {
                 }
                 formula = digitResult.getReminder();
             } else {
-                console.log(digitResult, atomResult.getReminder());
                 if (map.has(atomResult.getResult())) {
                     throw new Error('Invalid formula input');
                 } else {
