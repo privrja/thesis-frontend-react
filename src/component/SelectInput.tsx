@@ -41,7 +41,7 @@ export class SelectInput extends React.Component<Props, State> {
         return (
             <select id={this.props.id} name={this.props.name} className={this.props.className} onChange={this.props.onChange ? this.props.onChange : (event) => this.setState({selected: event.target.value})}>
                 {this.props.options.map(option => (
-                    <option value={option.key} selected={option.key === this.state.selected}>{option.label} {console.log(option.key, option.label, this.state.selected)}</option>
+                    <option value={option.key} selected={option.key === this.state.selected}>{option.label}</option>
                 ))}
             </select>
         )
