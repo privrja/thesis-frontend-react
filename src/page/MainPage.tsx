@@ -65,7 +65,6 @@ interface SequenceState {
     organism: any[];
     sequenceId?: number;
     sequenceEdit: boolean;
-    databaseBlockSelect?: number;
     blocksAll: any[],
     blockEdit?: any,
     selectedContainerName?: string;
@@ -103,6 +102,8 @@ const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
 const POLYKETIDE_PREFIX = '(-2H)';
 const POLYKETIDE_PREFIX_SPACE = POLYKETIDE_PREFIX + ' ';
+const H2O = 'H2O';
+const H2 = 'H2';
 
 class MainPage extends React.Component<any, SequenceState> {
 
@@ -136,6 +137,7 @@ class MainPage extends React.Component<any, SequenceState> {
         this.similarity = this.similarity.bind(this);
         this.refreshFormula = this.refreshFormula.bind(this);
         this.refreshSmiles = this.refreshSmiles.bind(this);
+        this.blockRefreshSmiles = this.blockRefreshSmiles.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -879,7 +881,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editEnd() {
-        this.setState({editable: undefined, databaseBlockSelect: undefined, blockEdit: undefined});
+        this.setState({editable: undefined, blockEdit: undefined});
     }
 
     replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
@@ -998,7 +1000,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     method: 'POST',
                     body: JSON.stringify([{
                         smiles: smiles,
-                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
                     }])
                 }).then(response => {
                     if (response.status === 200) {
@@ -1019,7 +1021,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     method: 'POST',
                     body: JSON.stringify([{
                         smiles: smiles,
-                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
                     }])
                 }).then(response => {
                     if (response.status === 200) {
@@ -1078,6 +1080,26 @@ class MainPage extends React.Component<any, SequenceState> {
                         moleculeData.formula = data[0].formula;
                         moleculeData.mass = data[0].mass;
                         this.setState({molecule: moleculeData});
+                    }
+                });
+            }
+        });
+    }
+
+    blockRefreshFormula(event: any) {
+        (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+    }
+
+    blockRefreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{smiles: event.target.value, computeLosses: this.state.blocks.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O }])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        (document.getElementById(TXT_EDIT_BLOCK_FORMULA) as HTMLInputElement).value = data[0].formula;
+                        (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = data[0].mass;
                     }
                 });
             }
@@ -1409,7 +1431,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
-                                                   name={TXT_EDIT_BLOCK_SMILES}
+                                                   name={TXT_EDIT_BLOCK_SMILES} onChange={this.blockRefreshSmiles}
                                                    id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME}
@@ -1417,7 +1439,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA}
-                                                   name={TXT_EDIT_BLOCK_FORMULA}
+                                                   name={TXT_EDIT_BLOCK_FORMULA} onChange={this.blockRefreshFormula}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS}
