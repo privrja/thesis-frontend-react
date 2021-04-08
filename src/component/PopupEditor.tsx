@@ -12,6 +12,7 @@ interface Props {
 
 interface State {
     isActive: boolean;
+    firstSmiles: string;
     smiles: string;
 }
 
@@ -23,11 +24,11 @@ class PopupEditor extends React.Component<Props, State> {
         this.activate = this.activate.bind(this);
         this.smiles = this.smiles.bind(this);
         this.done = this.done.bind(this);
-        this.state = {isActive: false, smiles: 'CCC'};
+        this.state = {isActive: false, firstSmiles: 'CCC', smiles: 'CCC'};
     }
 
     activate(smiles: string) {
-        this.setState({isActive: true, smiles: smiles});
+        this.setState({isActive: true, firstSmiles: smiles, smiles: smiles});
     }
 
     deactivate() {
@@ -56,7 +57,7 @@ class PopupEditor extends React.Component<Props, State> {
         if (this.state.isActive) {
             return (
                 <div className={this.props.className} onClick={this.deactivate}>
-                    <Jsme height="80vh" width="50wv" options="oldlook,star" smiles={this.state.smiles}
+                    <Jsme height="80vh" width="50wv" options="oldlook,star" smiles={this.state.firstSmiles}
                           onChange={this.smiles}/>
                     <div>
                         <button onClick={this.done}>Done</button>
