@@ -141,6 +141,18 @@ class ContainerPage extends ListComponent<any, State> {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
                     this.list();
+                    let uri = response.headers.get('Location');
+                    if (uri) {
+                        let containerId = uri.split('/');
+                        fetch(uri, {
+                            method: 'GET',
+                            headers: {'x-auth-token': token ?? ''}
+                        }).then(response => {
+                            if (response.status === 200) {
+                                response.json().then(data => this.selectContainer(Number(containerId[containerId.length - 1]), data.containerName));
+                            }
+                        });
+                    }
                 } else {
                     response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
                 }
