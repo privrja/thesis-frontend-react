@@ -1364,7 +1364,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                 this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
                             }}>Edit
                             </button>
-                            <button onClick={this.canonical}>Canonical&nbsp;SMILES</button>
+                            <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
                             <button onClick={this.unique}>Unique&nbsp;SMILES</button>
                             <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
                             <button onClick={this.save}>Save</button>
