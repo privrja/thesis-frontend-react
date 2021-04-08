@@ -216,7 +216,7 @@ input {
   padding: 0.4vh;
 }
 
-input:focus, select:focus{
+input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 10px #2684ff;
   outline-color: #2684ff;
 }
@@ -277,6 +277,13 @@ select {
 textarea {
   height: 16vh;
   font-size: 1.3vh;
+  margin: 0 1vh;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(0, 0, 80);
+  padding: 0.4vh;
 }
 
 .area {
