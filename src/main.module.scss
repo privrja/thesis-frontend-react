@@ -77,7 +77,7 @@ footer {
 // ---------------------------- Page ----------------------------
 
 .page {
-  width: 90%;
+  width: 95%;
   height: fit-content;
   min-height: 90vh;
   margin: auto;
@@ -104,7 +104,7 @@ canvas {
 }
 
 .drawerArea {
-  width: 50%;
+  width: 60%;
   height: 80vh;
   margin: 1vh;
   vertical-align: top;
@@ -184,8 +184,8 @@ h1 {
 }
 
 h2 {
-  padding: 1vh;
-  margin: 1vh 0;
+  padding: 1vh 0 0 0;
+  margin: 1vh 0 0 0;
   font-size: $fontSizeHeader;
   color: $fontColor;
   text-align: center;
@@ -214,6 +214,7 @@ input {
   border-style: solid;
   border-color: hsl(0, 0, 80);
   padding: 0.4vh 0.3vh;
+  justify-content: end;
 }
 
 input:focus, select:focus, textarea:focus, button:focus {
@@ -237,11 +238,16 @@ button {
   border-style: solid;
   border-color: hsl(0, 0, 80);
   padding: 0.3vh;
+  justify-content: end;
 }
 
 button:hover {
   cursor: pointer;
   background-color: $primaryAColor;
+}
+
+.buttonMainPage {
+  margin-top: 1vh;
 }
 
 /* Create button */
@@ -269,6 +275,7 @@ select {
   border-style: solid;
   border-color: hsl(0, 0, 80);
   padding: 0.4vh 0.3vh;
+  justify-content: end;
 }
 
 .creatable {
@@ -290,6 +297,7 @@ textarea {
   border-style: solid;
   border-color: hsl(0, 0, 80);
   padding: 0.4vh 0.3vh;
+  justify-content: end;
 }
 
 .area {
@@ -315,11 +323,14 @@ textarea {
 }
 
 .drawerInput button {
-  width: 8vw;
+  width: 80%;
 }
 
 .drawerInput .buttons {
   text-align: center;
+  justify-items: center;
+  display: grid;
+  width: 100%;
 }
 
 // ---------------------------- Table ----------------------------

@@ -1358,11 +1358,11 @@ class MainPage extends React.Component<any, SequenceState> {
                                    onChange={this.refreshMolecule}/>
 
                         <div className={styles.buttons}>
-                            <button onClick={this.find}>Find</button>
+                            <button onClick={this.find} className={styles.buttonMainPage}>Find</button>
                             <button onClick={() => {
                                 this.setState({editorSequence: true});
                                 this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
-                            }}>Edit
+                            }} className={styles.buttonMainPage}>Edit
                             </button>
                             <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
                             <button onClick={this.unique}>Unique&nbsp;SMILES</button>
