@@ -79,7 +79,6 @@ footer {
 .page {
   width: 95%;
   height: fit-content;
-  min-height: 90vh;
   margin: auto;
   text-align: center;
   background-repeat: no-repeat;
@@ -241,6 +240,16 @@ button {
   justify-content: end;
 }
 
+.twoButtons {
+  box-sizing: border-box;
+  display: inline;
+}
+
+.twoButtons button {
+  box-sizing: border-box;
+  width: 39.2%;
+}
+
 button:hover {
   cursor: pointer;
   background-color: $primaryAColor;
@@ -322,15 +331,9 @@ textarea {
   margin-top: 1.5vh;
 }
 
-.drawerInput button {
-  width: 80%;
-}
-
 .drawerInput .buttons {
   text-align: center;
-  justify-items: center;
-  display: grid;
-  width: 100%;
+  margin-top: 2vh;
 }
 
 // ---------------------------- Table ----------------------------

@@ -1358,16 +1358,22 @@ class MainPage extends React.Component<any, SequenceState> {
                                    onChange={this.refreshMolecule}/>
 
                         <div className={styles.buttons}>
-                            <button onClick={this.find} className={styles.buttonMainPage}>Find</button>
-                            <button onClick={() => {
-                                this.setState({editorSequence: true});
-                                this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
-                            }} className={styles.buttonMainPage}>Edit
-                            </button>
-                            <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
-                            <button onClick={this.unique}>Unique&nbsp;SMILES</button>
-                            <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
-                            <button onClick={this.save}>Save</button>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.find}>Find</button>
+                                <button onClick={() => {
+                                    this.setState({editorSequence: true});
+                                    this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
+                                }}>Edit
+                                </button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
+                                <button onClick={this.unique}>Unique&nbsp;SMILES</button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
+                                <button onClick={this.save}>Save</button>
+                            </div>
                         </div>
                     </div>
                 </section>
