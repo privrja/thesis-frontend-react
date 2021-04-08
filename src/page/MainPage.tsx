@@ -34,7 +34,7 @@ import Sleep from "../helper/Sleep";
 import Creatable from "react-select/creatable";
 import LossesHelper from "../helper/LossesHelper";
 import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
-import ComputeHelper from "../helper/ComputeHelper";
+import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -102,8 +102,6 @@ const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
 const POLYKETIDE_PREFIX = '(-2H)';
 const POLYKETIDE_PREFIX_SPACE = POLYKETIDE_PREFIX + ' ';
-const H2O = 'H2O';
-const H2 = 'H2';
 
 class MainPage extends React.Component<any, SequenceState> {
 
@@ -988,7 +986,10 @@ class MainPage extends React.Component<any, SequenceState> {
                             molecule!.mass = data[0].mass;
                         }
                         this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
-                    }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
+                    }).catch(() => this.setState({
+                        editorSequence: false,
+                        molecule: molecule
+                    }, () => this.drawSmiles(smiles)));
                 }
             }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
@@ -1063,9 +1064,13 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     refreshFormula(event: any) {
-        let moleculeData = this.moleculeData();
-        moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
-        this.setState({molecule: moleculeData});
+        try {
+            let moleculeData = this.moleculeData();
+            moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
+            this.setState({molecule: moleculeData});
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
     }
 
     refreshSmiles(event: any) {
@@ -1087,13 +1092,20 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     blockRefreshFormula(event: any) {
-        (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        try {
+            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
     }
 
     blockRefreshSmiles(event: any) {
         fetch(ENDPOINT + 'smiles/formula', {
             method: 'POST',
-            body: JSON.stringify([{smiles: event.target.value, computeLosses: this.state.blocks.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O }])
+            body: JSON.stringify([{
+                smiles: event.target.value,
+                computeLosses: this.state.blocks.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O
+            }])
         }).then(response => {
             if (response.status === 200) {
                 response.json().then(data => {

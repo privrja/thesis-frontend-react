@@ -117,13 +117,16 @@ const PERIODIC_TABLE = {
     "Lr": 262.109802
 };
 
+export const H2O = 'H2O';
+export const H2 = 'H2';
+
 class ComputeHelper {
 
     public static computeMass(formula: string) {
         let mass = 0;
         let map = this.formulaMap(formula);
+        console.log(map);
         map.forEach((value: number, key: string) => {
-            console.log(key, value);
             // @ts-ignore
             mass += PERIODIC_TABLE[key] * value;
         });
@@ -137,6 +140,7 @@ class ComputeHelper {
         while (formula !== '') {
             let atomResult = atomParser.parse(formula);
             if (!atomResult.isAccepted()) {
+                console.log(atomResult);
                 throw new Error('Invalid formula input');
             }
             let digitResult = digitParser.parse(atomResult.getReminder());
@@ -148,6 +152,7 @@ class ComputeHelper {
                 }
                 formula = digitResult.getReminder();
             } else {
+                console.log(digitResult, atomResult.getReminder());
                 if (map.has(atomResult.getResult())) {
                     throw new Error('Invalid formula input');
                 } else {

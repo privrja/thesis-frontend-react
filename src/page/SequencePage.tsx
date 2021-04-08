@@ -46,6 +46,7 @@ import TextInput from "../component/TextInput";
 import Creatable from "react-select/creatable";
 import {SelectInput} from "../component/SelectInput";
 import {SequenceEnumHelper} from "../enum/SequenceEnum";
+import ComputeHelper from "../helper/ComputeHelper";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
@@ -187,6 +188,14 @@ class SequencePage extends ListComponent<any, State> {
         }
     }
 
+    refreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -277,7 +286,7 @@ class SequencePage extends ListComponent<any, State> {
                                     : sequence.sequenceType}</td>
                                 <td>{sequence.sequence}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
-                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_FORMULA}
+                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_FORMULA} onChange={this.refreshFormula}
                                                  id={TXT_EDIT_SEQUENCE_FORMULA} value={sequence.formula}/>
                                     : sequence.formula}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id

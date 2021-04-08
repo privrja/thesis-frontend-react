@@ -16,6 +16,7 @@ import {Field, Form, Formik, FormikHelpers} from "formik";
 import Helper from "../helper/Helper";
 import ContainerHelper from "../helper/ContainerHelper";
 import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
+import ComputeHelper from "../helper/ComputeHelper";
 
 const TXT_EDIT_MODIFICATION_NAME = 'txt-edit-modificationName';
 const TXT_EDIT_FORMULA = 'txt-edit-formula';
@@ -131,6 +132,14 @@ class ModificationPage extends ListComponent<any, ListState> {
         this.setState({lastSortOrder: undefined, lastSortParam: undefined}, this.filter);
     }
 
+    refreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -232,7 +241,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                                                name={TXT_EDIT_MODIFICATION_NAME}
                                                id={TXT_EDIT_MODIFICATION_NAME}/> : modification.modificationName}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
-                                    <TextInput className={styles.filter} value={modification.modificationFormula} name={TXT_EDIT_FORMULA}
+                                    <TextInput className={styles.filter} value={modification.modificationFormula} name={TXT_EDIT_FORMULA} onChange={this.refreshFormula}
                                                id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
                                     <TextInput className={styles.filter}
