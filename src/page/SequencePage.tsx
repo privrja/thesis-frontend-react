@@ -320,7 +320,7 @@ class SequencePage extends ListComponent<any, State> {
                                         <div/>}
                                     <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
                                     </button>
-                                    <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>
+                                    {sequence.smiles ? <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button> : ''}
                                     <button className={styles.create} onClick={() => this.clone(sequence.id)}>Clone
                                     </button>
                                     <button className={styles.delete}
