@@ -393,7 +393,8 @@ class MainPage extends React.Component<any, SequenceState> {
                         mass: block.block?.mass,
                         losses: block.block?.losses,
                         source: block.block?.database,
-                        identifier: block.block?.identifier
+                        identifier: block.block?.identifier,
+                        isPolyketide: block.isPolyketide
                     }
                 })
             };
