@@ -69,6 +69,7 @@ interface SequenceState {
     blockEdit?: any,
     selectedContainerName?: string;
     source: ServerEnum;
+    searchParam: string;
     editorSequence: boolean;
 }
 
@@ -148,6 +149,7 @@ class MainPage extends React.Component<any, SequenceState> {
             blocksAll: [],
             selectedContainerName: ContainerHelper.getSelectedContainerName(),
             source: ServerEnum.PUBCHEM,
+            searchParam: 'name',
             editorSequence: false
         };
     }
@@ -1061,7 +1063,8 @@ class MainPage extends React.Component<any, SequenceState> {
     refreshMolecule() {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
-        this.setState({molecule: this.moleculeData(), source: search});
+        let searchParam = (document.getElementById('search')) as HTMLInputElement;
+        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam.value});
     }
 
     refreshFormula(event: any) {
@@ -1329,6 +1332,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
                                      options={SearchEnumHelper.getOptionsBySource(this.state.source)}
+                                     selected={this.state.searchParam}
                                      onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
