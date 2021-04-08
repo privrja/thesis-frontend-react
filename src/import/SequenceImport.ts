@@ -15,7 +15,7 @@ class SequenceImport extends AbstractImport {
         let ref = this.getReference(parts[8]);
         this.okStack.push({
             sequenceType: parts[0],
-            sequenceName: parts[1],
+            sequenceName: parts[1].replaceAll('.', ','),
             formula: parts[2],
             mass: Number(parts[3]),
             sequence: parts[4],

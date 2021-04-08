@@ -15,7 +15,7 @@ class BlockImport extends AbstractImport {
         let ref = this.getReference(parts[5]);
         if (ref) {
             this.okStack.push({
-                blockName: parts[0],
+                blockName: parts[0].replaceAll('.', ','),
                 acronym: parts[1],
                 formula: parts[2],
                 mass: Number(parts[3]),
