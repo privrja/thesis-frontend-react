@@ -777,20 +777,20 @@ class MainPage extends React.Component<any, SequenceState> {
      */
     select(molecule: SingleStructure, search ?: number) {
         if (search === undefined) {
-            let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
+            let searchInput: HTMLSelectElement = document.getElementById('search') as HTMLSelectElement;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
         let smilesInput: HTMLTextAreaElement = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
-        smilesInput!.value = molecule.smiles ?? '';
-        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
-        formulaInput!.value = molecule.formula ?? '';
-        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-        massInput!.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
-        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-        identifierInput!.value = molecule.identifier ?? '';
-        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
+        smilesInput.value = molecule.smiles ?? '';
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
+        formulaInput.value = molecule.formula ?? '';
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
+        massInput.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
+        identifierInput.value = molecule.identifier ?? '';
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
         if (search !== SearchEnum.NAME) {
-            nameInput!.value = molecule.structureName ?? '';
+            nameInput.value = molecule.structureName ?? '';
         } else {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
