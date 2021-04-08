@@ -34,6 +34,7 @@ import Sleep from "../helper/Sleep";
 import Creatable from "react-select/creatable";
 import LossesHelper from "../helper/LossesHelper";
 import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
+import ComputeHelper from "../helper/ComputeHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -130,6 +131,7 @@ class MainPage extends React.Component<any, SequenceState> {
         this.blockDbChange = this.blockDbChange.bind(this);
         this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
         this.similarity = this.similarity.bind(this);
+        this.refreshFormula = this.refreshFormula.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -1028,6 +1030,12 @@ class MainPage extends React.Component<any, SequenceState> {
         this.setState({molecule: this.moleculeData(), source: search});
     }
 
+    refreshFormula(event: any) {
+        let moleculeData = this.moleculeData();
+        moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
+        this.setState({molecule: moleculeData});
+    }
+
     removeBlock(key: number) {
         let block = this.state.blocks.find(e => e.id === key);
         let position = this.getAcronymPosition(key);
@@ -1253,7 +1261,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
                                    className={styles.main} onKeyDown={(e) => this.enterFind(e)}
-                                   onChange={this.refreshMolecule}/>
+                                   onChange={this.refreshFormula}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <TextInput name={'mass'} id={'mass'}

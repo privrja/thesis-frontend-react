@@ -1,5 +1,4 @@
-import AtomParser from "../parser/AtomParser";
-import DigitParser from "../parser/DigitParser";
+import ComputeHelper from "./ComputeHelper";
 
 class LossesHelper {
 
@@ -12,31 +11,11 @@ class LossesHelper {
     }
 
     static removeFromFormula(formula: string, removeWater: boolean): string {
-        let tmpFormula = formula;
-        let map = new Map();
-        let atomParser = new AtomParser();
-        let digitParser = new DigitParser();
-        while (formula !== '') {
-            let atomResult = atomParser.parse(formula);
-            if (!atomResult.isAccepted()) {
-                return tmpFormula;
-            }
-            let digitResult = digitParser.parse(atomResult.getReminder());
-            if (digitResult.isAccepted()) {
-                if (map.has(atomResult.getResult())) {
-                    return tmpFormula;
-                } else {
-                    map.set(atomResult.getResult(), digitResult.getResult());
-                }
-                formula = digitResult.getReminder();
-            } else {
-                if (map.has(atomResult.getResult())) {
-                    return tmpFormula
-                } else {
-                    map.set(atomResult.getResult(), 1);
-                }
-                formula = atomResult.getReminder();
-            }
+        let map;
+        try {
+            map = ComputeHelper.formulaMap(formula);
+        } catch (e) {
+            return formula;
         }
         LossesHelper.removeAtom('H', 2, map);
         if (removeWater) {
