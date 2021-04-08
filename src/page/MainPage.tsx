@@ -101,6 +101,9 @@ const SEL_EDIT_SOURCE = 'sel-edit-source';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
 const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
+const POLYKETIDE_PREFIX = '(-2H)';
+const POLYKETIDE_PREFIX_SPACE = POLYKETIDE_PREFIX + ' ';
+
 class MainPage extends React.Component<any, SequenceState> {
 
     flashRef: React.RefObject<Flash>;
@@ -132,6 +135,7 @@ class MainPage extends React.Component<any, SequenceState> {
         this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
         this.similarity = this.similarity.bind(this);
         this.refreshFormula = this.refreshFormula.bind(this);
+        this.refreshSmiles = this.refreshSmiles.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -477,7 +481,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         blockData[e.sameAs].block?.smiles ?? '',
                         blockData[e.sameAs].block?.formula ?? '',
                         blockData[e.sameAs].block?.mass ?? 0
-                    );
+                );
                 }
             });
             return blockData;
@@ -505,10 +509,11 @@ class MainPage extends React.Component<any, SequenceState> {
                             smiles: item.smiles,
                             unique: item.unique,
                             sameAs: null,
+                            isPolyketide: item.isPolyketide,
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + name,
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
@@ -523,10 +528,11 @@ class MainPage extends React.Component<any, SequenceState> {
                                 smiles: item.smiles,
                                 unique: item.unique,
                                 sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
                                 block: {
                                     identifier: item.block.identifier,
                                     database: item.block.database,
-                                    structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + item.block.structureName,
+                                    structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + item.block.structureName,
                                     smiles: item.block.smiles,
                                     formula: item.block.formula,
                                     mass: item.block.mass
@@ -540,10 +546,11 @@ class MainPage extends React.Component<any, SequenceState> {
                                 smiles: item.smiles,
                                 unique: item.unique,
                                 sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
                                 block: {
                                     identifier: '',
                                     database: -1,
-                                    structureName: (item.isPolyketide ? '(-2H) ' : ''),
+                                    structureName: (item.isPolyketide ? POLYKETIDE_PREFIX_SPACE : ''),
                                     smiles: item.smiles,
                                     formula: '',
                                     mass: 0
@@ -663,7 +670,8 @@ class MainPage extends React.Component<any, SequenceState> {
                 smiles: smiles[index].smiles,
                 unique: smiles[index].smiles,
                 sameAs: null,
-                block: null
+                block: null,
+                isPolyketide: smiles[index].isPolyketide
             } as BlockStructure);
             this.setState({blocks: data, sequence: sequence}, () => this.blockFinder(data, sequence));
         }
@@ -901,6 +909,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
                 blocks[block.id].unique = smiles.value;
+                blocks[block.id].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
                 if (!blocks[block.id].block) {
                     blocks[block.id].block = new SingleStructure(
                         identifier.value,
@@ -928,6 +937,7 @@ class MainPage extends React.Component<any, SequenceState> {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
             blocks[blockId].unique = smiles.value;
+            blocks[blockId].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
             if (!blocks[blockId].block) {
                 blocks[blockId].block = new SingleStructure(
                     identifier.value,
@@ -970,9 +980,10 @@ class MainPage extends React.Component<any, SequenceState> {
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
                 let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
+                console.log(this.state.blocks, this.state.editorBlockId);
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles}])
+                    body: JSON.stringify([{smiles: smiles, computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"}])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
@@ -990,7 +1001,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 let blockId = this.state.editorBlockId;
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles}])
+                    body: JSON.stringify([{smiles: smiles, computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"}])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
@@ -1034,6 +1045,24 @@ class MainPage extends React.Component<any, SequenceState> {
         let moleculeData = this.moleculeData();
         moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
         this.setState({molecule: moleculeData});
+    }
+
+    refreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{smiles: event.target.value, computeLosses: 'None'}])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        let moleculeData = this.moleculeData();
+                        moleculeData.formula = data[0].formula;
+                        moleculeData.mass = data[0].mass;
+                        this.setState({molecule: moleculeData});
+                    }
+                });
+            }
+        });
     }
 
     removeBlock(key: number) {
@@ -1256,7 +1285,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
                                   value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
-                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
+                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}

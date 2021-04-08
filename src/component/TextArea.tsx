@@ -6,7 +6,7 @@ interface Props {
     value: string;
     size?: number;
     className?: string;
-    onChange?: () => void;
+    onChange?: (e: any) => void;
     onKeyDown?: (e: any) => void;
     onInput?: () => void;
 }
@@ -34,7 +34,7 @@ class TextArea extends React.Component<Props, State> {
     handleChange(event: any) {
         this.setState({value: event.target.value});
         if (this.props.onChange) {
-            this.props.onChange();
+            this.props.onChange(event);
         }
     }
 
