@@ -338,9 +338,14 @@ textarea {
 
 // ---------------------------- Table ----------------------------
 
-table {
+.tableLarge {
   margin: 0;
   width: 100%;
+  text-align: center;
+}
+
+table {
+  margin: 0 auto;
   text-align: center;
 }
 

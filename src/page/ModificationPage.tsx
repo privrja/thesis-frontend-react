@@ -190,7 +190,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                     }
 
                     <h2>List of Modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
-                    <table>
+                    <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}

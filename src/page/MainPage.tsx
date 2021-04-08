@@ -1415,7 +1415,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                                onFamilyChange={(family: any[]) => this.setState({family: family})}
                                                onOrganismChange={(organism: any[]) => this.setState({organism: organism})}
                                                organism={this.state.organism}/>
-                        <table>
+                        <table className={styles.tableLarge}>
                             <thead>
                             <tr>
                                 <th>MSB acronym</th>
