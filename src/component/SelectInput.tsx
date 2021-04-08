@@ -31,11 +31,17 @@ export class SelectInput extends React.Component<Props, State> {
         this.state = {selected: props.selected ?? this.props.options[0].key};
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.selected !== this.props.selected && this.props.selected) {
+            this.setState({selected: this.props.selected});
+        }
+    }
+
     render() {
         return (
             <select id={this.props.id} name={this.props.name} className={this.props.className} onChange={this.props.onChange ? this.props.onChange : (event) => this.setState({selected: event.target.value})}>
                 {this.props.options.map(option => (
-                    <option value={option.key} selected={option.key === this.state.selected}>{option.label}</option>
+                    <option value={option.key} selected={option.key === this.state.selected}>{option.label} {console.log(option.key, option.label, this.state.selected)}</option>
                 ))}
             </select>
         )

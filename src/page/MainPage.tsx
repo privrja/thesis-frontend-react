@@ -1063,8 +1063,8 @@ class MainPage extends React.Component<any, SequenceState> {
     refreshMolecule() {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
-        let searchParam = (document.getElementById('search')) as HTMLInputElement;
-        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam.value});
+        let searchParam = (document.getElementById('search')) as HTMLSelectElement;
+        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam?.options[searchParam.selectedIndex].value});
     }
 
     refreshFormula(event: any) {
