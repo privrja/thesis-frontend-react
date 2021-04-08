@@ -481,7 +481,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         blockData[e.sameAs].block?.smiles ?? '',
                         blockData[e.sameAs].block?.formula ?? '',
                         blockData[e.sameAs].block?.mass ?? 0
-                );
+                    );
                 }
             });
             return blockData;
@@ -649,7 +649,10 @@ class MainPage extends React.Component<any, SequenceState> {
         fetch(endpoint, init).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
-                        this.setState({results: [], blocks: data, sequence: sequence}, () => {this.blockFinder(data, sequence); this.similarity(data)});
+                        this.setState({results: [], blocks: data, sequence: sequence}, () => {
+                            this.blockFinder(data, sequence);
+                            this.similarity(data)
+                        });
                     }
                 );
             } else {
@@ -968,22 +971,35 @@ class MainPage extends React.Component<any, SequenceState> {
     editorClose(smiles: string) {
         if (this.state.editorSequence) {
             let molecule = this.state.molecule;
-            if (molecule) {
-                molecule.smiles = smiles;
-            } else {
+            if (!molecule) {
                 molecule = this.moleculeData();
-                molecule.smiles = smiles;
             }
-            this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+            molecule.smiles = smiles;
+            fetch(ENDPOINT + 'smiles/formula', {
+                method: 'POST',
+                body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        if (data.length > 0) {
+                            molecule!.formula = data[0].formula;
+                            molecule!.mass = data[0].mass;
+                        }
+                        this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+                    }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
+                }
+            }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
                 let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
-                console.log(this.state.blocks, this.state.editorBlockId);
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles, computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"}])
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"
+                    }])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
@@ -1001,7 +1017,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 let blockId = this.state.editorBlockId;
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles, computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"}])
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? "H2" : "H2O"
+                    }])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
