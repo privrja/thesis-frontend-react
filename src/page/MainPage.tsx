@@ -985,8 +985,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 if (response.status === 200) {
                     response.json().then(data => {
                         if (data.length > 0) {
-                            molecule!.formula = data[0].formula;
-                            molecule!.mass = data[0].mass;
+                            if (molecule) {
+                                molecule.formula = data[0].formula;
+                                molecule.mass = data[0].mass;
+                            }
                         }
                         this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
                     }).catch(() => this.setState({

@@ -157,8 +157,12 @@ class PubChemFinder implements IFinder {
             method: 'GET',
         }).then(async response => {
             if(response.status === 200) {
-                let json = await response.json().catch(() => {}) as NameResponse;
-                return json.InformationList.Information[0].Synonym[0];
+                let json = await response.json().catch(() => { /* On purpose*/ }) as NameResponse;
+                if (json.InformationList.Information.length > 0 && json.InformationList.Information[0].Synonym.length > 0) {
+                    return json.InformationList.Information[0].Synonym[0];
+                } else {
+                    return defaultName;
+                }
             } else {
                 return defaultName;
             }
@@ -166,11 +170,13 @@ class PubChemFinder implements IFinder {
     }
 
     private async jsonListResult(response: Response): Promise<SingleStructure[]> {
-        let json = await response.json().catch(() => {}) as ListResponseJson;
+        let json = await response.json().catch(() => { /* On purpose */ }) as ListResponseJson;
         if (json.IdentifierList.CID.length > 1) {
             return this.findByIdentifiers(json.IdentifierList.CID as []);
-        } else {
+        } else if (json.IdentifierList.CID.length > 0) {
             return this.findByIdentifier(json.IdentifierList.CID[0].toString());
+        } else {
+            return [];
         }
     }
 
