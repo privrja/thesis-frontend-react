@@ -30,6 +30,8 @@ function App() {
                 <title>MassSpecBlocks</title>
             </Helmet>
 
+            <base href={URL_PREFIX} />
+
             <Router>
                 <Route exact path={URL_PREFIX} component={MainPage}/>
                 <Route path={URL_PREFIX + 'login/'} component={LoginPage}/>
