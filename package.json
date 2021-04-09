@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.13.15",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
@@ -23,7 +24,6 @@
     "async-parallel": "^1.2.3",
     "file-saver": "^2.0.5",
     "formik": "^2.1.5",
-    "fs-extra": "^9.0.1",
     "html-react-parser": "latest",
     "jsme-editor": "^0.8.2",
     "jsme-react": "0.0.9",
