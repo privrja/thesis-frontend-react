@@ -143,13 +143,13 @@ class ContainerPage extends ListComponent<any, State> {
                     this.list();
                     let uri = response.headers.get('Location');
                     if (uri) {
-                        let containerId = uri.split('/');
+                        let containerIdArray = uri.split('/');
                         fetch(uri, {
                             method: 'GET',
                             headers: {'x-auth-token': token ?? ''}
-                        }).then(response => {
-                            if (response.status === 200) {
-                                response.json().then(data => this.selectContainer(Number(containerId[containerId.length - 1]), data.containerName));
+                        }).then(responseCloned => {
+                            if (responseCloned.status === 200) {
+                                responseCloned.json().then(data => this.selectContainer(Number(containerIdArray[containerIdArray.length - 1]), data.containerName));
                             }
                         });
                     }
