@@ -46,6 +46,7 @@ import TextInput from "../component/TextInput";
 import Creatable from "react-select/creatable";
 import {SelectInput} from "../component/SelectInput";
 import {SequenceEnumHelper} from "../enum/SequenceEnum";
+import ComputeHelper from "../helper/ComputeHelper";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
 
@@ -187,6 +188,14 @@ class SequencePage extends ListComponent<any, State> {
         }
     }
 
+    refreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -197,7 +206,7 @@ class SequencePage extends ListComponent<any, State> {
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
                     <h2>List of Sequences
                         - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
-                    <table>
+                    <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
@@ -268,16 +277,16 @@ class SequencePage extends ListComponent<any, State> {
                         {this.state.list.map(sequence => (
                             <tr key={sequence.id}>
                                 {SHOW_ID ? <td>{sequence.id}</td> : ''}
-                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                <td className={styles.tdSequenceName} onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_NAME}
                                                  id={TXT_EDIT_SEQUENCE_NAME} value={sequence.sequenceName}/>
                                     : sequence.sequenceName}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <SelectInput className={styles.filter} id={SEL_EDIT_SEQUENCE_TYPE} name={SEL_EDIT_SEQUENCE_TYPE} options={SequenceEnumHelper.getOptions()} selected={SequenceEnumHelper.getValue(sequence.sequenceType).toString()}/>
                                     : sequence.sequenceType}</td>
-                                <td>{sequence.sequence}</td>
+                                <td className={styles.tdSequence}>{sequence.sequence}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
-                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_FORMULA}
+                                    ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_FORMULA} onChange={this.refreshFormula}
                                                  id={TXT_EDIT_SEQUENCE_FORMULA} value={sequence.formula}/>
                                     : sequence.formula}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
@@ -320,7 +329,7 @@ class SequencePage extends ListComponent<any, State> {
                                         <div/>}
                                     <button className={styles.update} onClick={() => this.detail(sequence.id)}>Detail
                                     </button>
-                                    <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button>
+                                    {sequence.smiles ? <button onClick={() => this.showLargeSmiles(sequence.smiles)}>Show</button> : ''}
                                     <button className={styles.create} onClick={() => this.clone(sequence.id)}>Clone
                                     </button>
                                     <button className={styles.delete}

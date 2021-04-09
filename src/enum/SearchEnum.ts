@@ -35,6 +35,22 @@ export class SearchEnumHelper {
         }
     }
 
+    static getValue(name: string) {
+        switch (name) {
+            default:
+            case 'name':
+                return SearchEnum.NAME;
+            case 'smiles':
+                return SearchEnum.SMILES;
+            case 'formula':
+                return SearchEnum.FORMULA;
+            case 'mass':
+                return SearchEnum.MASS;
+            case 'identifier':
+                return SearchEnum.IDENTIFIER;
+        }
+    }
+
     static find(value: SearchEnum, finder: IFinder, param: any): Promise<SingleStructure[]> {
         switch (value) {
             case SearchEnum.NAME:

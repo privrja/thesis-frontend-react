@@ -34,6 +34,7 @@ import Sleep from "../helper/Sleep";
 import Creatable from "react-select/creatable";
 import LossesHelper from "../helper/LossesHelper";
 import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
+import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -64,11 +65,11 @@ interface SequenceState {
     organism: any[];
     sequenceId?: number;
     sequenceEdit: boolean;
-    databaseBlockSelect?: number;
     blocksAll: any[],
     blockEdit?: any,
     selectedContainerName?: string;
     source: ServerEnum;
+    searchParam: string;
     editorSequence: boolean;
 }
 
@@ -100,6 +101,9 @@ const SEL_EDIT_SOURCE = 'sel-edit-source';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
 const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
+const POLYKETIDE_PREFIX = '(-2H)';
+const POLYKETIDE_PREFIX_SPACE = POLYKETIDE_PREFIX + ' ';
+
 class MainPage extends React.Component<any, SequenceState> {
 
     flashRef: React.RefObject<Flash>;
@@ -130,6 +134,9 @@ class MainPage extends React.Component<any, SequenceState> {
         this.blockDbChange = this.blockDbChange.bind(this);
         this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
         this.similarity = this.similarity.bind(this);
+        this.refreshFormula = this.refreshFormula.bind(this);
+        this.refreshSmiles = this.refreshSmiles.bind(this);
+        this.blockRefreshSmiles = this.blockRefreshSmiles.bind(this);
         this.state = {
             results: [],
             blocks: [],
@@ -142,6 +149,7 @@ class MainPage extends React.Component<any, SequenceState> {
             blocksAll: [],
             selectedContainerName: ContainerHelper.getSelectedContainerName(),
             source: ServerEnum.PUBCHEM,
+            searchParam: 'name',
             editorSequence: false
         };
     }
@@ -154,7 +162,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     componentDidUpdate() {
-        this.initializeSmilesDrawers();
+        this.initializeSmilesDrawers(this.state.sequence?.decays);
         this.drawSmiles();
         let small = document.getElementsByClassName(styles.canvasSmall);
         if (small.length > 0) {
@@ -387,7 +395,8 @@ class MainPage extends React.Component<any, SequenceState> {
                         mass: block.block?.mass,
                         losses: block.block?.losses,
                         source: block.block?.database,
-                        identifier: block.block?.identifier
+                        identifier: block.block?.identifier,
+                        isPolyketide: block.isPolyketide
                     }
                 })
             };
@@ -503,10 +512,11 @@ class MainPage extends React.Component<any, SequenceState> {
                             smiles: item.smiles,
                             unique: item.unique,
                             sameAs: null,
+                            isPolyketide: item.isPolyketide,
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + name,
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
@@ -521,10 +531,11 @@ class MainPage extends React.Component<any, SequenceState> {
                                 smiles: item.smiles,
                                 unique: item.unique,
                                 sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
                                 block: {
                                     identifier: item.block.identifier,
                                     database: item.block.database,
-                                    structureName: (item.isPolyketide && !item.block.structureName.includes('(-2H)') ? '(-2H) ' : '') + item.block.structureName,
+                                    structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + item.block.structureName,
                                     smiles: item.block.smiles,
                                     formula: item.block.formula,
                                     mass: item.block.mass
@@ -538,10 +549,11 @@ class MainPage extends React.Component<any, SequenceState> {
                                 smiles: item.smiles,
                                 unique: item.unique,
                                 sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
                                 block: {
                                     identifier: '',
                                     database: -1,
-                                    structureName: (item.isPolyketide ? '(-2H) ' : ''),
+                                    structureName: (item.isPolyketide ? POLYKETIDE_PREFIX_SPACE : ''),
                                     smiles: item.smiles,
                                     formula: '',
                                     mass: 0
@@ -640,9 +652,10 @@ class MainPage extends React.Component<any, SequenceState> {
         fetch(endpoint, init).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
-                        this.setState({results: [], blocks: data, sequence: sequence});
-                        this.blockFinder(data, sequence);
-                        this.similarity(data);
+                        this.setState({results: [], blocks: data, sequence: sequence}, () => {
+                            this.blockFinder(data, sequence);
+                            this.similarity(data)
+                        });
                     }
                 );
             } else {
@@ -654,7 +667,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     transformSmiles(smiles: any[], sequence: SequenceStructure) {
-        let data = [];
+        let data: any[] = [];
         for (let index = 0; index < smiles.length; index++) {
             data.push({
                 id: index,
@@ -663,10 +676,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 smiles: smiles[index].smiles,
                 unique: smiles[index].smiles,
                 sameAs: null,
-                block: null
+                block: null,
+                isPolyketide: smiles[index].isPolyketide
             } as BlockStructure);
-            this.setState({blocks: data});
-            this.blockFinder(data, sequence);
+            this.setState({blocks: data, sequence: sequence}, () => this.blockFinder(data, sequence));
         }
     }
 
@@ -764,20 +777,20 @@ class MainPage extends React.Component<any, SequenceState> {
      */
     select(molecule: SingleStructure, search ?: number) {
         if (search === undefined) {
-            let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
+            let searchInput: HTMLSelectElement = document.getElementById('search') as HTMLSelectElement;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
         let smilesInput: HTMLTextAreaElement = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
-        smilesInput!.value = molecule.smiles ?? '';
-        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
-        formulaInput!.value = molecule.formula ?? '';
-        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-        massInput!.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
-        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-        identifierInput!.value = molecule.identifier ?? '';
-        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
+        smilesInput.value = molecule.smiles ?? '';
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
+        formulaInput.value = molecule.formula ?? '';
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
+        massInput.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
+        identifierInput.value = molecule.identifier ?? '';
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
         if (search !== SearchEnum.NAME) {
-            nameInput!.value = molecule.structureName ?? '';
+            nameInput.value = molecule.structureName ?? '';
         } else {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
@@ -798,6 +811,7 @@ class MainPage extends React.Component<any, SequenceState> {
      * Convert Isomeric SMILES to canonical
      */
     canonical() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
@@ -814,10 +828,21 @@ class MainPage extends React.Component<any, SequenceState> {
         }
     }
 
+    decaysReset() {
+        if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
+            let sequence = this.state.sequence;
+            sequence.decays = '';
+            this.setState({
+                sequence: sequence
+            });
+        }
+    }
+
     /**
      * Convert SMILES to Unique SMILES
      */
     unique() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
@@ -857,7 +882,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     editEnd() {
-        this.setState({editable: undefined, databaseBlockSelect: undefined, blockEdit: undefined});
+        this.setState({editable: undefined, blockEdit: undefined});
     }
 
     replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
@@ -880,7 +905,7 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequence = this.state.sequence;
         let blocks = this.state.blocks;
         if (sequence) {
-            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value); // blbe musi byt zvlast pro konkretni a zvlast pro vsechny
+            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
         }
         if (this.state.editSame) {
             let blocksCopy = [...blocks];
@@ -890,6 +915,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
                 blocks[block.id].unique = smiles.value;
+                blocks[block.id].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
                 if (!blocks[block.id].block) {
                     blocks[block.id].block = new SingleStructure(
                         identifier.value,
@@ -917,6 +943,7 @@ class MainPage extends React.Component<any, SequenceState> {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
             blocks[blockId].unique = smiles.value;
+            blocks[blockId].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
             if (!blocks[blockId].block) {
                 blocks[blockId].block = new SingleStructure(
                     identifier.value,
@@ -947,13 +974,29 @@ class MainPage extends React.Component<any, SequenceState> {
     editorClose(smiles: string) {
         if (this.state.editorSequence) {
             let molecule = this.state.molecule;
-            if (molecule) {
-                molecule.smiles = smiles;
-            } else {
+            if (!molecule) {
                 molecule = this.moleculeData();
-                molecule.smiles = smiles;
             }
-            this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+            molecule.smiles = smiles;
+            fetch(ENDPOINT + 'smiles/formula', {
+                method: 'POST',
+                body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        if (data.length > 0) {
+                            if (molecule) {
+                                molecule.formula = data[0].formula;
+                                molecule.mass = data[0].mass;
+                            }
+                        }
+                        this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+                    }).catch(() => this.setState({
+                        editorSequence: false,
+                        molecule: molecule
+                    }, () => this.drawSmiles(smiles)));
+                }
+            }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
@@ -961,7 +1004,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles}])
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
+                    }])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
@@ -979,7 +1025,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 let blockId = this.state.editorBlockId;
                 fetch(ENDPOINT + 'smiles/formula', {
                     method: 'POST',
-                    body: JSON.stringify([{smiles: smiles}])
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
+                    }])
                 }).then(response => {
                     if (response.status === 200) {
                         response.json().then(data => {
@@ -1016,7 +1065,63 @@ class MainPage extends React.Component<any, SequenceState> {
     refreshMolecule() {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
-        this.setState({molecule: this.moleculeData(), source: search});
+        let searchParam = (document.getElementById('search')) as HTMLSelectElement;
+        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam?.options[searchParam.selectedIndex].value});
+    }
+
+    refreshFormula(event: any) {
+        try {
+            let moleculeData = this.moleculeData();
+            moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
+            this.setState({molecule: moleculeData});
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
+    refreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{smiles: event.target.value, computeLosses: 'None'}])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        let moleculeData = this.moleculeData();
+                        moleculeData.formula = data[0].formula;
+                        moleculeData.mass = data[0].mass;
+                        this.setState({molecule: moleculeData});
+                    }
+                });
+            }
+        });
+    }
+
+    blockRefreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
+    blockRefreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{
+                smiles: event.target.value,
+                computeLosses: this.state.blocks.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O
+            }])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        (document.getElementById(TXT_EDIT_BLOCK_FORMULA) as HTMLInputElement).value = data[0].formula;
+                        (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = data[0].mass;
+                    }
+                });
+            }
+        });
     }
 
     removeBlock(key: number) {
@@ -1210,7 +1315,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     <title>{this.state.title}</title>
                 </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
-                <PopupEditor id={'popupEditor'} className={styles.popupLargeEditor} ref={this.popupEditorRef}
+                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor} ref={this.popupEditorRef}
                              onClose={this.editorClose}/>
                 <section>
                     <div className={styles.drawerArea}>
@@ -1229,6 +1334,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
                                      options={SearchEnumHelper.getOptionsBySource(this.state.source)}
+                                     selected={this.state.searchParam}
                                      onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
@@ -1239,12 +1345,12 @@ class MainPage extends React.Component<any, SequenceState> {
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
                                   value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
-                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshMolecule}/>
+                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
                                    className={styles.main} onKeyDown={(e) => this.enterFind(e)}
-                                   onChange={this.refreshMolecule}/>
+                                   onChange={this.refreshFormula}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
                         <TextInput name={'mass'} id={'mass'}
@@ -1258,16 +1364,22 @@ class MainPage extends React.Component<any, SequenceState> {
                                    onChange={this.refreshMolecule}/>
 
                         <div className={styles.buttons}>
-                            <button onClick={this.find}>Find</button>
-                            <button onClick={() => {
-                                this.setState({editorSequence: true});
-                                this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
-                            }}>Edit
-                            </button>
-                            <button onClick={this.canonical}>Canonical&nbsp;SMILES</button>
-                            <button onClick={this.unique}>Unique&nbsp;SMILES</button>
-                            <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
-                            <button onClick={this.save}>Save</button>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.find}>Find</button>
+                                <button onClick={() => {
+                                    this.setState({editorSequence: true});
+                                    this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
+                                }}>Edit
+                                </button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
+                                <button onClick={this.unique}>Unique&nbsp;SMILES</button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
+                                <button onClick={this.save}>Save</button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1309,7 +1421,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                                onFamilyChange={(family: any[]) => this.setState({family: family})}
                                                onOrganismChange={(organism: any[]) => this.setState({organism: organism})}
                                                organism={this.state.organism}/>
-                        <table>
+                        <table className={styles.tableLarge}>
                             <thead>
                             <tr>
                                 <th>MSB acronym</th>
@@ -1344,7 +1456,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
-                                                   name={TXT_EDIT_BLOCK_SMILES}
+                                                   name={TXT_EDIT_BLOCK_SMILES} onChange={this.blockRefreshSmiles}
                                                    id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME}
@@ -1352,7 +1464,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA}
-                                                   name={TXT_EDIT_BLOCK_FORMULA}
+                                                   name={TXT_EDIT_BLOCK_FORMULA} onChange={this.blockRefreshFormula}
                                                    value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
                                     <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
                                         <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS}

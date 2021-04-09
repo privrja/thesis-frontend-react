@@ -12,7 +12,7 @@ class ModificationImport extends AbstractImport {
 
     transformation(parts: string[]) {
         this.okStack.push({
-            modificationName: parts[0],
+            modificationName: parts[0].replaceAll('.', ','),
             formula: parts[1],
             mass: Number(parts[2]),
             nTerminal: parts[3] === '1',

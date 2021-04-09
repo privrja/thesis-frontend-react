@@ -47,6 +47,7 @@ class ImportPage extends React.Component<any, State> {
     }
 
     changeHandler(event: any) {
+        this.flashRef.current!.activate(FlashType.PENDING);
         let area = document.getElementById(TXT_BAD_INPUTS) as HTMLTextAreaElement;
         area.value = '';
         let token = localStorage.getItem(TOKEN);

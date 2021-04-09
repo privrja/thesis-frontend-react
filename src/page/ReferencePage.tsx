@@ -31,7 +31,7 @@ class ReferencePage extends React.Component<any, any> {
                     </p>
 
                     <h3>ChemSpider</h3>
-                    <p><a href={'http://www.chemspider.com'}>ChemSpider</a> is chemical database where use can search information about structures through MSB.</p>
+                    <p><a href={'https://www.chemspider.com'}>ChemSpider</a> is chemical database where use can search information about structures through MSB.</p>
 
                     <h3>ChEBI</h3>
                     <p><a href={'https://www.ebi.ac.uk/chebi'}>ChEBI</a> is chemical database used by MSB to serach information.<br/>

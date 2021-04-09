@@ -38,6 +38,9 @@ interface ListPeptides {
 class NorineFinder implements IFinder {
 
     findByIdentifier(id: string): Promise<SingleStructure[]> {
+        if(id === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'id/json/' + id, {
                 method: 'GET'
             }
@@ -59,6 +62,9 @@ class NorineFinder implements IFinder {
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
+        if(name === '') {
+            return Sleep.noSleepPromise();
+        }
         return fetch(ENDPOINT_URI + 'name/json/' + name, {
             method: 'GET'
         }).then(async response => {

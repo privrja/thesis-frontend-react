@@ -28,6 +28,7 @@ import ContainerHelper from "../helper/ContainerHelper";
 import Creatable from "react-select/creatable";
 import FetchHelper from "../helper/FetchHelper";
 import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
+import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
 const TXT_EDIT_ACRONYM = 'txt-edit-acronym';
@@ -82,6 +83,7 @@ interface Block {
     family: string;
     source: number;
     identifier: string;
+    isPolyketide: boolean;
 }
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -99,6 +101,7 @@ class BlockPage extends ListComponent<any, State> {
         this.fetchFamily = this.fetchFamily.bind(this);
         this.newFamilyChange = this.newFamilyChange.bind(this);
         this.familyEditChange = this.familyEditChange.bind(this);
+        this.refreshSmiles = this.refreshSmiles.bind(this);
         this.state = {
             list: [],
             familyOptions: [],
@@ -332,6 +335,33 @@ class BlockPage extends ListComponent<any, State> {
         }
     }
 
+    refreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
+    refreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{
+                smiles: event.target.value,
+                computeLosses: this.state.list.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O
+            }])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        (document.getElementById(TXT_EDIT_FORMULA) as HTMLInputElement).value = data[0].formula;
+                        (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = data[0].mass;
+                    }
+                });
+            }
+        });
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -370,7 +400,7 @@ class BlockPage extends ListComponent<any, State> {
                     }
 
                     <h2>List of Blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
-                    <table>
+                    <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
@@ -437,6 +467,7 @@ class BlockPage extends ListComponent<any, State> {
                                                id={TXT_EDIT_ACRONYM}/> : block.acronym}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput className={styles.filter} value={block.formula} name={TXT_EDIT_FORMULA}
+                                               onChange={this.refreshFormula}
                                                id={TXT_EDIT_FORMULA}/> : block.formula}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput className={styles.filter}
@@ -453,7 +484,7 @@ class BlockPage extends ListComponent<any, State> {
                                                onChange={this.familyEditChange}/> : block.family}</td>
                                 <td onClick={() => this.edit(block.id, block.family)}>{this.state.editable === block.id ?
                                     <TextInput className={styles.filter} value={block.uniqueSmiles}
-                                               name={TXT_EDIT_SMILES}
+                                               name={TXT_EDIT_SMILES} onChange={this.refreshSmiles}
                                                id={TXT_EDIT_SMILES}/> : block.uniqueSmiles}</td>
                                 <td>
                                     {this.state.editable === block.id
@@ -461,8 +492,8 @@ class BlockPage extends ListComponent<any, State> {
                                                             options={ServerEnumHelper.getOptions()}
                                                             selected={block.source?.toString()}/>
                                             <TextInput className={styles.filter}
-                                                value={block.identifier} id={TXT_EDIT_IDENTIFIER}
-                                                name={TXT_EDIT_IDENTIFIER}/></div>
+                                                       value={block.identifier} id={TXT_EDIT_IDENTIFIER}
+                                                       name={TXT_EDIT_IDENTIFIER}/></div>
                                         : <a href={ServerEnumHelper.getLink(block.source, block.identifier)}
                                              target={'_blank'}
                                              rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(block.source, block.identifier)}</a>}</td>

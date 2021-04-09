@@ -92,13 +92,7 @@ class ChemSpiderFinder implements IFinder {
                 headers: {'apikey': this.apiKey},
                 body: JSON.stringify({mass: mass, range: 0.5})
             }
-        ).then(response => {
-            if (response.status === 200) {
-                return response.json().then(data => data.queryId).catch(() => -1);
-            } else {
-                return [];
-            }
-        }).catch(() => -1);
+        ).then(ChemSpiderFinder.getResponse).catch(() => -1);
         if (queryId === -1) {
             return [];
         }
@@ -113,17 +107,19 @@ class ChemSpiderFinder implements IFinder {
             method: 'POST',
             headers: {'apikey': this.apiKey},
             body: JSON.stringify({name: name})
-        }).then(response => {
-            if (response.status === 200) {
-                return response.json().then(data => data.queryId).catch(() => -1);
-            } else {
-                return [];
-            }
-        }).catch(() => -1);
+        }).then(ChemSpiderFinder.getResponse).catch(() => -1);
         if (queryId === -1) {
             return [];
         }
         return this.jsonListResult(queryId);
+    }
+
+    private static getResponse(response: any) {
+        if (response.status === 200) {
+            return response.json().then((data: any) => data.queryId).catch(() => -1);
+        } else {
+            return [];
+        }
     }
 
     async findBySmiles(smiles: string): Promise<SingleStructure[]> {
