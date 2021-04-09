@@ -149,7 +149,7 @@ class ModificationComponent extends React.Component<Props, State> {
             case SequenceEnum.LINEAR_POLYKETIDE:
                 this.nModificationRef.current!.changeTitle('Left modification');
                 this.cModificationRef.current!.changeTitle('Right modification');
-            // eslint-disable-next-line no-fallthrough
+                /* falls through */
             case SequenceEnum.LINEAR:
                 this.nModificationRef.current!.unDisable();
                 this.cModificationRef.current!.unDisable();
