@@ -28,7 +28,7 @@
     "html-react-parser": "latest",
     "jsme-editor": "^0.8.2",
     "jsme-react": "0.0.9",
-    "react": "^16.13.1",
+    "react": "^17.0.2",
     "react-dom": "^16.13.1",
     "react-fontawesome": "^1.7.1",
     "react-helmet": "^6.1.0",
