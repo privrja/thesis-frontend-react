@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {HashRouter, Route} from "react-router-dom";
 import './main.module.scss';
 import Helmet from "react-helmet";
 import Header from "./template/Header";
@@ -32,7 +32,7 @@ function App() {
 
             <base href={URL_PREFIX} />
 
-            <Router>
+            <HashRouter basename={process.env.PUBLIC_URL}>
                 <Route exact path={URL_PREFIX} component={MainPage}/>
                 <Route path={URL_PREFIX + 'login/'} component={LoginPage}/>
                 <Route path={URL_PREFIX + 'logout/'} component={LogoutPage}/>
@@ -49,7 +49,7 @@ function App() {
                 <Route path={URL_PREFIX + 'reference/'} component={ReferencePage}/>
                 <Route path={URL_PREFIX + 'import/'} component={ImportPage}/>
                 <Route path={URL_PREFIX + 'setup/'} component={SettingPage}/>
-            </Router>
+            </HashRouter>
 
             <Footer/>
         </div>
