@@ -6,6 +6,8 @@ $tertiallyCColor: #E0E0E0;
 $colorFlashOk: #72A337;
 $colorFlashBad: #F20915;
 $colorFlashPending: #FF7400;
+$colorFlashWarning: #F9FF1A;
+$colorFlashNotice: $secondaryAColor;
 
 $fontColor: #000000;
 $fontSize: 1.6vh;
@@ -75,18 +77,18 @@ footer {
 // ---------------------------- Page ----------------------------
 
 .page {
-  width: 90%;
+  width: 95%;
   height: fit-content;
-  min-height: 90vh;
   margin: auto;
   text-align: center;
   background-repeat: no-repeat;
   background-position: center;
+  min-height: 80vh;
 }
 
 section {
   margin-bottom: 4vh;
-  padding-bottom: 2vh;
+  padding-bottom: 3vh;
   height: fit-content;
   background-color: $primaryAColor;
 }
@@ -102,8 +104,8 @@ canvas {
 }
 
 .drawerArea {
-  width: 50%;
-  height: 70vh;
+  width: 60%;
+  height: 80vh;
   margin: 1vh;
   vertical-align: top;
   display: inline-block;
@@ -111,7 +113,7 @@ canvas {
 
 .drawerInput {
   width: 30%;
-  height: 70vh;
+  height: 80vh;
   margin-top: 1vh;
   display: inline-block;
   vertical-align: top;
@@ -182,8 +184,8 @@ h1 {
 }
 
 h2 {
-  padding: 1vh;
-  margin: 1vh 0;
+  padding: 1vh 0 0 0;
+  margin: 1vh 0 0 0;
   font-size: $fontSizeHeader;
   color: $fontColor;
   text-align: center;
@@ -203,23 +205,59 @@ label {
   padding: 1vh;
 }
 
-input {
-  margin: 0 1vh;
+input, select {
+  margin: 0 0.5vh;
   font-size: 1.3vh;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(0, 0%, 80%);
+  padding: 0.4vh 0.3vh;
+  justify-content: end;
+}
+
+input:focus, select:focus, textarea:focus, button:focus {
+  box-shadow: 0 0 10px #2684ff;
+  outline-color: #2684ff;
+}
+
+.filter {
+  width: 90%;
+  margin: 0 auto;
 }
 
 button {
-  padding: 0.2vh 1vh;
-  margin: 1vh;
+  margin: 0.5vh;
   background-color: $secondaryAColor;
   color: $fontColor;
-  border: 1px solid $fontColor;
   font-size: 1.3vh;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(0, 0%, 80%);
+  padding: 0.3vh;
+  justify-content: end;
+}
+
+.twoButtons {
+  box-sizing: border-box;
+  display: inline;
+}
+
+.twoButtons button {
+  box-sizing: border-box;
+  width: 39.2%;
 }
 
 button:hover {
   cursor: pointer;
   background-color: $primaryAColor;
+}
+
+.buttonMainPage {
+  margin-top: 1vh;
 }
 
 /* Create button */
@@ -237,22 +275,36 @@ button:hover {
   background-color: $colorFlashPending;
 }
 
-/* Select with options */
-select {
-  margin: 0 1vh;
-  padding: 0.2vh;
-  font-size: 1.3vh;
-}
-
 .creatable {
   width: 12vw;
   display: inline-block;
   font-size: 1.3vh;
+  box-sizing: border-box;
+  margin: 0 0.5vh;
+  padding: 0.3vh;
 }
 
 textarea {
   height: 16vh;
   font-size: 1.3vh;
+  margin: 0 0.5vh;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(0, 0%, 80%);
+  padding: 0.4vh 0.3vh;
+  justify-content: end;
+}
+
+.area {
+  width: 40%;
+  height: 40vh;
+}
+
+.areaBad {
+  width: 50vw;
+  height: 35vh;
 }
 
 .main {
@@ -267,18 +319,21 @@ textarea {
   margin-top: 1.5vh;
 }
 
-.drawerInput button {
-  width: 8vw;
-}
-
 .drawerInput .buttons {
   text-align: center;
+  margin-top: 2vh;
 }
 
 // ---------------------------- Table ----------------------------
 
+.tableLarge {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
 table {
-  margin: auto;
+  margin: 0 auto;
   text-align: center;
 }
 
@@ -296,11 +351,15 @@ tbody tr:hover {
 }
 
 td, th {
-  padding: 0.5vw 3vh;
+  padding: 0.5vw 2vh;
 }
 
-.tdMin {
-  min-width: 6vw;
+.tdSequence {
+  min-width: 10vw;
+}
+
+.tdSequenceName {
+  min-width: 5vw;
 }
 
 // ---------------------------- Flash ----------------------------
@@ -330,6 +389,14 @@ td, th {
 
 .flashPending {
   background-color: $colorFlashPending;
+}
+
+.flashWarning {
+  background-color: $colorFlashWarning;
+}
+
+.flashNotice {
+  background-color: $colorFlashNotice;
 }
 
 .hidden {
@@ -373,6 +440,7 @@ td, th {
   background-color: $primaryAColor;
   font-size: 3vh;
   cursor: pointer;
+  z-index: 99999;
 }
 
 #popupLargeSmiles {
@@ -381,16 +449,7 @@ td, th {
 }
 
 .popupLargeEditor {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  padding: 1vh 2vh;
-  width: 90%;
-  height: 90%;
-  border: 2px solid $colorFlashBad;
-  background-color: $primaryAColor;
-  font-size: 3vh;
+  cursor: default;
 }
 
 .canvasSmall {
@@ -398,4 +457,3 @@ td, th {
   height: 25vh;
   cursor: pointer;
 }
-

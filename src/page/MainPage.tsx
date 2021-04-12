@@ -4,8 +4,12 @@ import styles from "../main.module.scss";
 import Helmet from "react-helmet";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
-import {OPTION_DRAW_DECAY_POINTS, OPTION_THEMES} from "../constant/SmilesDrawerConstants";
-import {SelectInput} from "../component/SelectInput";
+import {
+    OPTION_DRAW_DECAY_POINTS,
+    OPTION_DRAW_DECAY_POINTS_SOURCE,
+    OPTION_THEMES
+} from "../constant/SmilesDrawerConstants";
+import {SelectInput, SelectOption} from "../component/SelectInput";
 import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import {SearchEnum, SearchEnumHelper} from "../enum/SearchEnum";
 import IFinder from "../finder/IFinder";
@@ -14,7 +18,7 @@ import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
 import Canonical from "../helper/Canonical";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
-import {ENDPOINT, SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {CHEMSPIDER_KEY, CONTAINER, SEQUENCE_EDIT, SEQUENCE_ID, TOKEN} from "../constant/ApiConstants";
 import PubChemFinder from "../finder/PubChemFinder";
 import FetchHelper from "../helper/FetchHelper";
 import Modification from "../structure/Modification";
@@ -24,6 +28,13 @@ import NameHelper from "../helper/NameHelper";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import PopupEditor from "../component/PopupEditor";
+import ContainerHelper from "../helper/ContainerHelper";
+import TextArea from "../component/TextArea";
+import Sleep from "../helper/Sleep";
+import Creatable from "react-select/creatable";
+import LossesHelper from "../helper/LossesHelper";
+import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
+import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
 
 let smilesDrawer: SmilesDrawer.Drawer;
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -35,23 +46,38 @@ const ERROR_NOTHING_TO_CONVERT = 'Nothing to convert';
 const SMILES_UNIQUE = 'smiles/unique';
 const PAGE_TITLE = 'Home';
 
-interface State {
+interface SequenceState {
     results: SingleStructure[];
     molecule?: SingleStructure;
     blocks: BlockStructure[];
     sequence?: SequenceStructure;
     selectedContainer: number;
     modifications?: Modification[];
+    blockOptions?: SelectOption[];
+    nModification?: any;
+    cModification?: any;
+    bModification?: any;
     editable?: number;
     editSame: boolean;
     title: string;
     editorBlockId?: number;
     family: any[];
+    organism: any[];
+    sequenceId?: number;
+    sequenceEdit: boolean;
+    blocksAll: any[],
+    blockEdit?: any,
+    selectedContainerName?: string;
+    source: ServerEnum;
+    searchParam: string;
+    editorSequence: boolean;
 }
 
 interface SequenceStructure {
     sequenceType: string;
     sequence: string;
+    sequenceOriginal: string;
+    decays: string;
 }
 
 interface BlockStructure {
@@ -61,6 +87,7 @@ interface BlockStructure {
     smiles: string;
     unique: string | null;
     sameAs: number | null;
+    isPolyketide: boolean;
     block: SingleStructure | null;
 }
 
@@ -72,16 +99,22 @@ const TXT_EDIT_BLOCK_MASS = 'txt-edit-mass';
 const TXT_EDIT_BLOCK_LOSSES = 'txt-edit-losses';
 const SEL_EDIT_SOURCE = 'sel-edit-source';
 const TXT_EDIT_IDENTIFIER = 'txt-edit-identifier';
+const TXT_EDIT_BLOCK_DB_ACRONYM = 'txt-edit-db-acronym';
 
-class MainPage extends React.Component<any, State> {
+const POLYKETIDE_PREFIX = '(-2H)';
+const POLYKETIDE_PREFIX_SPACE = POLYKETIDE_PREFIX + ' ';
+
+class MainPage extends React.Component<any, SequenceState> {
 
     flashRef: React.RefObject<Flash>;
+    flashNotice: React.RefObject<Flash>;
     popupRef: React.RefObject<PopupSmilesDrawer>;
     popupEditorRef: React.RefObject<PopupEditor>;
 
     constructor(props: any, context: any) {
         super(props, context);
         this.flashRef = React.createRef();
+        this.flashNotice = React.createRef();
         this.popupRef = React.createRef();
         this.popupEditorRef = React.createRef();
         this.find = this.find.bind(this);
@@ -96,47 +129,154 @@ class MainPage extends React.Component<any, State> {
         this.save = this.save.bind(this);
         this.editorClose = this.editorClose.bind(this);
         this.blockFinder = this.blockFinder.bind(this);
+        this.refreshMolecule = this.refreshMolecule.bind(this);
+        this.fetchModifications = this.fetchModifications.bind(this);
+        this.blockDbChange = this.blockDbChange.bind(this);
+        this.fetchBlockOptions = this.fetchBlockOptions.bind(this);
+        this.similarity = this.similarity.bind(this);
+        this.refreshFormula = this.refreshFormula.bind(this);
+        this.refreshSmiles = this.refreshSmiles.bind(this);
+        this.blockRefreshSmiles = this.blockRefreshSmiles.bind(this);
         this.state = {
             results: [],
             blocks: [],
             editSame: true,
             title: PAGE_TITLE,
-            selectedContainer: this.getSelectedContainer(),
+            selectedContainer: ContainerHelper.getSelectedContainer(),
             family: [],
+            organism: [],
+            sequenceEdit: false,
+            blocksAll: [],
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
+            source: ServerEnum.PUBCHEM,
+            searchParam: 'name',
+            editorSequence: false
         };
     }
 
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
-    }
-
-    componentDidMount(): void {
+    componentDidMount() {
         this.initializeSmilesDrawers();
+        this.getSequenceId();
+        FetchHelper.initializeChemSpider();
+        this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
     }
 
     componentDidUpdate() {
+        this.initializeSmilesDrawers(this.state.sequence?.decays);
+        this.drawSmiles();
         let small = document.getElementsByClassName(styles.canvasSmall);
-        if (small.length > 1) {
+        if (small.length > 0) {
             SmilesDrawer.apply({width: small[0].clientWidth, height: small[0].clientHeight, compactDrawing: false});
+        }
+        if (this.state.sequenceEdit) {
+            this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + this.state.molecule?.structureName);
+        } else {
+            this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
         }
     }
 
-    initializeSmilesDrawers() {
+    getSequenceId() {
+        let editSequence = localStorage.getItem(SEQUENCE_EDIT);
+        let sequenceId = localStorage.getItem(SEQUENCE_ID);
+        if (editSequence === 'Yes' && sequenceId) {
+            this.setState({sequenceEdit: true, sequenceId: Number(sequenceId)});
+            let token = localStorage.getItem(TOKEN);
+            let init;
+            if (token) {
+                init = {
+                    method: 'GET',
+                    headers: {'x-auth-token': token}
+                }
+            } else {
+                init = {method: 'GET'}
+            }
+            this.fetchModifications();
+            fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
+                if (response.status === 200) {
+                    response.json().then(sequence => {
+                        this.setState({
+                            molecule: new SingleStructure(
+                                sequence.identifier,
+                                sequence.source,
+                                sequence.sequenceName,
+                                sequence.smiles,
+                                sequence.formula,
+                                sequence.mass
+                            ),
+                            sequence: {
+                                sequence: sequence.sequence,
+                                sequenceType: sequence.sequenceType,
+                                sequenceOriginal: sequence.sequenceOriginal,
+                                decays: sequence.decays
+                            },
+                            nModification: sequence.nModification,
+                            cModification: sequence.cModification,
+                            bModification: sequence.bModification,
+                            family: sequence.family.map((family: any) => {
+                                return {value: family.id, label: family.family}
+                            }),
+                            organism: sequence.organism.map((organism: any) => {
+                                return {value: organism.id, label: organism.organism}
+                            }),
+                            blocks: sequence.blocks.map((block: any) => {
+                                return {
+                                    id: block.originalId,
+                                    databaseId: block.id,
+                                    acronym: block.acronym,
+                                    smiles: block.smiles,
+                                    unique: block.uniqueSmiles,
+                                    sameAs: block.sameAs,
+                                    block: new SingleStructure(
+                                        block.identifier,
+                                        block.source,
+                                        block.blockName,
+                                        block.uniqueSmiles,
+                                        block.formula,
+                                        block.mass
+                                    )
+                                }
+                            }),
+                        }, () => {
+                            this.flashNotice.current!.activate(FlashType.NOTICE, 'Editing sequence ' + sequence.sequenceName);
+                        });
+                        this.initializeSmilesDrawers(sequence.decays);
+                        this.drawSmiles();
+                    });
+                }
+            });
+        }
+    }
+
+    initializeSmilesDrawers(decays?: string) {
         const area = document.getElementById(ELEMENT_CANVAS);
-        smilesDrawer = new SmilesDrawer.Drawer({
-            width: area!.clientWidth,
-            height: area!.clientHeight,
-            compactDrawing: false,
-            drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
-            offsetX: area!.offsetLeft,
-            offsetY: area!.offsetTop,
-            themes: OPTION_THEMES,
-        });
+        let init;
+        let decaySource = [];
+        if (decays) {
+            decaySource = JSON.parse(decays);
+        }
+        if (decaySource.length > 0) {
+            init = {
+                width: area!.clientWidth,
+                height: area!.clientHeight,
+                compactDrawing: false,
+                drawDecayPoints: OPTION_DRAW_DECAY_POINTS_SOURCE,
+                offsetX: area!.offsetLeft,
+                offsetY: area!.offsetTop,
+                themes: OPTION_THEMES,
+                decaySource: decaySource
+            }
+        } else {
+            init = {
+                width: area!.clientWidth,
+                height: area!.clientHeight,
+                compactDrawing: false,
+                drawDecayPoints: OPTION_DRAW_DECAY_POINTS,
+                offsetX: area!.offsetLeft,
+                offsetY: area!.offsetTop,
+                themes: OPTION_THEMES,
+            }
+        }
+        smilesDrawer = new SmilesDrawer.Drawer(init);
         const large = document.getElementById(ELEMENT_LARGE_CANVAS);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
             width: large!.clientWidth,
@@ -145,9 +285,11 @@ class MainPage extends React.Component<any, State> {
         });
     }
 
-    drawSmiles() {
-        let input = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
-        SmilesDrawer.parse(input.value, function (tree: any) {
+    drawSmiles(smiles?: string) {
+        if (!smiles) {
+            smiles = (document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement).value;
+        }
+        SmilesDrawer.parse(smiles, function (tree: any) {
             smilesDrawer.draw(tree, ELEMENT_CANVAS);
         });
     }
@@ -228,17 +370,23 @@ class MainPage extends React.Component<any, State> {
                 smiles: this.state.molecule?.smiles,
                 source: this.state.molecule?.database,
                 identifier: this.state.molecule?.identifier,
-                sequence: txtSequence.value,
-                sequenceType: SequenceEnumHelper.getName(Number(selSequence.value)),
+                sequence: txtSequence?.value ?? null,
+                decays: '[' + smilesDrawer.graph.decays.toString() + ']',
+                sequenceOriginal: this.state.sequence?.sequenceOriginal,
+                sequenceType: SequenceEnumHelper.getName(Number(selSequence?.value)),
                 nModification: nModification,
                 cModification: cModification,
                 bModification: bModification,
                 family: this.state.family.map(family => {
                     return family.value
                 }),
+                organism: this.state.organism.map(organism => {
+                    return organism.value
+                }),
                 blocks: this.state.blocks.map(block => {
                     return {
                         databaseId: block.databaseId,
+                        originalId: block.id,
                         sameAs: block.sameAs,
                         acronym: block.acronym,
                         blockName: block.block?.structureName,
@@ -247,25 +395,35 @@ class MainPage extends React.Component<any, State> {
                         mass: block.block?.mass,
                         losses: block.block?.losses,
                         source: block.block?.database,
-                        identifier: block.block?.identifier
+                        identifier: block.block?.identifier,
+                        isPolyketide: block.isPolyketide
                     }
                 })
             };
-            fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence', {
-                method: 'POST',
+            let endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/sequence';
+            fetch(endpoint + (this.state.sequenceEdit ? '/' + this.state.sequenceId?.toString() ?? '' : ''), {
+                method: this.state.sequenceEdit ? 'PUT' : 'POST',
                 headers: {'x-auth-token': token},
                 body: JSON.stringify(sequence)
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence created');
+                } else if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK, 'Sequence updated');
+                    localStorage.removeItem(SEQUENCE_EDIT);
+                    localStorage.removeItem(SEQUENCE_ID);
+                    window.location.href = '#';
+                    Sleep.sleep(500).then(() => {
+                        window.location.href = '/container/' + this.state.selectedContainer + '/sequence';
+                    });
                 } else {
                     if (response.status === 401) {
                         localStorage.removeItem(TOKEN);
                     }
                     this.flashRef.current!.activate(FlashType.BAD);
-                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message));
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
                 }
-                document.location.href = '#main';
+                document.location.href = '#home';
             });
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
@@ -273,10 +431,14 @@ class MainPage extends React.Component<any, State> {
     }
 
     async blockFinder(data: any[], sequence: SequenceStructure) {
-        document.location.href = '#results';
         let finder = new PubChemFinder();
         Parallel.map(data, async (item: any) => {
             if (item.sameAs === null && item.block === null) {
+                let block = await finder.findBySmiles(item.smiles).then(blcData => blcData[0]).catch(() => undefined);
+                if (block) {
+                    block.formula = LossesHelper.removeFromFormula(block.formula, !item.isPolyketide);
+                    block.mass = LossesHelper.removeFromMass(block.mass ?? 0, !item.isPolyketide);
+                }
                 return {
                     id: item.id,
                     databaseId: null,
@@ -284,7 +446,8 @@ class MainPage extends React.Component<any, State> {
                     smiles: item.smiles,
                     unique: item.unique,
                     sameAs: null,
-                    block: await finder.findBySmiles(item.smiles).then(data => data[0])
+                    isPolyketide: item.isPolyketide,
+                    block: block
                 } as BlockStructure;
             } else {
                 if (item.block === null) {
@@ -295,6 +458,7 @@ class MainPage extends React.Component<any, State> {
                         smiles: item.smiles,
                         unique: item.unique,
                         sameAs: item.sameAs,
+                        isPolyketide: item.isPolyketide,
                         block: item.block
                     } as BlockStructure;
                 } else {
@@ -305,21 +469,28 @@ class MainPage extends React.Component<any, State> {
                         smiles: item.smiles,
                         unique: item.unique,
                         sameAs: item.sameAs,
+                        isPolyketide: item.isPolyketide,
                         block: item.block
                     } as BlockStructure;
                 }
             }
-        }, 2).then(async data => {
-            data.forEach(e => {
-                console.log(e.sameAs);
+        }, 2).then(async blockData => {
+            blockData.forEach(e => {
                 if (e.sameAs) {
-                    e.block = data[e.sameAs].block
+                    e.block = new SingleStructure(
+                        blockData[e.sameAs].block?.identifier ?? '',
+                        blockData[e.sameAs].block?.database ?? 0,
+                        blockData[e.sameAs].block?.structureName ?? '',
+                        blockData[e.sameAs].block?.smiles ?? '',
+                        blockData[e.sameAs].block?.formula ?? '',
+                        blockData[e.sameAs].block?.mass ?? 0
+                    );
                 }
             });
-            return data;
-        }).then(data => {
+            return blockData;
+        }).then(blcSeqData => {
             let sequence = this.state.sequence;
-            data.forEach((block: BlockStructure) => {
+            blcSeqData.forEach((block: BlockStructure) => {
                     if (block.sameAs !== null) {
                         if (sequence) {
                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', block.id.toString(), block.sameAs.toString());
@@ -327,11 +498,11 @@ class MainPage extends React.Component<any, State> {
                     }
                 }
             );
-            this.setState({editable: undefined, results: [], blocks: data, sequence: sequence});
-            return data;
-        }).then(data => {
+            this.setState({editable: undefined, results: [], blocks: blcSeqData, sequence: sequence});
+            return blcSeqData;
+        }).then(parData => {
                 let nameHelper = new NameHelper();
-                Parallel.map(data, async (item: BlockStructure) => {
+                Parallel.map(parData, async (item: BlockStructure) => {
                     if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
                         let name = await finder.findName(item.block.identifier, item.block.structureName);
                         return {
@@ -341,40 +512,89 @@ class MainPage extends React.Component<any, State> {
                             smiles: item.smiles,
                             unique: item.unique,
                             sameAs: null,
+                            isPolyketide: item.isPolyketide,
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + name,
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
                             }
                         } as BlockStructure;
                     } else {
-                        return item;
+                        if (item.block) {
+                            return {
+                                id: item.id,
+                                databaseId: item.databaseId,
+                                acronym: item.acronym,
+                                smiles: item.smiles,
+                                unique: item.unique,
+                                sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
+                                block: {
+                                    identifier: item.block.identifier,
+                                    database: item.block.database,
+                                    structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + item.block.structureName,
+                                    smiles: item.block.smiles,
+                                    formula: item.block.formula,
+                                    mass: item.block.mass
+                                }
+                            } as BlockStructure;
+                        } else {
+                            return {
+                                id: item.id,
+                                databaseId: item.databaseId,
+                                acronym: item.acronym,
+                                smiles: item.smiles,
+                                unique: item.unique,
+                                sameAs: item.sameAs,
+                                isPolyketide: item.isPolyketide,
+                                block: {
+                                    identifier: '',
+                                    database: -1,
+                                    structureName: (item.isPolyketide ? POLYKETIDE_PREFIX_SPACE : ''),
+                                    smiles: item.smiles,
+                                    formula: '',
+                                    mass: 0
+                                }
+                            } as BlockStructure;
+                        }
                     }
-                }, 2).then(async data => {
+                }, 2).then(async sameAsData => {
                     if (this.state.sequence) {
                         sequence = this.state.sequence;
                     }
-                    data.forEach(e => {
+                    sameAsData.forEach(e => {
                         if (e.sameAs !== null) {
-                            e.block = data[e.sameAs].block;
-                            e.acronym = data[e.sameAs].acronym;
-                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', data[e.sameAs].acronym, e.acronym);
+                            e.block = new SingleStructure(
+                                sameAsData[e.sameAs].block?.identifier ?? '',
+                                sameAsData[e.sameAs].block?.database ?? 0,
+                                sameAsData[e.sameAs].block?.structureName ?? '',
+                                sameAsData[e.sameAs].block?.smiles ?? '',
+                                sameAsData[e.sameAs].block?.formula ?? '',
+                                sameAsData[e.sameAs].block?.mass ?? 0
+                            );
+                            e.acronym = sameAsData[e.sameAs].acronym;
+                            sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', sameAsData[e.sameAs].acronym, e.acronym);
                         } else {
                             sequence.sequence = this.replaceSequence(sequence?.sequence ?? '', e.id.toString(), e.acronym);
                         }
                     });
-                    return data;
+                    return sameAsData;
                 }).then(data => {
                     this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
+                    document.location.href = '#results';
                     return data;
                 });
             }
         );
+        this.fetchModifications();
+        this.fetchBlockOptions();
+    }
 
+    async fetchModifications() {
         let token = localStorage.getItem(TOKEN);
         if (this.state.selectedContainer) {
             if (token) {
@@ -394,7 +614,6 @@ class MainPage extends React.Component<any, State> {
                 });
             }
         }
-
     }
 
     /**
@@ -412,65 +631,142 @@ class MainPage extends React.Component<any, State> {
         console.log(blockStructures);
         let sequence = {
             sequence: blockStructures.sequence,
-            sequenceType: blockStructures.sequenceType
+            sequenceType: blockStructures.sequenceType,
+            sequenceOriginal: blockStructures.sequence,
+            decays: '[' + blockStructures.decays?.toString() + ']',
         } as SequenceStructure;
-        fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles', {
+        let token = localStorage.getItem(TOKEN);
+        let endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles';
+        let init: any = {
             method: 'POST',
-            body: JSON.stringify(blockStructures.blockSmiles.map((e: any) => {
-                return {smiles: e}
-            }))
-        }).then(responseUnique => {
+            body: JSON.stringify(blockStructures.blockSmiles)
+        };
+        if (token) {
+            endpoint = ENDPOINT + 'container/' + this.state.selectedContainer + '/smiles';
+            init = {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify(blockStructures.blockSmiles)
+            };
+        }
+        fetch(endpoint, init).then(responseUnique => {
             if (responseUnique.status === 200) {
                 responseUnique.json().then(async data => {
-                        this.setState({results: [], blocks: data, sequence: sequence});
-                        this.blockFinder(data, sequence);
+                        this.setState({results: [], blocks: data, sequence: sequence}, () => {
+                            this.blockFinder(data, sequence);
+                            this.similarity(data)
+                        });
                     }
                 );
+            } else {
+                this.transformSmiles(blockStructures.blockSmiles, sequence);
             }
         }).catch(() => {
             this.transformSmiles(blockStructures.blockSmiles, sequence)
         });
     }
 
-    transformSmiles(smiles: string[], sequence: SequenceStructure) {
-        let data = [];
+    transformSmiles(smiles: any[], sequence: SequenceStructure) {
+        let data: any[] = [];
         for (let index = 0; index < smiles.length; index++) {
             data.push({
                 id: index,
                 databaseId: null,
                 acronym: index.toString(),
-                smiles: smiles[index],
-                unique: smiles[index],
+                smiles: smiles[index].smiles,
+                unique: smiles[index].smiles,
                 sameAs: null,
-                block: null
+                block: null,
+                isPolyketide: smiles[index].isPolyketide
             } as BlockStructure);
-            this.setState({blocks: data});
-            this.blockFinder(data, sequence);
+            this.setState({blocks: data, sequence: sequence}, () => this.blockFinder(data, sequence));
         }
+    }
+
+    similarity(data: any[]) {
+        let filtered: number[] = [];
+        data.forEach((block: any) => {
+            if (block.sameAs === null && block.block) {
+                filtered.push(block.block.databaseId);
+            }
+        });
+        let token = localStorage.getItem(TOKEN);
+        let init;
+        if (token) {
+            init = {
+                method: 'POST',
+                headers: {'x-auth-token': token},
+                body: JSON.stringify({
+                    sequencename: this.state.molecule?.structureName ?? '',
+                    blocklengthunique: filtered.length,
+                    blocklength: data.length,
+                    blocks: filtered
+                })
+            };
+        } else {
+            init = {
+                method: 'post',
+                body: JSON.stringify({
+                    sequencename: this.state.molecule?.structureName ?? '',
+                    blocklengthunique: filtered.length,
+                    blocklength: data.length,
+                    blocks: filtered
+                })
+            };
+        }
+        fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/sim', init).then(response => {
+            if (response.status === 200) {
+                response.json().then(simData => this.setState({family: simData}));
+            }
+        });
     }
 
     /**
      * Find structures on third party databases, by data in form
      */
     async find() {
-        this.setState({results: [], blocks: []});
+        if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
+            this.setState({
+                results: [],
+                blocks: [],
+                family: [],
+                organism: [],
+                sequenceEdit: false,
+                sequenceId: undefined,
+                sequence: undefined
+            });
+        }
         this.flashRef.current!.activate(FlashType.PENDING);
         let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
         let databaseInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement | null;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let database = Number(databaseInput?.options[databaseInput.selectedIndex].value);
         let searchParam: HTMLInputElement | null = document.getElementById(SearchEnumHelper.getName(search)) as HTMLInputElement | null;
-        let finder: IFinder = ServerEnumHelper.getFinder(database);
-        let response = await SearchEnumHelper.find(search, finder, searchParam?.value);
-        if (response.length === 0) {
-            this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
-        } else if (response.length === 1) {
-            this.flashRef.current!.activate(FlashType.OK);
-            this.select(response[0], search);
+        let apiKey = localStorage.getItem(CHEMSPIDER_KEY) ?? undefined;
+        let token = localStorage.getItem(TOKEN);
+        if (database === ServerEnum.CHEMSPIDER && !token) {
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to login');
+        } else if (database === ServerEnum.CHEMSPIDER && !apiKey && token) {
+            this.flashRef.current!.activate(FlashType.BAD, 'Please setup apikey');
         } else {
-            this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
-            this.setState({results: response});
-            document.location.href = '#results';
+            let finder: IFinder = ServerEnumHelper.getFinder(database, apiKey);
+            let response;
+            if (search === SearchEnum.SMILES && database === ServerEnum.MASS_SPEC_BLOCKS) {
+                let blockStructures = smilesDrawer.buildBlockSmiles();
+                response = await SearchEnumHelper.find(search, finder, blockStructures.blockSmiles.map((block: any) => block.smiles));
+            } else {
+                response = await SearchEnumHelper.find(search, finder, searchParam?.value);
+            }
+            if (response.length === 0) {
+                this.flashRef.current!.activate(FlashType.BAD, 'Nothing found');
+            } else if (response.length === 1) {
+                this.flashRef.current!.activate(FlashType.OK);
+                this.select(response[0], search);
+            } else {
+                this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
+                this.setState({results: response});
+                document.location.href = '#results';
+            }
         }
     }
 
@@ -480,27 +776,25 @@ class MainPage extends React.Component<any, State> {
      * @param search by which parameter was searched
      */
     select(molecule: SingleStructure, search ?: number) {
-        this.flashRef.current!.deactivate();
         if (search === undefined) {
-            let searchInput: HTMLSelectElement | null = document.getElementById('search') as HTMLSelectElement | null;
+            let searchInput: HTMLSelectElement = document.getElementById('search') as HTMLSelectElement;
             search = Number(searchInput?.options[searchInput.selectedIndex].value);
         }
-        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
-        smilesInput!.value = molecule.smiles ?? '';
-        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement | null;
-        formulaInput!.value = molecule.formula ?? '';
-        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement | null;
-        massInput!.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
-        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement | null;
-        identifierInput!.value = molecule.identifier ?? '';
-        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement | null;
+        let smilesInput: HTMLTextAreaElement = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
+        smilesInput.value = molecule.smiles ?? '';
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
+        formulaInput.value = molecule.formula ?? '';
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
+        massInput.value = ((molecule.mass ?? '') === 0) ? '' : (molecule.mass ?? '').toString();
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
+        identifierInput.value = molecule.identifier ?? '';
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
         if (search !== SearchEnum.NAME) {
-            nameInput!.value = molecule.structureName ?? '';
+            nameInput.value = molecule.structureName ?? '';
         } else {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
-        this.drawSmiles();
-        this.setState({results: [], molecule: molecule});
+        this.setState({results: [], molecule: molecule}, () => this.drawSmiles(molecule.smiles));
         document.location.href = '#home';
     }
 
@@ -517,12 +811,30 @@ class MainPage extends React.Component<any, State> {
      * Convert Isomeric SMILES to canonical
      */
     canonical() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
         } else {
-            smilesInput.value = Canonical.getCanonicalSmiles(smilesInput.value);
-            this.drawSmiles();
+            let smiles = Canonical.getCanonicalSmiles(smilesInput.value);
+            smilesInput.value = smiles;
+            let molecule = this.state.molecule;
+            if (molecule) {
+                molecule.smiles = smiles;
+                this.setState({molecule: molecule}, () => this.drawSmiles(smiles));
+            } else {
+                this.drawSmiles(smiles);
+            }
+        }
+    }
+
+    decaysReset() {
+        if (this.state.sequence && this.state.sequence.sequence && this.state.sequence.sequence !== '') {
+            let sequence = this.state.sequence;
+            sequence.decays = '';
+            this.setState({
+                sequence: sequence
+            });
         }
     }
 
@@ -530,6 +842,7 @@ class MainPage extends React.Component<any, State> {
      * Convert SMILES to Unique SMILES
      */
     unique() {
+        this.decaysReset();
         let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement | null;
         if (smilesInput?.value === undefined || smilesInput?.value === "") {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_NOTHING_TO_CONVERT);
@@ -539,7 +852,15 @@ class MainPage extends React.Component<any, State> {
                 body: JSON.stringify([{smiles: smilesInput.value}])
             }).then(response => {
                 if (response.status === 200) {
-                    response.json().then(data => smilesInput!.value = data[0].unique ?? data[0].smiles)
+                    response.json().then(data => {
+                        smilesInput!.value = data[0].unique ?? data[0].smiles;
+                        let molecule = this.state.molecule;
+                        if (molecule) {
+                            molecule.smiles = data[0].unique ?? data[0].smiles;
+                            this.setState({molecule: molecule});
+                        }
+                        this.drawSmiles(data[0].unique ?? data[0].smiles)
+                    });
                 }
             });
         }
@@ -552,7 +873,7 @@ class MainPage extends React.Component<any, State> {
     showLargeSmiles(smiles: string) {
         this.popupRef.current!.activate();
         SmilesDrawer.parse(smiles, function (tree: any) {
-            largeSmilesDrawer.draw(tree, 'popupLargeSmiles');
+            largeSmilesDrawer.draw(tree, ELEMENT_LARGE_CANVAS);
         });
     }
 
@@ -561,7 +882,7 @@ class MainPage extends React.Component<any, State> {
     }
 
     editEnd() {
-        this.setState({editable: undefined});
+        this.setState({editable: undefined, blockEdit: undefined});
     }
 
     replaceSequence(sequence: string, lastAcronym: string, newAcronym: string) {
@@ -588,48 +909,402 @@ class MainPage extends React.Component<any, State> {
         }
         if (this.state.editSame) {
             let blocksCopy = [...blocks];
-            let sameBlocks = blocksCopy.filter(block => block.sameAs === blockId || block.id === blockId);
+            let sameAs = blocks[blockId].sameAs === null ? blockId : blocks[blockId].sameAs;
+            let sameBlocks = blocksCopy.filter(block => block.sameAs === sameAs || block.id === sameAs);
             sameBlocks.forEach(block => {
                 blocks[block.id].acronym = acronym.value;
                 blocks[block.id].smiles = smiles.value;
-                blocks[block.id].block!.structureName = name.value;
-                blocks[block.id].block!.formula = formula.value;
-                blocks[block.id].block!.mass = Number(mass.value);
+                blocks[block.id].unique = smiles.value;
+                blocks[block.id].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
+                if (!blocks[block.id].block) {
+                    blocks[block.id].block = new SingleStructure(
+                        identifier.value,
+                        Number(source.value),
+                        name.value,
+                        smiles.value,
+                        formula.value,
+                        Number(mass.value)
+                    );
+                } else {
+                    blocks[block.id].block!.structureName = name.value;
+                    blocks[block.id].block!.formula = formula.value;
+                    blocks[block.id].block!.mass = Number(mass.value);
+                    blocks[block.id].block!.database = Number(source.value);
+                    blocks[block.id].block!.identifier = identifier.value;
+                }
                 blocks[block.id].block!.losses = losses.value;
-                blocks[block.id].block!.database = Number(source.value);
-                blocks[block.id].block!.identifier = identifier.value;
+                if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
+                    blocks[block.id].databaseId = this.state.blockEdit.id;
+                } else {
+                    blocks[block.id].databaseId = null;
+                }
             });
         } else {
             blocks[blockId].acronym = acronym.value;
             blocks[blockId].smiles = smiles.value;
-            blocks[blockId].block!.structureName = name.value;
-            blocks[blockId].block!.formula = formula.value;
-            blocks[blockId].block!.mass = Number(mass.value);
+            blocks[blockId].unique = smiles.value;
+            blocks[blockId].isPolyketide = name.value.includes(POLYKETIDE_PREFIX);
+            if (!blocks[blockId].block) {
+                blocks[blockId].block = new SingleStructure(
+                    identifier.value,
+                    Number(source.value),
+                    name.value,
+                    smiles.value,
+                    formula.value,
+                    Number(mass.value)
+                );
+            } else {
+                blocks[blockId].block!.structureName = name.value;
+                blocks[blockId].block!.formula = formula.value;
+                blocks[blockId].block!.mass = Number(mass.value);
+                blocks[blockId].block!.database = Number(source.value);
+                blocks[blockId].block!.identifier = identifier.value;
+            }
             blocks[blockId].block!.losses = losses.value;
-            blocks[blockId].block!.database = Number(source.value);
-            blocks[blockId].block!.identifier = identifier.value;
+            if (this.state.blockEdit && this.state.blockEdit.id !== -1) {
+                blocks[blockId].databaseId = this.state.blockEdit.id;
+            } else {
+                blocks[blockId].databaseId = null;
+            }
         }
         this.setState({blocks: blocks, sequence: sequence});
         this.editEnd();
     }
 
     editorClose(smiles: string) {
-        if (this.state.editorBlockId) {
+        if (this.state.editorSequence) {
+            let molecule = this.state.molecule;
+            if (!molecule) {
+                molecule = this.moleculeData();
+            }
+            molecule.smiles = smiles;
+            fetch(ENDPOINT + 'smiles/formula', {
+                method: 'POST',
+                body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        if (data.length > 0) {
+                            if (molecule) {
+                                molecule.formula = data[0].formula;
+                                molecule.mass = data[0].mass;
+                            }
+                        }
+                        this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+                    }).catch(() => this.setState({
+                        editorSequence: false,
+                        molecule: molecule
+                    }, () => this.drawSmiles(smiles)));
+                }
+            }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
+        } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
             if (this.state.editSame) {
                 let sameBlocks = blocksCopy.filter(block => block.sameAs === this.state.editorBlockId || block.id === this.state.editorBlockId);
-                sameBlocks.forEach(block => {
-                    blocks[block.id].smiles = smiles;
-                    blocks[block.id].unique = smiles;
-                    blocks[block.id].block!.formula = '';
-                    blocks[block.id].block!.mass = undefined;
+                fetch(ENDPOINT + 'smiles/formula', {
+                    method: 'POST',
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
+                    }])
+                }).then(response => {
+                    if (response.status === 200) {
+                        response.json().then(data => {
+                            sameBlocks.forEach(block => {
+                                blocks[block.id].smiles = smiles;
+                                blocks[block.id].unique = smiles;
+                                blocks[block.id].block!.formula = data[0].formula;
+                                blocks[block.id].block!.mass = data[0].mass;
+                            });
+                            this.setState({blocks: blocks});
+                        });
+                    }
                 });
             } else {
-                blocks[this.state.editorBlockId].smiles = smiles;
-                blocks[this.state.editorBlockId].unique = smiles;
+                let blockId = this.state.editorBlockId;
+                fetch(ENDPOINT + 'smiles/formula', {
+                    method: 'POST',
+                    body: JSON.stringify([{
+                        smiles: smiles,
+                        computeLosses: (this.state.blocks.find(e => e.id === this.state.editorBlockId)?.isPolyketide) ? H2 : H2O
+                    }])
+                }).then(response => {
+                    if (response.status === 200) {
+                        response.json().then(data => {
+                            blocks[blockId].smiles = smiles;
+                            blocks[blockId].unique = smiles;
+                            blocks[blockId].block!.formula = data[0].formula;
+                            blocks[blockId].block!.mass = data[0].mass;
+                            this.setState({blocks: blocks});
+                        });
+                    }
+                });
             }
-            this.setState({blocks: blocks});
+        }
+    }
+
+    moleculeData() {
+        let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
+        let search = Number(searchInput?.options[searchInput.selectedIndex].value);
+        let smilesInput: HTMLTextAreaElement | null = document.getElementById(ELEMENT_SMILES) as HTMLTextAreaElement;
+        let formulaInput: HTMLInputElement | null = document.getElementById('formula') as HTMLInputElement;
+        let massInput: HTMLInputElement | null = document.getElementById('mass') as HTMLInputElement;
+        let identifierInput: HTMLInputElement | null = document.getElementById('identifier') as HTMLInputElement;
+        let nameInput: HTMLInputElement | null = document.getElementById('name') as HTMLInputElement;
+        return new SingleStructure(
+            identifierInput.value,
+            search,
+            nameInput.value,
+            smilesInput.value,
+            formulaInput.value,
+            Number(massInput.value)
+        );
+    }
+
+    refreshMolecule() {
+        let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
+        let search = Number(searchInput?.options[searchInput.selectedIndex].value);
+        let searchParam = (document.getElementById('search')) as HTMLSelectElement;
+        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam?.options[searchParam.selectedIndex].value});
+    }
+
+    refreshFormula(event: any) {
+        try {
+            let moleculeData = this.moleculeData();
+            moleculeData.mass = Number(ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES));
+            this.setState({molecule: moleculeData});
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
+    refreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{smiles: event.target.value, computeLosses: 'None'}])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        let moleculeData = this.moleculeData();
+                        moleculeData.formula = data[0].formula;
+                        moleculeData.mass = data[0].mass;
+                        this.setState({molecule: moleculeData});
+                    }
+                });
+            }
+        });
+    }
+
+    blockRefreshFormula(event: any) {
+        try {
+            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+        } catch (e) {
+            /** Empty on purpose - wrong formula input*/
+        }
+    }
+
+    blockRefreshSmiles(event: any) {
+        fetch(ENDPOINT + 'smiles/formula', {
+            method: 'POST',
+            body: JSON.stringify([{
+                smiles: event.target.value,
+                computeLosses: this.state.blocks.find(e => e.id === this.state.editable)?.isPolyketide ? H2 : H2O
+            }])
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if (data.length > 0) {
+                        (document.getElementById(TXT_EDIT_BLOCK_FORMULA) as HTMLInputElement).value = data[0].formula;
+                        (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = data[0].mass;
+                    }
+                });
+            }
+        });
+    }
+
+    removeBlock(key: number) {
+        let block = this.state.blocks.find(e => e.id === key);
+        let position = this.getAcronymPosition(key);
+        if (block && this.state.sequence && this.state.sequence.sequenceOriginal && this.state.sequence.sequence) {
+            let sequenceOriginal = this.removeFromSequence(this.state.sequence?.sequenceOriginal, position, key.toString());
+            let sequence = this.removeFromSequence(this.state.sequence?.sequence, position, block.acronym);
+            this.setState({
+                blocks: this.state.blocks.filter(e => e.id !== key),
+                sequence: {
+                    sequence: sequence,
+                    sequenceOriginal: sequenceOriginal,
+                    sequenceType: this.state.sequence.sequenceType,
+                    decays: this.state.sequence.decays
+                }
+            })
+        }
+        this.setState({blocks: this.state.blocks.filter(e => e.id !== key)})
+    }
+
+    removeFromSequence(sequence: string, position: any, acronym: string) {
+        let cntPosition = 0;
+        let positionIndex = 0;
+        let inBracket = false;
+        let bracketPosition = 0;
+        let end = false;
+        let endings = false;
+        for (let i = 0; i < sequence.length; ++i) {
+            switch (sequence[i]) {
+                case '[':
+                    cntPosition++;
+                    if (cntPosition === position.position) {
+                        positionIndex = i;
+                        if (inBracket) {
+                            endings = true;
+                        } else {
+                            end = true;
+                        }
+                    }
+                    break;
+                case '(':
+                    inBracket = true;
+                    bracketPosition = i;
+                    continue;
+                case ')':
+                    if (endings) {
+                        end = true;
+                        break;
+                    }
+                    inBracket = false;
+                    bracketPosition = 0;
+                    continue;
+                default:
+                    continue;
+            }
+            if (end) {
+                break;
+            }
+        }
+        if (position.removeBracket) {
+            let newSequence = this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
+            let positionEnd = newSequence.indexOf(')', bracketPosition);
+            return newSequence.substr(0, bracketPosition - 1) + '-' + newSequence.substring(bracketPosition + 1, positionEnd - 1) + '-' + newSequence.substring(positionEnd + 1);
+        } else {
+            return this.removeSequenceAcronyms(sequence, inBracket, positionIndex, acronym);
+        }
+    }
+
+    removeSequenceAcronyms(sequence: string, inBracket: boolean, positionIndex: number, acronym: string) {
+        if (inBracket) {
+            if (sequence[positionIndex - 1] === '(') {
+                return sequence.substr(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+            }
+            return sequence.substr(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+        } else {
+            if (positionIndex + acronym.length + 2 > sequence.length || sequence[positionIndex + acronym.length + 2] !== '-') {
+                if (positionIndex - 1 > 0 && sequence[positionIndex - 1] === '-') {
+                    return sequence.substring(0, positionIndex - 1) + sequence.substring(positionIndex + acronym.length + 2);
+                }
+                return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 2);
+            } else {
+                return sequence.substring(0, positionIndex) + sequence.substring(positionIndex + acronym.length + 3);
+            }
+        }
+    }
+
+    getAcronymPosition(key: number) {
+        if (this.state.sequence && this.state.sequence.sequenceOriginal) {
+            let cntPosition = 0;
+            let position = 0;
+            let inBracket = false;
+            let cntInBracket = 0;
+            let end = false;
+            let endings = false;
+            for (let i = 0; i < this.state.sequence.sequenceOriginal.length; ++i) {
+                switch (this.state.sequence.sequenceOriginal[i]) {
+                    case '[':
+                        cntPosition++;
+                        if (inBracket) {
+                            cntInBracket++;
+                        }
+                        let char = '';
+                        let acronymString = '';
+                        while (char !== ']') {
+                            acronymString += char;
+                            i++;
+                            char = this.state.sequence.sequenceOriginal[i];
+                        }
+                        if (acronymString === key.toString()) {
+                            position = cntPosition;
+                            if (cntInBracket) {
+                                endings = true;
+                            } else {
+                                end = true;
+                            }
+                            break;
+                        }
+                        i--;
+                        continue;
+                    case '(':
+                        inBracket = true;
+                        continue;
+                    case ')':
+                        if (endings) {
+                            end = true;
+                            break;
+                        }
+                        inBracket = false;
+                        cntInBracket = 0;
+                        continue;
+                    default:
+                        continue;
+                }
+                if (end) {
+                    break;
+                }
+            }
+            return {position: position, removeBracket: inBracket && cntInBracket === 2};
+        }
+    }
+
+    fetchBlockOptions() {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        let options = data.map((block: any) => {
+                            return {value: block.id, label: block.acronym}
+                        });
+                        options.unshift(new SelectOption('-1', 'Not in DB'));
+                        this.setState({
+                            blocksAll: data,
+                            blockOptions: options,
+                        })
+                    });
+                }
+            });
+        }
+    }
+
+    blockDbChange(newValue: any) {
+        let block = this.state.blocksAll.find(blc => blc.id === newValue.value);
+        if (block) {
+            let editBlock = {
+                id: block.id,
+                acronym: block.acronym,
+                smiles: block.smiles,
+                unique: block.uniqueSmiles,
+                blockName: block.blockName,
+                formula: block.formula,
+                mass: block.mass,
+                losses: block.losses,
+                source: block.source,
+                identifier: block.identifier
+            };
+            this.setState({blockEdit: editBlock});
+        } else {
+            this.setState({blockEdit: undefined});
         }
     }
 
@@ -640,45 +1315,71 @@ class MainPage extends React.Component<any, State> {
                     <title>{this.state.title}</title>
                 </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
-                <PopupEditor id={'popupEditor'} className={styles.popupLargeEditor} ref={this.popupEditorRef}
+                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor} ref={this.popupEditorRef}
                              onClose={this.editorClose}/>
-                <section id='home'>
+                <section>
                     <div className={styles.drawerArea}>
                         <canvas id='drawArea' onClick={this.handle}/>
                     </div>
 
                     <div className={styles.drawerInput}>
                         <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
+                        <Flash textBad='Failure!' textOk='Success!' ref={this.flashNotice}/>
+                        <h2>{this.state.selectedContainerName}</h2>
                         <label htmlFor='database' className={styles.main}>Database</label>
                         <SelectInput id="database" name="database" className={styles.main}
-                                     options={ServerEnumHelper.getOptions()}/>
+                                     options={ServerEnumHelper.getSearchOptions(this.state.selectedContainerName)}
+                                     onChange={this.refreshMolecule}/>
 
                         <label htmlFor='search' className={styles.main}>Search by</label>
                         <SelectInput id="search" name="search" className={styles.main}
-                                     options={SearchEnumHelper.getOptions()}/>
+                                     options={SearchEnumHelper.getOptionsBySource(this.state.source)}
+                                     selected={this.state.searchParam}
+                                     onChange={this.refreshMolecule}/>
 
                         <label htmlFor='name' className={styles.main}>Name</label>
-                        <input id="name" name="name" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <TextInput name={'name'} id={'name'} value={this.state.molecule?.structureName ?? ''}
+                                   className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                                   onChange={this.refreshMolecule}/>
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
-                        <textarea id='smiles' name="smiles" className={styles.main} onInput={this.drawSmiles} onKeyDown={(e) => this.enterFind(e)}/>
+                        <TextArea name={'smiles'} id={'smiles'} className={styles.main}
+                                  value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
+                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
-                        <input id="formula" className={styles.main} name="formula" onKeyDown={(e) => this.enterFind(e)}/>
+                        <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
+                                   className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                                   onChange={this.refreshFormula}/>
 
                         <label htmlFor='mass' className={styles.main}>Monoisotopic Mass</label>
-                        <input id="mass" name="mass" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <TextInput name={'mass'} id={'mass'}
+                                   value={this.state.molecule?.mass ? this.state.molecule.mass.toString() : ''}
+                                   className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                                   onChange={this.refreshMolecule}/>
 
                         <label htmlFor='identifier' className={styles.main}>Identifier</label>
-                        <input id="identifier" name="identifier" className={styles.main} onKeyDown={(e) => this.enterFind(e)}/>
+                        <TextInput name={'identifier'} id={'identifier'} value={this.state.molecule?.identifier ?? ''}
+                                   className={styles.main} onKeyDown={(e) => this.enterFind(e)}
+                                   onChange={this.refreshMolecule}/>
 
                         <div className={styles.buttons}>
-                            <button onClick={this.find}>Find</button>
-                            <button>Edit</button>
-                            <button onClick={this.canonical}>Cannonical SMILES</button>
-                            <button onClick={this.unique}>Unique SMILES</button>
-                            <button onClick={this.buildBlocks}>Build Blocks</button>
-                            <button onClick={this.save}>Save</button>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.find}>Find</button>
+                                <button onClick={() => {
+                                    this.setState({editorSequence: true});
+                                    this.popupEditorRef.current!.activate(this.state.molecule?.smiles ?? '');
+                                }}>Edit
+                                </button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.canonical}>Generic&nbsp;SMILES</button>
+                                <button onClick={this.unique}>Unique&nbsp;SMILES</button>
+                            </div>
+                            <div className={styles.twoButtons}>
+                                <button onClick={this.buildBlocks}>Build&nbsp;Blocks</button>
+                                <button onClick={this.save}>Save</button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -691,7 +1392,7 @@ class MainPage extends React.Component<any, State> {
                                         data-smiles={molecule.smiles}
                                         onClick={() => this.showLargeSmiles(molecule.smiles)}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
-                                <div className={styles.itemResults}>{molecule.mass}</div>
+                                <div className={styles.itemResults}>{molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
@@ -711,11 +1412,20 @@ class MainPage extends React.Component<any, State> {
                                                sequenceType={this.state.sequence?.sequenceType}
                                                sequence={this.state.sequence?.sequence}
                                                modifications={this.state.modifications}
-                                               onFamilyChange={(family: any[]) => this.setState({family: family})}/>
-                        <table>
+                                               nModification={this.state.nModification}
+                                               cModification={this.state.cModification}
+                                               bModification={this.state.bModification}
+                                               family={this.state.family}
+                                               editSame={this.state.editSame}
+                                               onEditChange={(newValue: boolean) => this.setState({editSame: newValue})}
+                                               onFamilyChange={(family: any[]) => this.setState({family: family})}
+                                               onOrganismChange={(organism: any[]) => this.setState({organism: organism})}
+                                               organism={this.state.organism}/>
+                        <table className={styles.tableLarge}>
                             <thead>
                             <tr>
-                                <th/>
+                                <th>MSB acronym</th>
+                                <th>Preview</th>
                                 <th>Acronym</th>
                                 <th>SMILES</th>
                                 <th>Name</th>
@@ -729,47 +1439,54 @@ class MainPage extends React.Component<any, State> {
                             <tbody>
                             {this.state.blocks.map(block => (
                                 <tr>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <Creatable className={styles.creatable} id={TXT_EDIT_BLOCK_DB_ACRONYM}
+                                                   options={this.state.blockOptions}
+                                                   onChange={this.blockDbChange}/> : (block.databaseId ? block.acronym : '')}</td>
                                     <td>
                                         <canvas id={'canvas-small-' + block.id} className={styles.canvasSmall}
                                                 data-smiles={block.unique}
                                                 onClick={() => this.showLargeSmiles(block.unique ?? '')}/>
                                     </td>
-                                    <td onClick={() => this.edit(block.id)}
-                                        className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.acronym} name={TXT_EDIT_BLOCK_ACRONYM}
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.acronym : block.acronym) : block.acronym}
+                                                   name={TXT_EDIT_BLOCK_ACRONYM}
                                                    id={TXT_EDIT_BLOCK_ACRONYM}/> : block.acronym}</td>
-                                    <td onClick={() => this.edit(block.id)}
-                                        className={styles.tdMin}>{this.state.editable === block.id ?
-                                        <TextInput value={block.unique ?? ''} name={TXT_EDIT_BLOCK_SMILES}
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.unique : block.unique) : block.unique ?? ''}
+                                                   name={TXT_EDIT_BLOCK_SMILES} onChange={this.blockRefreshSmiles}
                                                    id={TXT_EDIT_BLOCK_SMILES}/> : block.unique}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput name={TXT_EDIT_BLOCK_NAME} id={TXT_EDIT_BLOCK_NAME}
-                                                   value={block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_FORMULA} name={TXT_EDIT_BLOCK_FORMULA}
-                                                   value={block.block?.formula ?? ''}/> : block.block?.formula}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_MASS} name={TXT_EDIT_BLOCK_MASS}
-                                                   value={block.block?.mass?.toString() ?? ''}/> : block.block?.mass}</td>
-                                    <td className={styles.tdMin}
-                                        onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
-                                        <TextInput id={TXT_EDIT_BLOCK_LOSSES} name={TXT_EDIT_BLOCK_LOSSES}
-                                                   value={block.block?.losses ?? ''}/> : block.block?.losses}</td>
-                                    <td className={styles.tdMin}>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter} name={TXT_EDIT_BLOCK_NAME}
+                                                   id={TXT_EDIT_BLOCK_NAME}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.blockName : block.block?.structureName) : block.block?.structureName ?? ''}/> : block.block?.structureName}</td>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_FORMULA}
+                                                   name={TXT_EDIT_BLOCK_FORMULA} onChange={this.blockRefreshFormula}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.formula : block.block?.formula) : block.block?.formula ?? ''}/> : block.block?.formula}</td>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_MASS}
+                                                   name={TXT_EDIT_BLOCK_MASS}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.mass.toFixed(DECIMAL_PLACES) : block.block?.mass?.toFixed(DECIMAL_PLACES)) : block.block?.mass?.toFixed(DECIMAL_PLACES) ?? ''}/> : block.block?.mass?.toFixed(DECIMAL_PLACES)}</td>
+                                    <td onClick={() => this.edit(block.id)}>{this.state.editable === block.id ?
+                                        <TextInput className={styles.filter} id={TXT_EDIT_BLOCK_LOSSES}
+                                                   name={TXT_EDIT_BLOCK_LOSSES}
+                                                   value={this.state.editable === block.id ? (this.state.blockEdit ? this.state.blockEdit.losses : block.block?.losses) : block.block?.losses ?? ''}/> : block.block?.losses}</td>
+                                    <td>
                                         {this.state.editable === block.id
                                             ? <div><SelectInput id={SEL_EDIT_SOURCE} name={SEL_EDIT_SOURCE}
                                                                 options={ServerEnumHelper.getOptions()}
-                                                                selected={block.block?.database.toString()}/><TextInput
-                                                value={block.block?.identifier ?? ''} id={TXT_EDIT_IDENTIFIER}
-                                                name={TXT_EDIT_IDENTIFIER}/></div>
+                                                                selected={this.state.blockEdit ? (this.state.blockEdit.source ? this.state.blockEdit.toString() : '') : block.block?.database.toString()}/>
+                                                <TextInput className={styles.filter}
+                                                           value={this.state.blockEdit ? this.state.blockEdit.identifier : block.block?.identifier ?? ''}
+                                                           id={TXT_EDIT_IDENTIFIER} name={TXT_EDIT_IDENTIFIER}/></div>
                                             :
                                             <a href={ServerEnumHelper.getLink(Number(block.block?.database), block.block?.identifier ?? '')}
                                                target={'_blank'}
                                                rel={'noopener noreferrer'}>{ServerEnumHelper.getFullId(Number(block.block?.database), block.block?.identifier ?? '')}</a>}</td>
-                                    <td className={styles.tdMin}>
+                                    <td>
                                         {this.state.editable === block.id ? <button className={styles.update}
                                                                                     onClick={() => this.update(block.id)}>Update</button> :
                                             <div/>}
@@ -782,7 +1499,7 @@ class MainPage extends React.Component<any, State> {
                                         }}>Editor
                                         </button>
                                         <button className={styles.delete}
-                                                onClick={() => this.setState({blocks: this.state.blocks.filter(e => e.id !== block.id)})}>Remove
+                                                onClick={() => this.removeBlock(block.id)}>Remove
                                         </button>
                                     </td>
                                 </tr>

@@ -1,5 +1,6 @@
 import * as React from "react";
 import styles from "../main.module.scss"
+import {Link} from "react-router-dom";
 
 interface Props {
     text: string;
@@ -11,7 +12,7 @@ class HeaderTile extends React.Component<Props> {
     render() {
         return (
             <div className={styles.headerTile}>
-                <a className={styles.headerRef} href={this.props.url}>{this.props.text}</a>
+                <Link className={styles.headerRef} to={this.props.url}>{this.props.text}</Link>
             </div>
         )
     }

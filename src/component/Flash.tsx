@@ -6,6 +6,8 @@ interface Props {
     textOk?: string;
     textBad?: string;
     textPending?: string;
+    textWarning?: string;
+    textNotice?: string;
 }
 
 interface State {
@@ -17,14 +19,15 @@ class Flash extends React.Component<Props, State> {
     public static defaultProps = {
         textOk: 'OK',
         textBad: 'Failure!',
-        textPending: 'Pending ...'
+        textPending: 'Pending ...',
+        textWarning: 'Warning!',
+        textNotice: 'Notice -'
     };
 
     private customText = '';
 
     constructor(props: Props) {
         super(props);
-
         this.state = {isActive: false, flashType: FlashType.OK};
     }
 
@@ -44,6 +47,10 @@ class Flash extends React.Component<Props, State> {
             return <div className={styles.flashBad + " " + styles.flash}>{this.props.textBad} {this.customText}</div>
         } else if (this.state.isActive && this.state.flashType === FlashType.PENDING) {
             return <div className={styles.flashPending + " " + styles.flash}>{this.props.textPending} {this.customText}</div>
+        } else if (this.state.isActive && this.state.flashType === FlashType.WARNING) {
+            return <div className={styles.flashWarning + " " + styles.flash}>{this.props.textWarning} {this.customText}</div>
+        } else if (this.state.isActive && this.state.flashType === FlashType.NOTICE) {
+            return <div className={styles.flashNotice + " " + styles.flash}>{this.props.textNotice} {this.customText}</div>
         } else {
             return <div className={styles.hidden + " " + styles.flash}>{this.props.textBad}</div>
         }

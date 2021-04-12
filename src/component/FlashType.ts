@@ -1,5 +1,5 @@
 enum FlashType {
-    OK, BAD, PENDING
+    OK, BAD, PENDING, WARNING, NOTICE
 }
 
 export default FlashType;

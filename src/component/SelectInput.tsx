@@ -1,5 +1,4 @@
-import * as React from "react";
-import {ChangeEvent} from "react";
+import React, {ChangeEvent} from "react";
 
 export class SelectOption {
     public key: string;
@@ -29,13 +28,18 @@ export class SelectInput extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        this.state = {selected: props.selected ?? this.props.options[0].key};
+    }
 
-        this.state = {selected: props.selected ?? this.props.options[0].key}
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (prevProps.selected !== this.props.selected && this.props.selected) {
+            this.setState({selected: this.props.selected});
+        }
     }
 
     render() {
         return (
-            <select id={this.props.id} name={this.props.name} className={this.props.className} onChange={this.props.onChange ? this.props.onChange : (event) => {this.setState({selected: event.target.value})}}>
+            <select id={this.props.id} name={this.props.name} className={this.props.className} onChange={this.props.onChange ? this.props.onChange : (event) => this.setState({selected: event.target.value})}>
                 {this.props.options.map(option => (
                     <option value={option.key} selected={option.key === this.state.selected}>{option.label}</option>
                 ))}

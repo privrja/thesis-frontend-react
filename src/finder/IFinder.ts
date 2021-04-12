@@ -6,7 +6,7 @@ interface IFinder {
     findByMass(mass: number): Promise<SingleStructure[]>;
     findByFormula(formula: string): Promise<SingleStructure[]>;
     findByIdentifier(id: string): Promise<SingleStructure[]>;
-    findByIdentifiers(ids: []): Promise<SingleStructure[]>;
+    findByIdentifiers(ids: string[]): Promise<SingleStructure[]>;
 }
 
 export default IFinder;

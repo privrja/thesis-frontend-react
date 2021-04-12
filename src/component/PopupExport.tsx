@@ -1,7 +1,8 @@
 import * as React from "react";
 import styles from "../main.module.scss"
 import {saveAs} from 'file-saver'
-import {ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
+import {ENDPOINT} from "../constant/Constants";
 
 interface Props {
     label: string;
@@ -21,6 +22,7 @@ class PopupExport extends React.Component<Props, State> {
         this.all = this.all.bind(this);
         this.sequences = this.sequences.bind(this);
         this.blocks = this.blocks.bind(this);
+        this.mergedBlocks = this.mergedBlocks.bind(this);
         this.modifications = this.modifications.bind(this);
         this.getFile = this.getFile.bind(this);
         this.deactivate = this.deactivate.bind(this);
@@ -36,7 +38,7 @@ class PopupExport extends React.Component<Props, State> {
     }
 
     all() {
-        this.getFile('/export')
+        this.getFile('/export', 'archive.zip')
     }
 
     sequences() {
@@ -51,8 +53,11 @@ class PopupExport extends React.Component<Props, State> {
         this.getFile('/modification/export');
     }
 
+    mergedBlocks() {
+        this.getFile('/block/export/merge')
+    }
 
-    getFile(url: string) {
+    getFile(url: string, fileName: string = 'data.txt') {
         let token = localStorage.getItem(TOKEN);
         let headers: any = {method: 'GET'};
         if (token) {
@@ -63,7 +68,7 @@ class PopupExport extends React.Component<Props, State> {
         }
         fetch(ENDPOINT + 'container/' + this.state.containerId + url, headers).then(response => {
             if (response.status === 200) {
-                return response.blob().then(blob => saveAs(blob, 'data.txt'));
+                return response.blob().then(blob => saveAs(blob, fileName));
             } else {
                 this.props.onFail();
             }
@@ -79,6 +84,8 @@ class PopupExport extends React.Component<Props, State> {
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.sequences}>Sequences
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Blocks</button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.mergedBlocks}>Merged blocks
+                    </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton}
                             onClick={this.modifications}>Modifications
                     </button>
@@ -95,6 +102,8 @@ class PopupExport extends React.Component<Props, State> {
                         Sequences
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.blocks}>Export Blocks
+                    </button>
+                    <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.mergedBlocks}>Merged blocks
                     </button>
                     <button className={styles.popupYes + ' ' + styles.popupButton} onClick={this.modifications}>Export
                         Modifications

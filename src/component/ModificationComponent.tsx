@@ -6,21 +6,34 @@ import * as React from "react";
 import Modification from "../structure/Modification";
 import TextInput from "./TextInput";
 import Creatable from "react-select/creatable";
-import {CONTAINER, ENDPOINT, TOKEN} from "../constant/ApiConstants";
+import {CONTAINER, TOKEN} from "../constant/ApiConstants";
+import CheckInput from "./CheckInput";
+import {ENDPOINT} from "../constant/Constants";
 
 interface Props {
     containerId: number;
     blockLength: number;
     sequenceType?: string;
     sequence?: string;
+    nModification?: any;
+    cModification?: any;
+    bModification?: any;
     modifications?: Modification[];
     onFamilyChange?: (family: any[]) => void;
+    onOrganismChange?: (organism: any[]) => void;
+    family: any[];
+    organism: any[];
+    editSame: boolean;
+    onEditChange?: (value: boolean) => void;
 }
 
 interface State {
     sequence: string
     familyOptions: any[];
+    organismOptions: any[];
     family: any[];
+    organism: any[];
+    editSame: boolean;
 }
 
 class ModificationComponent extends React.Component<Props, State> {
@@ -34,14 +47,25 @@ class ModificationComponent extends React.Component<Props, State> {
         this.nModificationRef = React.createRef();
         this.cModificationRef = React.createRef();
         this.bModificationRef = React.createRef();
+        this.handleEditChange = this.handleEditChange.bind(this);
         this.family = this.family.bind(this);
+        this.organism = this.organism.bind(this);
         this.handleFamilyChange = this.handleFamilyChange.bind(this);
+        this.handleOrganismChange = this.handleOrganismChange.bind(this);
         this.updateModifications = this.updateModifications.bind(this);
-        this.state = {sequence: props.sequence ?? '', familyOptions: [], family: []}
+        this.state = {
+            sequence: props.sequence ?? '',
+            familyOptions: [],
+            family: this.props.family,
+            editSame: this.props.editSame,
+            organismOptions: [],
+            organism: this.props.organism
+        }
     }
 
     componentDidMount(): void {
         this.family();
+        this.organism();
         let txtType = document.getElementById('sel-sequence-type') as HTMLSelectElement;
         let typeEnum = SequenceEnumHelper.getValue(this.props.sequenceType ?? SequenceEnumHelper.getName(SequenceEnum.OTHER));
         txtType.value = typeEnum.toString();
@@ -66,16 +90,55 @@ class ModificationComponent extends React.Component<Props, State> {
         }
     }
 
+    organism() {
+        const token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + CONTAINER + '/' + this.props.containerId + '/organism', {
+                method: 'GET',
+                headers: {'x-auth-token': token}
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => this.setState({
+                        organismOptions: data.map((organism: any) => {
+                            return {value: organism.id, label: organism.organism}
+                        })
+                    }));
+                }
+            });
+        }
+    }
+
     handleFamilyChange(newValue: any) {
-        this.setState({family: newValue});
+        let fam = [];
+        if (newValue) {
+            fam = newValue;
+        }
+        this.setState({family: fam});
         if (this.props.onFamilyChange) {
-            this.props.onFamilyChange(newValue);
+            this.props.onFamilyChange(fam);
+        }
+    }
+
+    handleOrganismChange(newValue: any) {
+        let org = [];
+        if (newValue) {
+            org = newValue;
+        }
+        this.setState({organism: org});
+        if (this.props.onOrganismChange) {
+            this.props.onOrganismChange(org);
         }
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
         if (prevProps.sequence !== this.props.sequence) {
             this.setState({sequence: this.props.sequence ?? ''});
+        }
+        if (prevProps.family !== this.props.family) {
+            this.setState({family: this.props.family});
+        }
+        if (prevProps.editSame !== this.props.editSame) {
+            this.setState({editSame: this.props.editSame});
         }
     }
 
@@ -86,7 +149,7 @@ class ModificationComponent extends React.Component<Props, State> {
             case SequenceEnum.LINEAR_POLYKETIDE:
                 this.nModificationRef.current!.changeTitle('Left modification');
                 this.cModificationRef.current!.changeTitle('Right modification');
-            // eslint-disable-next-line no-fallthrough
+                /* falls through */
             case SequenceEnum.LINEAR:
                 this.nModificationRef.current!.unDisable();
                 this.cModificationRef.current!.unDisable();
@@ -118,6 +181,13 @@ class ModificationComponent extends React.Component<Props, State> {
         this.disable(parseInt(txtType.value));
     }
 
+    handleEditChange(newValue: any) {
+        this.setState({editSame: newValue.target.checked});
+        if (this.props.onEditChange) {
+            this.props.onEditChange(newValue.target.checked);
+        }
+    }
+
     render() {
         return (
             <div id="div-sequence">
@@ -131,15 +201,24 @@ class ModificationComponent extends React.Component<Props, State> {
                     <div className={styles.padding}>
                         <label htmlFor={'cre-family'}>Family</label>
                         <Creatable className={styles.creatable} id={'cre-family'} options={this.state.familyOptions}
+                                   value={this.state.family}
                                    onChange={this.handleFamilyChange} isMulti={true}/>
+                        <label htmlFor={'cre-organism'}>Organism</label>
+                        <Creatable className={styles.creatable} id={'cre-organism'} options={this.state.organismOptions}
+                                   value={this.state.organism}
+                                   onChange={this.handleOrganismChange} isMulti={true}/>
                     </div>
+                    <CheckInput name={'chck-edit-same'} id={'chck-edit-same'} checked={this.state.editSame}
+                                onChange={this.handleEditChange}/>
+                    <label htmlFor={'chck-edit-same'}>Edit same blocks together</label>
                 </div>
                 <ModificationInput type='n' title='N-terminal modification' modifications={this.props.modifications}
-                                   ref={this.nModificationRef}/>
+                                   ref={this.nModificationRef} modification={this.props.nModification}/>
                 <ModificationInput type='c' title='C-terminal modification' modifications={this.props.modifications}
-                                   ref={this.cModificationRef}/>
+                                   ref={this.cModificationRef} modification={this.props.cModification}/>
                 <ModificationInput type='b' title='Branch-terminal modification'
-                                   modifications={this.props.modifications} ref={this.bModificationRef}/>
+                                   modifications={this.props.modifications}
+                                   ref={this.bModificationRef} modification={this.props.bModification}/>
             </div>
         );
     }

@@ -1,6 +1,7 @@
 import {SelectOption} from "../component/SelectInput";
 import IFinder from "../finder/IFinder";
 import SingleStructure from "../finder/SingleStructure";
+import {ServerEnum} from "./ServerEnum";
 
 export enum SearchEnum {
     NAME, SMILES, FORMULA, MASS, IDENTIFIER
@@ -34,6 +35,22 @@ export class SearchEnumHelper {
         }
     }
 
+    static getValue(name: string) {
+        switch (name) {
+            default:
+            case 'name':
+                return SearchEnum.NAME;
+            case 'smiles':
+                return SearchEnum.SMILES;
+            case 'formula':
+                return SearchEnum.FORMULA;
+            case 'mass':
+                return SearchEnum.MASS;
+            case 'identifier':
+                return SearchEnum.IDENTIFIER;
+        }
+    }
+
     static find(value: SearchEnum, finder: IFinder, param: any): Promise<SingleStructure[]> {
         switch (value) {
             case SearchEnum.NAME:
@@ -47,6 +64,35 @@ export class SearchEnumHelper {
             case SearchEnum.IDENTIFIER:
                 return finder.findByIdentifier(param);
         }
+    }
+
+    static getOptionsBySource(source: ServerEnum) {
+        switch (source) {
+            case ServerEnum.PUBCHEM:
+                return [
+                    new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
+                    new SelectOption(SearchEnum.SMILES.toString(), this.getName(SearchEnum.SMILES)),
+                    new SelectOption(SearchEnum.FORMULA.toString(), this.getName(SearchEnum.FORMULA)),
+                    new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
+                ];
+            case ServerEnum.NORINE:
+                return [
+                    new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
+                    new SelectOption(SearchEnum.FORMULA.toString(), this.getName(SearchEnum.FORMULA)),
+                    new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
+                ];
+            case ServerEnum.PDB:
+                return [
+                    new SelectOption(SearchEnum.IDENTIFIER.toString(), this.getName(SearchEnum.IDENTIFIER)),
+                ];
+            case ServerEnum.CHEBI:
+            case ServerEnum.CHEMSPIDER:
+            case ServerEnum.MASS_SPEC_BLOCKS:
+            default:
+                return this.getOptions();
+        }
+
+
     }
 
 }

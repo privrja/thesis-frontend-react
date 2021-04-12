@@ -1,7 +1,12 @@
 import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
-import {CONTAINER, ENDPOINT, SELECTED_CONTAINER, TOKEN, URL_PREFIX} from "../constant/ApiConstants";
+import {
+    CONTAINER,
+    SELECTED_CONTAINER,
+    SELECTED_CONTAINER_NAME,
+    TOKEN, USER_NAME
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import {SelectInput, SelectOption} from "../component/SelectInput";
@@ -11,6 +16,9 @@ import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import PopupExport from "../component/PopupExport";
+import ContainerHelper from "../helper/ContainerHelper";
+import Helper from "../helper/Helper";
+import {ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
 
 interface Container {
     id: number,
@@ -50,37 +58,42 @@ class ContainerPage extends ListComponent<any, State> {
         super(props);
         this.popupExportRef = React.createRef();
         this.freeContainers = this.freeContainers.bind(this);
-        this.exportModifications = this.exportModifications.bind(this);
-        this.state = {list: [], freeContainers: [], selectedContainer: this.getSelectedContainer()};
+        this.clone = this.clone.bind(this);
+        this.state = {list: [], freeContainers: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
 
     componentDidMount(): void {
         this.list();
         this.freeContainers();
+        Helper.resetStorage();
     }
 
     freeContainers() {
-        fetch(ENDPOINT + 'free/container', {
-            method: 'GET'
+        fetch(ENDPOINT + 'free/container/', {
+            method: 'GET',
         })
             .then(response => response.json())
             .then(response => this.setState({freeContainers: response}));
     }
 
-    selectContainer(containerId: number) {
-        this.setState({selectedContainer: containerId});
+    selectContainer(containerId: number, containerName: string) {
+        this.setState({selectedContainer: containerId, selectedContainerName: containerName});
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
+        localStorage.setItem(SELECTED_CONTAINER_NAME, containerName);
     }
 
     create(values: Values): void {
         this.defaultCreate(this.getEndpoint(), {
             containerName: values.containerName,
             visibility: values.visibility
-        }, this.freeContainers);
+        }, (response) => {
+            let containerId = response.headers.get('Location').split('/');
+            this.selectContainer(Number(containerId[containerId.length - 1]), values.containerName);
+        });
     }
 
     delete(key: number) {
-        this.defaultDelete(this.getEndpointWithId(key), key, this.list);
+        this.defaultDelete(this.getEndpointWithId(key), key, this.freeContainers);
     }
 
     update(key: number) {
@@ -88,7 +101,6 @@ class ContainerPage extends ListComponent<any, State> {
         if (token) {
             let name = document.getElementById(TXT_EDIT_CONTAINER_NAME) as HTMLInputElement;
             let visibility = document.getElementById(SEL_EDIT_VISIBILITY) as HTMLSelectElement;
-
             fetch(this.getEndpointWithId(key), {
                 method: 'PUT',
                 headers: {'x-auth-token': token},
@@ -96,6 +108,8 @@ class ContainerPage extends ListComponent<any, State> {
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Updated');
+                    this.list();
+                    this.freeContainers();
                 } else {
                     response.json().then(data => {
                         this.flashRef.current!.activate(FlashType.BAD, data.message);
@@ -103,8 +117,6 @@ class ContainerPage extends ListComponent<any, State> {
                 }
             });
             this.editEnd();
-            this.list();
-            this.freeContainers();
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
@@ -118,19 +130,35 @@ class ContainerPage extends ListComponent<any, State> {
         return ENDPOINT + CONTAINER;
     }
 
-    exportModifications(key: number) {
+    clone(containerId: number) {
+        this.flashRef.current!.activate(FlashType.PENDING);
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            fetch(this.getEndpointWithId(key) + '/modification/export', {
-                method: 'GET',
+            fetch(this.getEndpointWithId(containerId) + '/clone', {
+                method: 'POST',
                 headers: {'x-auth-token': token}
             }).then(response => {
-                if (response.status === 200) {
-                    return response.blob().then(blob => saveAs(blob, 'data.txt'));
+                if (response.status === 201) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.list();
+                    let uri = response.headers.get('Location');
+                    if (uri) {
+                        let containerIdArray = uri.split('/');
+                        fetch(uri, {
+                            method: 'GET',
+                            headers: {'x-auth-token': token ?? ''}
+                        }).then(responseCloned => {
+                            if (responseCloned.status === 200) {
+                                responseCloned.json().then(data => this.selectContainer(Number(containerIdArray[containerIdArray.length - 1]), data.containerName));
+                            }
+                        });
+                    }
                 } else {
-                    this.flashRef.current!.activate(FlashType.BAD, 'Export failed');
+                    response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
                 }
-            });
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }
     }
 
@@ -138,9 +166,10 @@ class ContainerPage extends ListComponent<any, State> {
         return (
             <section className={styles.page}>
                 <section className={styles.pageTable}>
-                    <h1>Container</h1>
-                    <PopupYesNo label={"Realy want to delete container?"} onYes={this.delete} ref={this.popupRef}/>
-                    <PopupExport label={'Export'} onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')} ref={this.popupExportRef}/>
+                    <PopupYesNo label={"Really want to delete"} onYes={this.delete} ref={this.popupRef}/>
+                    <PopupExport label={'Export'}
+                                 onFail={() => this.flashRef.current!.activate(FlashType.BAD, 'Export failed')}
+                                 ref={this.popupExportRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
                     {localStorage.getItem(TOKEN) !== null ?
@@ -167,73 +196,78 @@ class ContainerPage extends ListComponent<any, State> {
                                            placeholder='Your new Container Name'/>
 
                                     <label htmlFor="visibility">Container visibility:</label>
-                                    <SelectInput id="visibility" name="visibility" options={visibilityOptions}/>
+                                    <Field name={'visibility'} id={'visibility'} as={'select'}>
+                                        <option value={'PRIVATE'} selected={true}>PRIVATE</option>
+                                        <option value={'PUBLIC'}>PUBLIC</option>
+                                    </Field>
 
                                     <button type="submit" className={styles.create}>Create new container</button>
                                 </Form>
                             </Formik>
-                        </div> : <div/>
+
+                            <h2>Your containers - {this.state.list.length} rows</h2>
+                            <table>
+                                <thead>
+                                <tr>
+                                    {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
+                                    <th onClick={() => this.sortBy('containerName')}>Container name {this.sortIcons('containerName')}</th>
+                                    <th onClick={() => this.sortBy('visibility')}>Visibility {this.sortIcons('visibility')}</th>
+                                    <th onClick={() => this.sortBy('mode')}>Mode {this.sortIcons('mode')}</th>
+                                    <th>Is selected</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {this.state.list.map(container => (
+                                    <tr key={container.id}>
+                                        {SHOW_ID ? <td>{container.id}</td> : ''}
+                                        <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                            <TextInput className={styles.filter} value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
+                                                       id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
+                                        <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
+                                            <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
+                                                         options={visibilityOptions}
+                                                         selected={container.visibility}/> : container.visibility}</td>
+                                        <td>{container.mode}</td>
+                                        <td>{container.id.toString() === this.state.selectedContainer.toString() ? 'Yes' : 'No'}</td>
+                                        <td>
+                                            {this.state.editable === container.id ? <button className={styles.update}
+                                                                                            onClick={() => this.update(container.id)}>Update</button> :
+                                                <div/>}
+                                            {this.state.editable === container.id ?
+                                                <button className={styles.delete}
+                                                        onClick={this.editEnd}>Cancel</button> :
+                                                <div/>}
+                                            <button onClick={() => {
+                                                this.selectContainer(container.id, container.containerName);
+                                                window.location.reload();
+                                            }}>Select
+                                            </button>
+                                            <button
+                                                onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
+                                            </button>
+                                            <button onClick={() => this.clone(container.id)}>Clone</button>
+                                            <button
+                                                onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
+                                            </button>
+                                            <button className={styles.delete}
+                                                    onClick={() => this.popup(container.id)}>Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div> : ''
                     }
 
-                    <h2>Your containers</h2>
-
+                    <h2>Public containers - {this.state.freeContainers.length} rows</h2>
                     <table>
                         <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>Container name</th>
-                            <th>Visibility</th>
-                            <th>Mode</th>
-                            <th>Is selected</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {this.state.list.map(container => (
-                            <tr key={container.id}>
-                                <td>{container.id}</td>
-                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <TextInput value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
-                                               id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
-                                <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                    <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
-                                                 options={visibilityOptions}
-                                                 selected={container.visibility}/> : container.visibility}</td>
-                                <td>{container.mode}</td>
-                                <td>{container.id === this.state.selectedContainer ? 'Yes' : 'No'}</td>
-                                <td>
-                                    {this.state.editable === container.id ? <button className={styles.update}
-                                                                                    onClick={() => this.update(container.id)}>Update</button> :
-                                        <div/>}
-                                    {this.state.editable === container.id ?
-                                        <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
-                                        <div/>}
-                                    <button onClick={() => {
-                                        this.selectContainer(container.id);
-                                        window.location.reload();
-                                    }}>Select
-                                    </button>
-                                    <button
-                                        onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
-                                    </button>
-                                    <button>Go on</button>
-                                    <button>Clone</button>
-                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
-                                    <button className={styles.delete} onClick={() => this.popup(container.id)}>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
-                    <h2>Public containers</h2>
-
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Container name</th>
+                            {SHOW_ID ?
+                                <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id {this.sortIcons('id')}</th> : ''}
+                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container Name {this.sortIcons('containerName')}</th>
                             <th>Is selected</th>
                             <th>Actions</th>
                         </tr>
@@ -241,17 +275,19 @@ class ContainerPage extends ListComponent<any, State> {
                         <tbody>
                         {this.state.freeContainers.map(container => (
                             <tr key={container.id}>
-                                <td>{container.id}</td>
+                                {SHOW_ID ? <td>{container.id}</td> : ''}
                                 <td>{container.containerName}</td>
                                 <td>{container.id.toString() === localStorage.getItem(SELECTED_CONTAINER) ? 'Yes' : 'No'}</td>
                                 <td>
                                     <button onClick={() => {
-                                        this.selectContainer(container.id);
+                                        this.selectContainer(container.id, container.containerName);
                                         window.location.reload();
                                     }}>Select
                                     </button>
-                                    <button>Clone</button>
-                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export</button>
+                                    <button onClick={() => this.clone(container.id)}>Clone</button>
+                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details</button> : ''}
+                                    <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
+                                    </button>
                                 </td>
                             </tr>
                         ))}

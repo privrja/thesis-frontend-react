@@ -3,21 +3,43 @@ import styles from "../main.module.scss";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import FlashType from "../component/FlashType";
-import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
+import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 interface Values {
     name: string;
     password: string;
-    password2: string
+    password2: string;
+    conditions: boolean;
+    cap: string;
 }
 
-class RegisterPage extends React.Component<any> {
+const BAD_CAP = 'Something bad happen with Cap';
+
+interface State {
+    question: string;
+}
+
+class RegisterPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
 
     constructor(props: any) {
         super(props);
         this.flashRef = React.createRef();
+        this.state = {question: ''}
+    }
+
+    componentDidMount(): void {
+        fetch(ENDPOINT + 'cap', {
+            credentials: 'include',
+            method: 'GET'
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    this.setState({question: data.question});
+                }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
+            }
+        }).catch(() => this.flashRef.current!.activate(FlashType.BAD, BAD_CAP));
     }
 
     checkEmpty(value: string, message: string) {
@@ -38,14 +60,19 @@ class RegisterPage extends React.Component<any> {
 
     register(values: Values) {
         values.name = values.name.trim();
+        if (!values.conditions) {
+            this.flashRef.current!.activate(FlashType.BAD, 'You need to agree with terms and conditions');
+            return;
+        }
         let check = this.checkEmpty(values.name, 'Name is empty');
         check = check && this.checkEmpty(values.password, 'Password is empty');
         check = check && this.checkEmpty(values.password2, 'Password is empty');
         check = check && this.checkPasswords(values.password, values.password2, 'Password aren\'t the same');
         if (check) {
             fetch(ENDPOINT + 'register', {
+                credentials: "include",
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password})
+                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap})
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -64,15 +91,17 @@ class RegisterPage extends React.Component<any> {
         return (
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
-                    <h1>Registration</h1>
+                    <h2>Registration</h2>
 
-                    <Flash textBad='Registration failure!' textOk='Registration sucessful!' ref={this.flashRef}/>
+                    <Flash textBad='Registration failure!' textOk='Registration successful!' ref={this.flashRef}/>
 
                     <Formik
                         initialValues={{
                             name: '',
                             password: '',
-                            password2: ''
+                            password2: '',
+                            conditions: false,
+                            cap: ''
                         }}
                         onSubmit={(
                             values: Values,
@@ -97,9 +126,12 @@ class RegisterPage extends React.Component<any> {
                             <label htmlFor="password">Password check:</label>
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
 
+                            <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
+                            <Field id={'cap'} name={'cap'}/>
+
                             <label htmlFor="conditions">
                                 <Field id="conditions" name="conditions" type="checkbox"/>
-                                I'm agree with <a href={URL_PREFIX + 'condition'} target="_blank"
+                                I agree with <a href={URL_PREFIX + 'condition'} target="_blank"
                                                   rel={'noopener noreferrer'}>terms and conditions</a></label>
                             <button type="submit">Register</button>
                         </Form>

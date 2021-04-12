@@ -1,15 +1,25 @@
 import * as React from "react";
 import Flash from "./Flash";
 import PopupYesNo from "./PopupYesNo";
-import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
+import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
 import {ERROR_LOGIN_NEEDED, OK_CREATED} from "../constant/FlashConstants";
+import FetchHelper from "../helper/FetchHelper";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
 
 export interface ListState {
     selectedContainer: number;
+    selectedContainerName?: string;
     editable?: number;
     list: any[];
+    lastSortParam?: string;
+    lastSortOrder?: string;
+    filter?: string;
 }
+
+const ORDER_BY_ASC = 'asc';
+const ORDER_BY_DESC = 'desc';
 
 abstract class ListComponent<P extends any, S extends ListState> extends React.Component<P, S> {
 
@@ -35,6 +45,9 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.list = this.list.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
+        this.addFilter = this.addFilter.bind(this);
+        this.clearConcreteFilter = this.clearConcreteFilter.bind(this);
+        this.sortIcons = this.sortIcons.bind(this);
     }
 
     componentDidMount(): void {
@@ -43,26 +56,54 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         }
     }
 
-    getSelectedContainer(): number {
-        let selectedContainer = localStorage.getItem(SELECTED_CONTAINER);
-        if (!selectedContainer) {
-            selectedContainer = '4';
-            localStorage.setItem(SELECTED_CONTAINER, selectedContainer);
-        }
-        return parseInt(selectedContainer);
-    }
-
     popup(key: number): void {
         this.popupRef.current!.key = key;
-        this.popupRef.current!.activate();
+        this.popupRef.current!.activate(this.findName(key) + '?');
     }
 
-    edit(containerId: number): void {
-        this.setState({editable: containerId});
+    edit(editId: number): void {
+        this.setState({editable: editId});
     }
 
     editEnd(): void {
         this.setState({editable: undefined});
+    }
+
+    sortIcons(param: string) {
+        if (this.state.lastSortParam !== param) {
+            return <FontAwesomeIcon icon={faSort}/>
+        } else {
+            return this.state.lastSortOrder === 'asc'
+                ? <FontAwesomeIcon icon={faSortUp}/>
+                : <FontAwesomeIcon icon={faSortDown}/>
+        }
+    }
+
+    sortBy(param: string, endpoint?: string, transformationCallback?: (e: any) => void) {
+        let order = this.state.lastSortOrder === ORDER_BY_ASC ? ORDER_BY_DESC : ORDER_BY_ASC;
+        if (this.state.lastSortParam !== param) {
+            order = ORDER_BY_ASC;
+        }
+        if (!endpoint) {
+            endpoint = this.getEndpoint();
+        }
+        if (!transformationCallback) {
+            this.defaultList(endpoint + '?' + (this.state.filter ?? '') + 'sort=' + param + '&order=' + order, );
+        } else {
+            this.defaultListTransformation(endpoint + '?' + (this.state.filter ?? '') + ListComponent.sortURI(param, order), transformationCallback);
+        }
+        this.setState({lastSortParam: param, lastSortOrder: order});
+    }
+
+    addFilter(filter: string, valueName: string, value: string) {
+        if (value !== '') {
+            return filter + valueName + '=' + value + '&'
+        }
+        return filter;
+    }
+
+    clearConcreteFilter(filter: string) {
+        (document.getElementById(filter) as HTMLInputElement).value = '';
     }
 
     defaultList(endpoint: string) {
@@ -70,21 +111,10 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     }
 
     defaultListTransformation(endpoint: string, transformationCallback: (e: any) => void) {
-        const token = localStorage.getItem(TOKEN);
-        fetch(endpoint, token ? {
-            method: 'GET',
-            headers: {'x-auth-token': token}
-        } : {
-            method: 'GET'
-        }).then(response => {
-            if (response.status === 401) {
-                localStorage.removeItem(TOKEN);
-            }
-            return response;
-        }).then(response => { if (response.status === 200) { response.json().then(transformationCallback)}});
+        FetchHelper.fetch(endpoint, 'GET', transformationCallback);
     }
 
-    defaultCreate(endpoint: string, body: any, successCallback: () => void = () => { /* Empty on purpose */ }) {
+    defaultCreate(endpoint: string, body: any, successCallback: (response: any) => void = () => { /* Empty on purpose */ }) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(endpoint, {
@@ -95,7 +125,7 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK, OK_CREATED);
                     this.list();
-                    successCallback();
+                    successCallback(response);
                 } else {
                     this.badResponse(response);
                 }
@@ -115,8 +145,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, this.findName(key) + ' updated');
-                    this.list();
                     successCallback();
+                    this.list();
                 } else {
                     this.badResponse(response);
                 }
@@ -160,7 +190,17 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
     }
 
     list(): void {
-        this.defaultList(this.getEndpoint());
+        this.defaultList(this.getEndpoint() + '?' + (this.state.filter ?? '') + ListComponent.sortURI(this.state.lastSortParam, this.state.lastSortOrder));
+    }
+
+    static sortURI(param?: string, order?: string) {
+        if (!param) {
+            return '';
+        }
+        if (!order) {
+            order = 'asc';
+        }
+        return 'sort=' + param + '&order=' + order;
     }
 
     delete(key: number): void {
@@ -169,6 +209,12 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     find(key: number): any {
         return this.state.list.find(e => e.id === key);
+    }
+
+    enterCall(e: any, call: () => void) {
+        if (e.key === 'Enter') {
+            call();
+        }
     }
 
     abstract create(values: any): void;

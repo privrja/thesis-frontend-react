@@ -2,10 +2,16 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import {Field, Form, Formik, FormikHelpers} from "formik/dist";
 import styles from "../main.module.scss"
-import {ENDPOINT, URL_PREFIX} from "../constant/ApiConstants";
+import {
+    TOKEN,
+    USER_NAME
+} from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
-import Sleep from "../helper/Sleep";
+import Helper from "../helper/Helper";
+import PopupYesNo from "../component/PopupYesNo";
+import FetchHelper from "../helper/FetchHelper";
+import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
 
 interface Values {
     name: string;
@@ -15,11 +21,13 @@ interface Values {
 class LoginPage extends React.Component<any> {
 
     flashRef: React.RefObject<Flash>;
+    popupRef: React.RefObject<PopupYesNo>;
 
     constructor(props: any) {
         super(props);
-
         this.flashRef = React.createRef();
+        this.popupRef = React.createRef();
+        this.login = this.login.bind(this);
     }
 
     login(values: Values) {
@@ -33,11 +41,15 @@ class LoginPage extends React.Component<any> {
                 if (response.status === 204) {
                     const token = response.headers.get('x-auth-token');
                     if (token) {
-                        localStorage.setItem('token', token);
+                        localStorage.setItem(TOKEN, token);
+                        localStorage.setItem(USER_NAME, values.name);
                         this.flashRef.current!.activate(FlashType.OK);
-                        Sleep.sleep(500).then(() => {
-                            window.location.href = URL_PREFIX
-                        });
+                        Helper.resetUserStorage();
+                        if (response.headers.get('x-condition') !== "1") {
+                            this.popupRef.current!.activateWithoutText();
+                        } else {
+                            FetchHelper.refresh();
+                        }
                     } else {
                         this.flashRef.current!.activate(FlashType.BAD);
                     }
@@ -51,9 +63,9 @@ class LoginPage extends React.Component<any> {
         return (
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
-                    <h1>Login</h1>
-
-                    <Flash textBad='Login failure!' textOk='Login sucessful!' ref={this.flashRef}/>
+                    <h2>Login</h2>
+                    <Flash textBad='Login failure!' textOk='Login successful!' ref={this.flashRef}/>
+                    <PopupYesNo label={'You need to agree with'} defaultText={'<a href=\'' + URL_PREFIX + 'condition\'>Terms and conditions</a>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
 
                     <Formik
                         initialValues={{
@@ -81,8 +93,7 @@ class LoginPage extends React.Component<any> {
                         </Form>
                     </Formik>
 
-                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here.</a>
-
+                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here</a> <a href={URL_PREFIX + 'forgot'}>Reset password</a>
                 </section>
             </section>
         )
