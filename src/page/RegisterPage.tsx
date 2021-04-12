@@ -3,7 +3,8 @@ import styles from "../main.module.scss";
 import Flash from "../component/Flash";
 import {Field, Form, Formik, FormikHelpers} from "formik";
 import FlashType from "../component/FlashType";
-import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import {ENDPOINT} from "../constant/Constants";
+import {Link} from "react-router-dom";
 
 interface Values {
     name: string;
@@ -126,17 +127,18 @@ class RegisterPage extends React.Component<any, State> {
                             <label htmlFor="password">Password check:</label>
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
 
-                            <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
+                            <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a
+                                href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
                             <Field id={'cap'} name={'cap'}/>
 
                             <label htmlFor="conditions">
                                 <Field id="conditions" name="conditions" type="checkbox"/>
-                                I agree with <a href={URL_PREFIX + 'condition'} target="_blank"
-                                                  rel={'noopener noreferrer'}>terms and conditions</a></label>
+                                I agree with <Link to={'/condition'} target="_blank"
+                                                   rel={'noopener noreferrer'}>terms and conditions</Link></label>
                             <button type="submit">Register</button>
                         </Form>
                     </Formik>
-                    <a href={URL_PREFIX + 'login'}>Already have an account? Login here.</a>
+                    <Link to={'/register'}>Don't have an account? Register here</Link>
                 </section>
             </section>
         );

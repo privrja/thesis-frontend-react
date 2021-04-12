@@ -2,6 +2,7 @@
   "name": "thesis-frontend-react",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://localhost:80/msb/",
   "dependencies": {
     "@babel/core": "^7.13.15",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",

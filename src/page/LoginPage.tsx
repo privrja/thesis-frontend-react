@@ -11,7 +11,8 @@ import FlashType from "../component/FlashType";
 import Helper from "../helper/Helper";
 import PopupYesNo from "../component/PopupYesNo";
 import FetchHelper from "../helper/FetchHelper";
-import {ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import {ENDPOINT} from "../constant/Constants";
+import {Link} from "react-router-dom";
 
 interface Values {
     name: string;
@@ -48,7 +49,7 @@ class LoginPage extends React.Component<any> {
                         if (response.headers.get('x-condition') !== "1") {
                             this.popupRef.current!.activateWithoutText();
                         } else {
-                            FetchHelper.refresh();
+                            FetchHelper.refresh(this.props.history);
                         }
                     } else {
                         this.flashRef.current!.activate(FlashType.BAD);
@@ -65,7 +66,7 @@ class LoginPage extends React.Component<any> {
                 <section>
                     <h2>Login</h2>
                     <Flash textBad='Login failure!' textOk='Login successful!' ref={this.flashRef}/>
-                    <PopupYesNo label={'You need to agree with'} defaultText={'<a href=\'' + URL_PREFIX + 'condition\'>Terms and conditions</a>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
+                    <PopupYesNo label={'You need to agree with'} defaultText={'<Link href=\'/condition\'>Terms and conditions</Link>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
 
                     <Formik
                         initialValues={{
@@ -93,7 +94,8 @@ class LoginPage extends React.Component<any> {
                         </Form>
                     </Formik>
 
-                    <a href={URL_PREFIX + 'register'}>Don't have an account? Register here</a> <a href={URL_PREFIX + 'forgot'}>Reset password</a>
+                    <Link to={'/register'}>Don't have an account? Register here</Link>
+                    <Link to={'/logout'}>Reset password</Link>
                 </section>
             </section>
         )

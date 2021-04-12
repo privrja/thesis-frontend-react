@@ -2,7 +2,7 @@ import {CHEMSPIDER_KEY, TOKEN} from "../constant/ApiConstants";
 import FlashType from "../component/FlashType";
 import Flash from "../component/Flash";
 import Sleep from "./Sleep";
-import {CHEMSPIDER_ONE_KEY, ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import {CHEMSPIDER_ONE_KEY, ENDPOINT} from "../constant/Constants";
 
 class FetchHelper {
 
@@ -67,7 +67,7 @@ class FetchHelper {
         }
     }
 
-    static conditionsOk() {
+    static conditionsOk(history: any) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             fetch(ENDPOINT + 'condition', {
@@ -75,28 +75,28 @@ class FetchHelper {
                 headers: {'x-auth-token': token}
             }).then(response => {
                 if (response.status !== 204) {
-                    FetchHelper.conditionsKo();
+                    FetchHelper.conditionsKo(history);
                 }
             })
         } else {
-            FetchHelper.conditionsKo();
+            FetchHelper.conditionsKo(history);
         }
     }
 
-    static conditionsKo() {
+    static conditionsKo(history: any) {
         localStorage.removeItem(TOKEN);
-        FetchHelper.refreshLogout();
+        FetchHelper.refreshLogout(history);
     }
 
-    static refreshLogout() {
+    static refreshLogout(history: any) {
         Sleep.sleep(500).then(() => {
-            window.location.href = '/logout'
+            history.push('/logout');
         });
     }
 
-    static refresh() {
+    static refresh(history: any) {
         Sleep.sleep(500).then(() => {
-            window.location.href = URL_PREFIX
+            history.push('/');
         });
     }
 

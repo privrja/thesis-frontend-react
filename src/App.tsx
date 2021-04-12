@@ -1,5 +1,5 @@
 import React from 'react';
-import {HashRouter, Route} from "react-router-dom";
+import {BrowserRouter as Router, Route} from "react-router-dom";
 import './main.module.scss';
 import Helmet from "react-helmet";
 import Header from "./template/Header";
@@ -24,35 +24,31 @@ import {URL_PREFIX} from "./constant/Constants";
 function App() {
 
     return (
-        <div id={'home'}>
-            <Header/>
-            <Helmet>
-                <title>MassSpecBlocks</title>
-            </Helmet>
-
-            <base href={URL_PREFIX} />
-
-            <HashRouter basename={process.env.PUBLIC_URL}>
-                <Route exact path={URL_PREFIX} component={MainPage}/>
-                <Route path={URL_PREFIX + 'login/'} component={LoginPage}/>
-                <Route path={URL_PREFIX + 'logout/'} component={LogoutPage}/>
-                <Route path={URL_PREFIX + 'register/'} component={RegisterPage}/>
-                <Route path={URL_PREFIX + 'container/:id/modification/'} exact component={ModificationPage}/>
-                <Route path={URL_PREFIX + 'container/:id/block/'} exact component={BlockPage}/>
-                <Route path={URL_PREFIX + 'container/:id/block/:blockId/usage'} exact component={BlockUsagePage}/>
-                <Route path={URL_PREFIX + 'container/:id/sequence/'} exact component={SequencePage}/>
-                <Route path={URL_PREFIX + 'smiles/:smiles'} exact component={EditorPage}/>
-                <Route path={URL_PREFIX + 'smiles/'} exact component={EditorPage}/>
-                <Route path={URL_PREFIX + 'container/:id'} exact component={ContainerDetailPage} />
-                <Route path={URL_PREFIX + 'container/'} exact component={ContainerPage}/>
-                <Route path={URL_PREFIX + 'condition/'} component={ConditionsPage}/>
-                <Route path={URL_PREFIX + 'reference/'} component={ReferencePage}/>
-                <Route path={URL_PREFIX + 'import/'} component={ImportPage}/>
-                <Route path={URL_PREFIX + 'setup/'} component={SettingPage}/>
-            </HashRouter>
-
-            <Footer/>
-        </div>
+        <Router basename={URL_PREFIX}>
+            <div id={'home'}>
+                <Header/>
+                <Helmet>
+                    <title>MassSpecBlocks</title>
+                </Helmet>
+                <Route exact path={'/'} component={MainPage}/>
+                <Route path={'/login/'} component={LoginPage}/>
+                <Route path={'/logout/'} component={LogoutPage}/>
+                <Route path={'/register/'} component={RegisterPage}/>
+                <Route path={'/container/:id/modification/'} exact component={ModificationPage}/>
+                <Route path={'/container/:id/block/'} exact component={BlockPage}/>
+                <Route path={'/container/:id/block/:blockId/usage'} exact component={BlockUsagePage}/>
+                <Route path={'/container/:id/sequence/'} exact component={SequencePage}/>
+                <Route path={'/smiles/:smiles'} exact component={EditorPage}/>
+                <Route path={'/smiles/'} exact component={EditorPage}/>
+                <Route path={'/container/:id'} exact component={ContainerDetailPage}/>
+                <Route path={'/container/'} exact component={ContainerPage}/>
+                <Route path={'/condition/'} component={ConditionsPage}/>
+                <Route path={'/reference/'} component={ReferencePage}/>
+                <Route path={'/import/'} component={ImportPage}/>
+                <Route path={'/setup/'} component={SettingPage}/>
+                <Footer/>
+            </div>
+        </Router>
     );
 }
 
