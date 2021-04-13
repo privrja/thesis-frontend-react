@@ -23,7 +23,6 @@ import {URL_PREFIX} from "./constant/Constants";
 import ResetPasswordComponent from "./component/ResetPasswordComponent";
 
 function App() {
-
     return (
         <Router basename={URL_PREFIX}>
             <div id={'home'}>
