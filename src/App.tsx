@@ -20,6 +20,7 @@ import ImportPage from "./page/ImportPage";
 import BlockUsagePage from "./page/BlockUsagePage";
 import SettingPage from "./page/SettingPage";
 import {URL_PREFIX} from "./constant/Constants";
+import ResetPasswordComponent from "./component/ResetPasswordComponent";
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
                 <Route path={'/reference/'} component={ReferencePage}/>
                 <Route path={'/import/'} component={ImportPage}/>
                 <Route path={'/setup/'} component={SettingPage}/>
+                <Route path={'/reset'} component={ResetPasswordComponent}/>
                 <Footer/>
             </div>
         </Router>

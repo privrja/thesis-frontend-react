@@ -66,7 +66,9 @@ class LoginPage extends React.Component<any> {
                 <section>
                     <h2>Login</h2>
                     <Flash textBad='Login failure!' textOk='Login successful!' ref={this.flashRef}/>
-                    <PopupYesNo label={'You need to agree with'} defaultText={'<Link href=\'/condition\'>Terms and conditions</Link>'} onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef} />
+                    <PopupYesNo label={'You need to agree with'}
+                                defaultText={'<Link href=\'/condition\'>Terms and conditions</Link>'}
+                                onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
 
                     <Formik
                         initialValues={{
@@ -94,8 +96,9 @@ class LoginPage extends React.Component<any> {
                         </Form>
                     </Formik>
 
-                    <Link to={'/register'}>Don't have an account? Register here</Link>
-                    <Link to={'/logout'}>Reset password</Link>
+                    <p>
+                        <Link to={'/register'}>Don't have an account? Register here</Link> | <Link to={'/reset'}>Reset password</Link>
+                    </p>
                 </section>
             </section>
         )

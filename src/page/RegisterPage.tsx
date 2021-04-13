@@ -138,7 +138,7 @@ class RegisterPage extends React.Component<any, State> {
                             <button type="submit">Register</button>
                         </Form>
                     </Formik>
-                    <Link to={'/register'}>Don't have an account? Register here</Link>
+                    <Link to={'/login'}>Already have an account? Login here</Link>
                 </section>
             </section>
         );
