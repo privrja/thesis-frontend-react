@@ -19,6 +19,7 @@ import PopupExport from "../component/PopupExport";
 import ContainerHelper from "../helper/ContainerHelper";
 import Helper from "../helper/Helper";
 import {ENDPOINT, SHOW_ID} from "../constant/Constants";
+import FetchHelper from "../helper/FetchHelper";
 
 interface Container {
     id: number,
@@ -80,6 +81,7 @@ class ContainerPage extends ListComponent<any, State> {
         this.setState({selectedContainer: containerId, selectedContainerName: containerName});
         localStorage.setItem(SELECTED_CONTAINER, containerId.toString());
         localStorage.setItem(SELECTED_CONTAINER_NAME, containerName);
+        FetchHelper.refresh(this.props.history, '/container');
     }
 
     create(values: Values): void {

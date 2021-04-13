@@ -94,9 +94,9 @@ class FetchHelper {
         });
     }
 
-    static refresh(history: any) {
+    static refresh(history: any, url?: string) {
         Sleep.sleep(500).then(() => {
-            history.push('/');
+            history.push(url ?? '/');
             caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
             window.location.reload(true);
         });

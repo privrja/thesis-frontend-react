@@ -31,7 +31,7 @@ function App() {
                 <Helmet>
                     <title>MassSpecBlocks</title>
                 </Helmet>
-                <Route path={'/'} component={MainPage}/>
+                <Route exact path={'/'} component={MainPage}/>
                 <Route path={'/login/'} component={LoginPage}/>
                 <Route path={'/logout/'} component={LogoutPage}/>
                 <Route path={'/register/'} component={RegisterPage}/>
