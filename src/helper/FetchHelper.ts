@@ -97,6 +97,8 @@ class FetchHelper {
     static refresh(history: any) {
         Sleep.sleep(500).then(() => {
             history.push('/');
+            caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+            window.location.reload(true);
         });
     }
 
