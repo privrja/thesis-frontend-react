@@ -27,7 +27,7 @@ import * as SmilesDrawer from 'smiles-drawer';
 import ContainerHelper from "../helper/ContainerHelper";
 import Creatable from "react-select/creatable";
 import FetchHelper from "../helper/FetchHelper";
-import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
@@ -245,7 +245,7 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     editor(key: number) {
-        localStorage.setItem(EDITOR_BACK, URL_PREFIX + 'container/' + this.state.selectedContainer + '/block');
+        localStorage.setItem(EDITOR_BACK, '/container/' + this.state.selectedContainer + '/block');
         localStorage.setItem(EDITOR_ITEM, key.toString());
         let smiles;
         if (key === -1) {
@@ -257,7 +257,7 @@ class BlockPage extends ListComponent<any, State> {
         } else {
             smiles = this.find(key).smiles;
         }
-        document.location.href = URL_PREFIX + 'smiles/' + smiles;
+        this.props.history.push('/smiles/' + smiles);
     }
 
     filter() {
@@ -508,7 +508,7 @@ class BlockPage extends ListComponent<any, State> {
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
                                     <button onClick={() => {
-                                        document.location.href = '/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage'
+                                        this.props.history.push('/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage');
                                     }}>Usage
                                     </button>
                                     <button className={styles.delete} onClick={() => this.popup(block.id)}>Delete

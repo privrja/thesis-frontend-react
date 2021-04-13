@@ -28,7 +28,7 @@ import {
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES_FROM, TXT_FILTER_SEQUENCE_USAGES_TO
 } from "../constant/DefaultConstants";
-import {DECIMAL_PLACES, ENDPOINT, URL_PREFIX} from "../constant/Constants";
+import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
 import FlashType from "../component/FlashType";
 import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 // @ts-ignore
@@ -95,7 +95,7 @@ class BlockUsagePage extends ListComponent<any, State> {
     detail(key: number) {
         localStorage.setItem(SEQUENCE_EDIT, 'Yes');
         localStorage.setItem(SEQUENCE_ID, key.toString());
-        document.location.href = URL_PREFIX;
+        this.props.history.push('/');
     }
 
     clone(key: number) {

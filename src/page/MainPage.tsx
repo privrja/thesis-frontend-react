@@ -412,9 +412,9 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence updated');
                     localStorage.removeItem(SEQUENCE_EDIT);
                     localStorage.removeItem(SEQUENCE_ID);
-                    window.location.href = '#';
+                    this.props.history.push('#results');
                     Sleep.sleep(500).then(() => {
-                        window.location.href = '/container/' + this.state.selectedContainer + '/sequence';
+                        this.props.history.push('/container/' + this.state.selectedContainer + '/sequence');
                     });
                 } else {
                     if (response.status === 401) {
@@ -423,7 +423,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.BAD);
                     response.json().then(data => this.flashRef.current!.activate(FlashType.BAD, data.message)).catch(() => this.flashRef.current!.activate(FlashType.BAD));
                 }
-                document.location.href = '#home';
+                this.props.history.push('#home');
             });
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
@@ -585,7 +585,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 }).then(data => {
                     this.setState({results: [], blocks: data, sequence: sequence, title: PAGE_TITLE});
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
-                    document.location.href = '#results';
+                    this.props.history.push('#results');
                     return data;
                 });
             }
@@ -765,7 +765,7 @@ class MainPage extends React.Component<any, SequenceState> {
             } else {
                 this.flashRef.current!.activate(FlashType.OK, 'Found more, select one');
                 this.setState({results: response});
-                document.location.href = '#results';
+                this.props.history.push('#results');
             }
         }
     }
@@ -795,7 +795,7 @@ class MainPage extends React.Component<any, SequenceState> {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
         this.setState({results: [], molecule: molecule}, () => this.drawSmiles(molecule.smiles));
-        document.location.href = '#home';
+        this.props.history.push('#results');
     }
 
     /**

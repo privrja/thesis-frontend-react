@@ -41,7 +41,7 @@ import {
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE
 } from "../constant/DefaultConstants";
-import {DECIMAL_PLACES, ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 import TextInput from "../component/TextInput";
 import Creatable from "react-select/creatable";
 import {SelectInput} from "../component/SelectInput";
@@ -144,7 +144,7 @@ class SequencePage extends ListComponent<any, State> {
     detail(key: number) {
         localStorage.setItem(SEQUENCE_EDIT, 'Yes');
         localStorage.setItem(SEQUENCE_ID, key.toString());
-        document.location.href = URL_PREFIX;
+        this.props.history.push('/');
     }
 
     clone(key: number) {

@@ -40,7 +40,7 @@ class EditorPage extends React.Component<any, State> {
     cancel() {
         let back = localStorage.getItem(EDITOR_BACK);
         if (back) {
-            document.location.href = back;
+            this.props.history.push(back);
         }
     }
 

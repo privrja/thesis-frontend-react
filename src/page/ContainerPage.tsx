@@ -18,7 +18,7 @@ import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import PopupExport from "../component/PopupExport";
 import ContainerHelper from "../helper/ContainerHelper";
 import Helper from "../helper/Helper";
-import {ENDPOINT, SHOW_ID, URL_PREFIX} from "../constant/Constants";
+import {ENDPOINT, SHOW_ID} from "../constant/Constants";
 
 interface Container {
     id: number,
@@ -240,11 +240,11 @@ class ContainerPage extends ListComponent<any, State> {
                                                 <div/>}
                                             <button onClick={() => {
                                                 this.selectContainer(container.id, container.containerName);
-                                                window.location.reload();
+                                                this.props.history.push('/container');
                                             }}>Select
                                             </button>
                                             <button
-                                                onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details
+                                                onClick={() => this.props.history.push('/container/' + container.id)}>Details
                                             </button>
                                             <button onClick={() => this.clone(container.id)}>Clone</button>
                                             <button
@@ -281,11 +281,11 @@ class ContainerPage extends ListComponent<any, State> {
                                 <td>
                                     <button onClick={() => {
                                         this.selectContainer(container.id, container.containerName);
-                                        window.location.reload();
+                                        this.props.history.push('/container');
                                     }}>Select
                                     </button>
                                     <button onClick={() => this.clone(container.id)}>Clone</button>
-                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button onClick={() => window.location.href = URL_PREFIX + 'container/' + container.id}>Details</button> : ''}
+                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button onClick={() => this.props.history.push('/container/' + container.id)}>Details</button> : ''}
                                     <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
                                     </button>
                                 </td>
