@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {HashRouter as Router, Route} from "react-router-dom";
 import './main.module.scss';
 import Helmet from "react-helmet";
 import Header from "./template/Header";
