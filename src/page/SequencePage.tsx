@@ -210,8 +210,7 @@ class SequencePage extends ListComponent<any, State> {
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
-                                name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>

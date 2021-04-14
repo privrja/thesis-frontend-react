@@ -404,7 +404,7 @@ class BlockPage extends ListComponent<any, State> {
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_NAME)}>Block name {this.sortIcons(SORT_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_NAME)}>Name {this.sortIcons(SORT_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_ACRONYM)}>Acronym {this.sortIcons(SORT_ACRONYM)}</th>
                             <th onClick={() => this.sortBy(SORT_RESIDUE)}>Residue {this.sortIcons(SORT_RESIDUE)}</th>
                             <th onClick={() => this.sortBy('blockMass')}>Mass {this.sortIcons('blockMass')}</th>

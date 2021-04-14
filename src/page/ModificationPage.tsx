@@ -194,8 +194,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Modification
-                                name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_FORMULA)}>Formula {this.sortIcons(SORT_MODIFICATION_FORMULA)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_MASS)}>Mass {this.sortIcons(SORT_MODIFICATION_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_N_TERMINAL)}>N-terminal {this.sortIcons(SORT_N_TERMINAL)}</th>
