@@ -38,7 +38,7 @@ class MailReset extends React.Component<any, any> {
     render() {
         return(
             <section>
-                <h2>Change Email</h2>
+                <h2>Change email</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'mail'}>New email</label>
                 <input type={'text'} id={'mail'}/>

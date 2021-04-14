@@ -149,7 +149,7 @@ class ModificationPage extends ListComponent<any, ListState> {
 
                     {localStorage.getItem(TOKEN) !== null ?
                         <div>
-                            <h2>Create new Modification</h2>
+                            <h2>Create new modification</h2>
                             <Formik
                                 initialValues={{
                                     modificationName: '',
@@ -189,7 +189,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                         </div> : ''
                     }
 
-                    <h2>List of Modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
+                    <h2>List of modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table className={styles.tableLarge}>
                         <thead>
                         <tr>

@@ -399,7 +399,7 @@ class BlockPage extends ListComponent<any, State> {
                         </div> : ''
                     }
 
-                    <h2>List of Blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
+                    <h2>List of blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table className={styles.tableLarge}>
                         <thead>
                         <tr>
