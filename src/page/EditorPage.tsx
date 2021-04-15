@@ -15,6 +15,7 @@ class EditorPage extends React.Component<any, State> {
         super(props);
         this.smiles = this.smiles.bind(this);
         this.back = this.back.bind(this);
+        this.cancel = this.cancel.bind(this);
         this.state = {smiles: this.props.match.params.smiles};
     }
 
@@ -49,7 +50,7 @@ class EditorPage extends React.Component<any, State> {
             <section className={styles.page}>
                 <section>
                 <Jsme height="70vh" width="50wv" options="oldlook,star" smiles={this.props.match.params.smiles} onChange={this.smiles}/>
-                    { localStorage.getItem(EDITOR_BACK) ? <div><button onClick={this.back}>Go Back</button><button onClick={this.cancel}>Cancel</button></div> : '' }
+                    { localStorage.getItem(EDITOR_BACK) ? <div><button onClick={this.back}>Done</button><button onClick={this.cancel}>Cancel</button></div> : '' }
                     <button onClick={() => document.location.reload()}>Reset</button>
                 </section>
             </section>
