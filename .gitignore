@@ -25,7 +25,9 @@ yarn-error.log*
 # Idea
 /.idea/
 
-
 # FireBase
 .firebase
 .firebaserc
+
+# Setup file
+./src/constant/Constant.ts
