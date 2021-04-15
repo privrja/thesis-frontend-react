@@ -95,7 +95,7 @@ class MailReset extends React.Component<any, State> {
                 <h2>Change email</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'mail'}>New email</label>
-                <TextInput id={'mail'} value={this.state.mail} name={'mail'} onKeyDown={(e: any) => this.enterCall(e, this.mail)}/>
+                <TextInput className={styles.txtLarger} id={'mail'} value={this.state.mail} name={'mail'} onKeyDown={(e: any) => this.enterCall(e, this.mail)}/>
                 <button className={styles.update} onClick={this.mail}>Change</button>
                 <button className={styles.delete} onClick={this.removeMail}>Remove</button>
             </section>

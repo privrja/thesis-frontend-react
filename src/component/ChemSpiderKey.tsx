@@ -96,7 +96,7 @@ class ChemSpiderKey extends React.Component<any, State> {
                 <h2>Set ChemSpider apikey</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'txt-key'}>API Key:</label>
-                <TextInput id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)} name={'txt-key'}
+                <TextInput className={styles.txtLarger} id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)} name={'txt-key'}
                            value={this.state.apiKey}/>
                 <button className={styles.update} onClick={this.setupKey}>Change</button>
                 <button className={styles.delete} onClick={this.removeKey}>Remove</button>
