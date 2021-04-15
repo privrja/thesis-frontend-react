@@ -3,7 +3,7 @@ import SingleStructure from "./SingleStructure";
 import Sleep from "../helper/Sleep";
 import {ServerEnum} from "../enum/ServerEnum";
 
-const ENDPOINT_URI = 'https://thingproxy.freeboard.io/fetch/https://bioinfo.cristal.univ-lille.fr/norine/rest/';
+const ENDPOINT_URI = 'https://guarded-atoll-36331.herokuapp.com/https://bioinfo.cristal.univ-lille.fr/norine/rest/';
 
 interface Peptide {
     cite: string[];
@@ -58,7 +58,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
@@ -69,7 +69,7 @@ class NorineFinder implements IFinder {
             method: 'GET'
         }).then(async response => {
             return response.status === 200 ? this.jsonListResult(response) : []
-        });
+        }).catch(() => []);
     }
 
     /**
@@ -103,7 +103,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     /**
@@ -140,7 +140,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     /**

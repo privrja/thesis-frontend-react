@@ -17,7 +17,7 @@ class Family extends ListComponent<Props, ListState> {
 
     constructor(props: Props) {
         super(props);
-        this.getName = this.getName.bind(this);
+        this.getNameFirstUpper = this.getNameFirstUpper.bind(this);
         this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer()};
     }
 
@@ -39,7 +39,7 @@ class Family extends ListComponent<Props, ListState> {
         this.defaultUpdate(this.getEndpointWithId(key), key, {family: family.value});
     }
 
-    getName() {
+    getNameFirstUpper() {
         return this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1);
     }
 
@@ -49,17 +49,17 @@ class Family extends ListComponent<Props, ListState> {
                 <PopupYesNo label={"Really want to remove"} onYes={this.delete} ref={this.popupRef}/>
                 <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
 
-                <h2>Create new {this.getName()} Family</h2>
+                <h2>Create new {this.props.type} family</h2>
                 <input type={'text'} id={'txt-new-' + this.props.type + '-family-name'}
-                       onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'New Family Name'}/>
-                <button onClick={this.create} className={styles.create}>Create new Family</button>
+                       onKeyDown={(e) => this.enterCall(e, this.create)} placeholder={'new family name'}/>
+                <button onClick={this.create} className={styles.create}>Create new family</button>
 
-                <h2 id={this.props.type + 'Families'}>{this.getName()} Families - {this.state.list.length} rows</h2>
+                <h2 id={this.props.type + 'families'}>{this.getNameFirstUpper()} families - {this.state.list.length} rows</h2>
                 <table>
                     <thead>
                     <tr>
                         {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
-                        <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>Family {this.sortIcons(this.props.type + 'FamilyName')}</th>
+                        <th onClick={() => this.sortBy(this.props.type + 'FamilyName')}>family {this.sortIcons(this.props.type + 'FamilyName')}</th>
                         <th>Actions</th>
                     </tr>
                     </thead>

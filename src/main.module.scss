@@ -222,6 +222,10 @@ input:focus, select:focus, textarea:focus, button:focus {
   outline-color: #2684ff;
 }
 
+.txtLarger {
+  width: 30vw;
+}
+
 .filter {
   width: 90%;
   margin: 0 auto;
@@ -276,7 +280,7 @@ button:hover {
 }
 
 .creatable {
-  width: 12vw;
+  width: 7vw;
   display: inline-block;
   font-size: 1.3vh;
   box-sizing: border-box;
@@ -359,7 +363,7 @@ td, th {
 }
 
 .tdSequenceName {
-  min-width: 5vw;
+  min-width: 2vw;
 }
 
 // ---------------------------- Flash ----------------------------

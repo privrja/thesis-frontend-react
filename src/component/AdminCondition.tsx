@@ -51,7 +51,7 @@ class AdminCondition extends React.Component<any> {
                 <Flash ref={this.flashRef}/>
                 <textarea id={'txt-condition'} className={styles.area}/><br/>
                 <label htmlFor={'btn-reset'}>Reset conditions and agreements for users:</label>
-                <button id={'btn-reset'} className={styles.update} onClick={this.reset}>Save and Reset</button>
+                <button id={'btn-reset'} className={styles.update} onClick={this.reset}>Save and reset</button>
             </section>
         );
     }

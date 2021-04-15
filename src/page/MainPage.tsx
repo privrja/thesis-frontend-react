@@ -155,6 +155,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     componentDidMount() {
+        window.scrollTo(0, 0);
         this.initializeSmilesDrawers();
         this.getSequenceId();
         FetchHelper.initializeChemSpider();

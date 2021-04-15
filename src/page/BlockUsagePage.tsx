@@ -28,7 +28,7 @@ import {
     TXT_FILTER_SEQUENCE_NAME,
     TXT_FILTER_SEQUENCE_TYPE, TXT_FILTER_SEQUENCE_USAGES_FROM, TXT_FILTER_SEQUENCE_USAGES_TO
 } from "../constant/DefaultConstants";
-import {DECIMAL_PLACES, ENDPOINT} from "../constant/Constants";
+import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 import FlashType from "../component/FlashType";
 import {ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
 // @ts-ignore
@@ -142,7 +142,7 @@ class BlockUsagePage extends ListComponent<any, State> {
                     <table>
                         <thead>
                         <tr>
-                            <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th>
+                            {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
                                 name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
@@ -161,9 +161,10 @@ class BlockUsagePage extends ListComponent<any, State> {
                         </thead>
                         <tbody>
                         <tr>
+                            {SHOW_ID ?
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
-                                       placeholder={'Id'}/></td>
+                                       placeholder={'Id'}/></td> : '' }
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
                                        placeholder={'Name'}/></td>
@@ -217,7 +218,7 @@ class BlockUsagePage extends ListComponent<any, State> {
                         </tr>
                         {this.state.list.length > 0 && this.state.list.map(sequence => (
                             <tr key={sequence.id}>
-                                <td>{sequence.id}</td>
+                                {SHOW_ID ? <td>{sequence.id}</td> : ''}
                                 <td>{sequence.sequenceName}</td>
                                 <td>{sequence.sequenceType}</td>
                                 <td>{sequence.sequence}</td>

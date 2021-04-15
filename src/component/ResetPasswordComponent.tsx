@@ -4,6 +4,9 @@ import styles from "../main.module.scss";
 import {ENDPOINT} from "../constant/Constants";
 import FlashType from "./FlashType";
 
+const TXT_MAIL = 'txt-mail';
+const TXT_CODE = 'txt-code';
+
 class ResetPasswordComponent extends React.Component<any, any> {
 
     flashRef: React.RefObject<Flash>;
@@ -22,10 +25,10 @@ class ResetPasswordComponent extends React.Component<any, any> {
     }
 
     sendCode() {
-        let nick = document.getElementById('txt-nick') as HTMLInputElement;
+        let mail = document.getElementById(TXT_MAIL) as HTMLInputElement;
         fetch(ENDPOINT + 'user/reset', {
             method: 'POST',
-            body: JSON.stringify({nick: nick.value})
+            body: JSON.stringify({mail: mail.value})
         }).then(response => {
             if (response.status === 204) {
                 this.flashRef.current!.activate(FlashType.OK, 'CODE send to your email');
@@ -36,11 +39,11 @@ class ResetPasswordComponent extends React.Component<any, any> {
     }
 
     setupCode() {
-        let nick = document.getElementById('txt-nick') as HTMLInputElement;
-        let code = document.getElementById('txt-code') as HTMLInputElement;
+        let mail = document.getElementById(TXT_MAIL) as HTMLInputElement;
+        let code = document.getElementById(TXT_CODE) as HTMLInputElement;
         fetch(ENDPOINT + 'user/generate', {
             method: 'POST',
-            body: JSON.stringify({nick: nick.value, token: code.value})
+            body: JSON.stringify({mail: mail.value, token: code.value})
         }).then(response => {
             if (response.status === 204) {
                 this.flashRef.current!.activate(FlashType.OK, 'New password send to your email');
@@ -58,11 +61,11 @@ class ResetPasswordComponent extends React.Component<any, any> {
                     <Flash ref={this.flashRef}/>
                     <p>We send you CODE to verify on your email. Then you place CODE here and then we send to your mail
                         your new password.</p>
-                    <label htmlFor={'txt-nick'}>nick:</label>
-                    <input type={'text'} id={'txt-nick'} onKeyDown={(e) => this.enterCall(e, this.sendCode)}/>
+                    <label htmlFor={TXT_MAIL}>Email:</label>
+                    <input type={'text'} id={TXT_MAIL} onKeyDown={(e) => this.enterCall(e, this.sendCode)}/>
                     <button className={styles.update} onClick={this.sendCode}>Send CODE to email</button>
-                    <label htmlFor={'txt-code'}>CODE from your email:</label>
-                    <input type={'text'} id={'txt-code'} onKeyDown={(e) => this.enterCall(e, this.setupCode)}/>
+                    <label htmlFor={TXT_CODE}>CODE from your email:</label>
+                    <input type={'text'} id={TXT_CODE} onKeyDown={(e) => this.enterCall(e, this.setupCode)}/>
                     <button className={styles.update} onClick={this.setupCode}>Confirm</button>
                 </section>
             </section>

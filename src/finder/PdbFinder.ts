@@ -35,7 +35,6 @@ class PdbFinder implements IFinder {
         ).then(async response => {
             if (response.status === 200) {
                 let json = await response.json() as PDBResponse;
-                console.log(json);
                 return [new SingleStructure(
                     json.chem_comp.id,
                     ServerEnum.NORINE,

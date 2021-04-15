@@ -44,8 +44,8 @@ class OrganismComponent extends ListComponent<Props, ListState> {
 
                 <h2>Create new Organism</h2>
                 <input type={'text'} id={'txt-new-organism'} onKeyDown={(e) => this.enterCall(e, this.create)}
-                       placeholder={'New Organism'}/>
-                <button onClick={this.create} className={styles.create}>Create new Family</button>
+                       placeholder={'New organism'}/>
+                <button onClick={this.create} className={styles.create}>Create new organism</button>
 
                 <h2 id={'Organisms'}>Organisms - {this.state.list.length} rows</h2>
                 <table>
