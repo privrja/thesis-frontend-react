@@ -197,8 +197,6 @@ class ContainerPage extends ListComponent<any, State> {
                                     <label htmlFor="containerName">Container name:</label>
                                     <Field id="containerName" name="containerName"
                                            placeholder='Your new Container Name'/>
-
-                                    {console.log(localStorage.getItem(USER_NAME))}
                                     {localStorage.getItem(USER_NAME) === ADMIN
                                         ? <span>
                                             <label htmlFor="visibility">Container visibility:</label>
