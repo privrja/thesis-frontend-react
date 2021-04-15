@@ -19,6 +19,7 @@ class MailReset extends React.Component<any, State> {
         super(props);
         this.flashRef = React.createRef();
         this.mail = this.mail.bind(this);
+        this.removeMail = this.removeMail.bind(this);
         this.state = {mail: ''};
     }
 
@@ -67,14 +68,36 @@ class MailReset extends React.Component<any, State> {
         }
     }
 
+    removeMail() {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'user/mail', {
+                method: 'DELETE',
+                headers: {'x-auth-token': token},
+            }).then(response => {
+                if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.setState({mail: ''});
+                } else {
+                    response.json().then((data: any) =>
+                        this.flashRef.current!.activate(FlashType.BAD, data.message)
+                    ).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+                }
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
+    }
+
     render() {
         return(
             <section>
                 <h2>Change email</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'mail'}>New email</label>
-                <TextInput id={'mail'} value={this.state.mail} name={'mail'}/>
-                <button className={styles.update} onClick={this.mail} onKeyDown={(e: any) => this.enterCall(e, this.mail)}>Change</button>
+                <TextInput id={'mail'} value={this.state.mail} name={'mail'} onKeyDown={(e: any) => this.enterCall(e, this.mail)}/>
+                <button className={styles.update} onClick={this.mail}>Change</button>
+                <button className={styles.delete} onClick={this.removeMail}>Remove</button>
             </section>
         );
     }
