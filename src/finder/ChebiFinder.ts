@@ -67,7 +67,7 @@ class ChebiFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     findByIdentifiers(ids: string[]): Promise<SingleStructure[]> {

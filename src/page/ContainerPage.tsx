@@ -2,6 +2,7 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
+    ADMIN,
     CONTAINER,
     SELECTED_CONTAINER,
     SELECTED_CONTAINER_NAME,
@@ -196,12 +197,14 @@ class ContainerPage extends ListComponent<any, State> {
                                     <label htmlFor="containerName">Container name:</label>
                                     <Field id="containerName" name="containerName"
                                            placeholder='Your new Container Name'/>
-
-                                    <label htmlFor="visibility">Container visibility:</label>
-                                    <Field name={'visibility'} id={'visibility'} as={'select'}>
-                                        <option value={'PRIVATE'} selected={true}>PRIVATE</option>
-                                        <option value={'PUBLIC'}>PUBLIC</option>
-                                    </Field>
+                                    {localStorage.getItem(USER_NAME) === ADMIN
+                                        ? <span>
+                                            <label htmlFor="visibility">Container visibility:</label>
+                                            <Field name={'visibility'} id={'visibility'} as={'select'}>
+                                                <option value={'PRIVATE'} selected={true}>PRIVATE</option>
+                                                <option value={'PUBLIC'}>PUBLIC</option>
+                                            </Field>
+                                        </span> : ''}
 
                                     <button type="submit" className={styles.create}>Create new container</button>
                                 </Form>
@@ -211,8 +214,10 @@ class ContainerPage extends ListComponent<any, State> {
                             <table>
                                 <thead>
                                 <tr>
-                                    {SHOW_ID ? <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
-                                    <th onClick={() => this.sortBy('containerName')}>Container name {this.sortIcons('containerName')}</th>
+                                    {SHOW_ID ?
+                                        <th onClick={() => this.sortBy('id')}>Id {this.sortIcons('id')}</th> : ''}
+                                    <th onClick={() => this.sortBy('containerName')}>Container
+                                        name {this.sortIcons('containerName')}</th>
                                     <th onClick={() => this.sortBy('visibility')}>Visibility {this.sortIcons('visibility')}</th>
                                     <th onClick={() => this.sortBy('mode')}>Mode {this.sortIcons('mode')}</th>
                                     <th>Is selected</th>
@@ -224,7 +229,8 @@ class ContainerPage extends ListComponent<any, State> {
                                     <tr key={container.id}>
                                         {SHOW_ID ? <td>{container.id}</td> : ''}
                                         <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
-                                            <TextInput className={styles.filter} value={container.containerName} name={TXT_EDIT_CONTAINER_NAME}
+                                            <TextInput className={styles.filter} value={container.containerName}
+                                                       name={TXT_EDIT_CONTAINER_NAME}
                                                        id={TXT_EDIT_CONTAINER_NAME}/> : container.containerName}</td>
                                         <td onClick={() => this.edit(container.id)}>{this.state.editable === container.id ?
                                             <SelectInput id={SEL_EDIT_VISIBILITY} name={SEL_EDIT_VISIBILITY}
@@ -269,7 +275,8 @@ class ContainerPage extends ListComponent<any, State> {
                         <tr>
                             {SHOW_ID ?
                                 <th onClick={() => this.sortBy('id', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Id {this.sortIcons('id')}</th> : ''}
-                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container Name {this.sortIcons('containerName')}</th>
+                            <th onClick={() => this.sortBy('containerName', ENDPOINT + 'free/container/', response => this.setState({freeContainers: response}))}>Container
+                                Name {this.sortIcons('containerName')}</th>
                             <th>Is selected</th>
                             <th>Actions</th>
                         </tr>
@@ -287,7 +294,8 @@ class ContainerPage extends ListComponent<any, State> {
                                     }}>Select
                                     </button>
                                     <button onClick={() => this.clone(container.id)}>Clone</button>
-                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button onClick={() => this.props.history.push('/container/' + container.id)}>Details</button> : ''}
+                                    {localStorage.getItem(USER_NAME) === 'admin' ? <button
+                                        onClick={() => this.props.history.push('/container/' + container.id)}>Details</button> : ''}
                                     <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
                                     </button>
                                 </td>

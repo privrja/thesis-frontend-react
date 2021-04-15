@@ -58,7 +58,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
@@ -69,7 +69,7 @@ class NorineFinder implements IFinder {
             method: 'GET'
         }).then(async response => {
             return response.status === 200 ? this.jsonListResult(response) : []
-        });
+        }).catch(() => []);
     }
 
     /**
@@ -103,7 +103,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     /**
@@ -140,7 +140,7 @@ class NorineFinder implements IFinder {
             } else {
                 return [];
             }
-        });
+        }).catch(() => []);
     }
 
     /**

@@ -45,7 +45,7 @@ import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 import TextInput from "../component/TextInput";
 import Creatable from "react-select/creatable";
 import {SelectInput} from "../component/SelectInput";
-import {SequenceEnumHelper} from "../enum/SequenceEnum";
+import {SequenceEnum, SequenceEnumHelper} from "../enum/SequenceEnum";
 import ComputeHelper from "../helper/ComputeHelper";
 
 let largeSmilesDrawer: SmilesDrawer.Drawer;
@@ -56,7 +56,8 @@ const TXT_EDIT_SEQUENCE_FORMULA = 'txt-edit-sequence-formula';
 const TXT_EDIT_SEQUENCE_MASS = 'txt-edit-sequence-mass';
 const SEL_EDIT_SEQUENCE_SOURCE = 'sel-edit-sequence-source';
 const TXT_EDIT_SEQUENCE_IDENTIFIER = 'txt-edit-sequence-identifier';
-
+const SEQUENCE_NAME = 'txt-new-sequence-name';
+const SEQUENCE_FORMULA = 'txt-new-sequence-formula';
 
 interface State extends ListState {
     familyOptions: any[];
@@ -64,6 +65,8 @@ interface State extends ListState {
     editFamily: any[];
     editOrganism: any[];
     lastEditBlockId: number;
+    newFamily: any[];
+    newOrganism: any[];
 }
 
 class SequencePage extends ListComponent<any, State> {
@@ -82,6 +85,8 @@ class SequencePage extends ListComponent<any, State> {
         this.fetchOrganism = this.fetchOrganism.bind(this);
         this.familyEditChange = this.familyEditChange.bind(this);
         this.organismEditChange = this.organismEditChange.bind(this);
+        this.newFamilyChange = this.newFamilyChange.bind(this);
+        this.newOrganismChange = this.newOrganismChange.bind(this);
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
@@ -90,7 +95,9 @@ class SequencePage extends ListComponent<any, State> {
             editFamily: [],
             organismOptions: [],
             editOrganism: [],
-            lastEditBlockId: -1
+            lastEditBlockId: -1,
+            newFamily: [],
+            newOrganism: [],
         };
     }
 
@@ -119,8 +126,8 @@ class SequencePage extends ListComponent<any, State> {
 
     fetchOrganism() {
         FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism', 'GET', (data: any) => this.setState({
-            organismOptions: data.map((family: any) => {
-                return {value: family.id, label: family.family}
+            organismOptions: data.map((organism: any) => {
+                return {value: organism.id, label: organism.organism}
             })
         }));
     }
@@ -196,6 +203,14 @@ class SequencePage extends ListComponent<any, State> {
         }
     }
 
+    newFamilyChange(newValue: any) {
+        this.setState({newFamily: newValue});
+    }
+
+    newOrganismChange(newValue: any) {
+        this.setState({newOrganism: newValue});
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -204,14 +219,36 @@ class SequencePage extends ListComponent<any, State> {
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2>List of Sequences
-                        - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
+
+                    {localStorage.getItem(TOKEN) !== null ?
+                        <div>
+                            <h2>Create new sequence/compound</h2>
+                            <label htmlFor={SEQUENCE_NAME}>Name:</label>
+                            <input type={'text'} id={SEQUENCE_NAME} name={SEQUENCE_NAME}
+                                   placeholder='Name'/>
+
+                            <label htmlFor={SEQUENCE_FORMULA}>Formula:</label>
+                            <input type={'text'} id={SEQUENCE_FORMULA} name={SEQUENCE_FORMULA}
+                                   placeholder='Formula'/>
+
+                            <label htmlFor={'cre-new-sequence-family'}>Family: </label>
+                            <Creatable className={styles.creatable} id={'cre-new-sequence-family'} isMulti={true}
+                                       options={this.state.familyOptions} onChange={this.newFamilyChange}/>
+
+                            <label htmlFor={'cre-new-sequence-organism'}>Organism: </label>
+                            <Creatable className={styles.creatable} id={'cre-new-sequence-organism'} isMulti={true}
+                                       options={this.state.organismOptions} onChange={this.newOrganismChange}/>
+
+                            <button className={styles.create} onClick={this.create}>Create new sequence/compound</button>
+                        </div> : ''
+                    }
+
+                    <h2>List of sequences - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Sequence
-                                name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_SEQUENCE_NAME)}>Name {this.sortIcons(SORT_SEQUENCE_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_TYPE)}>Type {this.sortIcons(SORT_SEQUENCE_TYPE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE)}>Sequence {this.sortIcons(SORT_SEQUENCE)}</th>
                             <th onClick={() => this.sortBy(SORT_SEQUENCE_FORMULA)}>Formula {this.sortIcons(SORT_SEQUENCE_FORMULA)}</th>
@@ -281,7 +318,7 @@ class SequencePage extends ListComponent<any, State> {
                                     ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_NAME}
                                                  id={TXT_EDIT_SEQUENCE_NAME} value={sequence.sequenceName}/>
                                     : sequence.sequenceName}</td>
-                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                <td className={styles.tdSequenceName} onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <SelectInput className={styles.filter} id={SEL_EDIT_SEQUENCE_TYPE} name={SEL_EDIT_SEQUENCE_TYPE} options={SequenceEnumHelper.getOptions()} selected={SequenceEnumHelper.getValue(sequence.sequenceType).toString()}/>
                                     : sequence.sequenceType}</td>
                                 <td className={styles.tdSequence}>{sequence.sequence}</td>
@@ -346,7 +383,15 @@ class SequencePage extends ListComponent<any, State> {
     }
 
     create(values: any): void {
-        /* Empty on purpose */
+        let sequenceName = document.getElementById(SEQUENCE_NAME) as HTMLInputElement;
+        let sequenceFormula = document.getElementById(SEQUENCE_FORMULA) as HTMLInputElement;
+        this.defaultCreate(this.getEndpoint(), {
+            sequenceName: sequenceName.value,
+            sequenceType: SequenceEnumHelper.getName(SequenceEnum.OTHER),
+            formula: sequenceFormula.value,
+            family: this.state.newFamily.map((family: any) => family.value),
+            organism: this.state.newOrganism.map((organism: any) => organism.value)
+        });
     }
 
     update(key: number): void {

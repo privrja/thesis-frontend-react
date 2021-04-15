@@ -113,8 +113,9 @@ class BlockPage extends ListComponent<any, State> {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.state.selectedContainer) {
+            await this.fetchFamily();
             let key = Number(localStorage.getItem(EDITOR_ITEM));
             if (key === -1) {
                 this.defaultListTransformation(this.getEndpoint(), response => {
@@ -133,6 +134,8 @@ class BlockPage extends ListComponent<any, State> {
                             if (block.id === key) {
                                 array[index].smiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
                                 array[index].uniqueSmiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
+                                this.familyEditValue(response[index].family);
+                                this.refreshSmiles({target: {value: localStorage.getItem(EDITOR_SMILES) ?? block.smiles}});
                             }
                         });
                     }
@@ -140,7 +143,6 @@ class BlockPage extends ListComponent<any, State> {
                     this.resetStorage(key);
                 });
             }
-            this.fetchFamily();
         }
         const large = document.getElementById(ELEMENT_LARGE_SMILES);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
@@ -395,16 +397,16 @@ class BlockPage extends ListComponent<any, State> {
                                        options={this.state.familyOptions} onChange={this.newFamilyChange}/>
 
                             <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
-                            <button className={styles.create} onClick={this.create}>Create new Block</button>
+                            <button className={styles.create} onClick={this.create}>Create new block</button>
                         </div> : ''
                     }
 
-                    <h2>List of Blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
+                    <h2>List of blocks - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_NAME)}>Block name {this.sortIcons(SORT_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_NAME)}>Name {this.sortIcons(SORT_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_ACRONYM)}>Acronym {this.sortIcons(SORT_ACRONYM)}</th>
                             <th onClick={() => this.sortBy(SORT_RESIDUE)}>Residue {this.sortIcons(SORT_RESIDUE)}</th>
                             <th onClick={() => this.sortBy('blockMass')}>Mass {this.sortIcons('blockMass')}</th>

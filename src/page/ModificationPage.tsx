@@ -149,7 +149,7 @@ class ModificationPage extends ListComponent<any, ListState> {
 
                     {localStorage.getItem(TOKEN) !== null ?
                         <div>
-                            <h2>Create new Modification</h2>
+                            <h2>Create new modification</h2>
                             <Formik
                                 initialValues={{
                                     modificationName: '',
@@ -170,11 +170,11 @@ class ModificationPage extends ListComponent<any, ListState> {
                                 <Form id="modificationCreate">
                                     <label htmlFor={MODIFICATION_NAME}>Modification name:</label>
                                     <Field id={MODIFICATION_NAME} name={MODIFICATION_NAME}
-                                           placeholder='Modification Name'/>
+                                           placeholder='Modification name'/>
 
                                     <label htmlFor={MODIFICATION_FORMULA}>Formula:</label>
                                     <Field id={MODIFICATION_FORMULA} name={MODIFICATION_FORMULA}
-                                           placeholder='Modification Formula'/>
+                                           placeholder='Modification formula'/>
 
                                     <label htmlFor={N_TERMINAL}>N-terminal:</label>
                                     <Field type={'checkbox'} id={N_TERMINAL} name={N_TERMINAL}/>
@@ -182,20 +182,19 @@ class ModificationPage extends ListComponent<any, ListState> {
                                     <label htmlFor={C_TERMINAL}>C-terminal:</label>
                                     <Field type={'checkbox'} id={C_TERMINAL} name={C_TERMINAL}/>
 
-                                    <button type="submit" className={styles.create}>Create new Modification</button>
+                                    <button type="submit" className={styles.create}>Create new modification</button>
                                 </Form>
                             </Formik>
 
                         </div> : ''
                     }
 
-                    <h2>List of Modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
+                    <h2>List of modifications - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table className={styles.tableLarge}>
                         <thead>
                         <tr>
                             {SHOW_ID ? <th onClick={() => this.sortBy(SORT_ID)}>Id {this.sortIcons(SORT_ID)}</th> : ''}
-                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Modification
-                                name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
+                            <th onClick={() => this.sortBy(SORT_MODIFICATION_NAME)}>Name {this.sortIcons(SORT_MODIFICATION_NAME)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_FORMULA)}>Formula {this.sortIcons(SORT_MODIFICATION_FORMULA)}</th>
                             <th onClick={() => this.sortBy(SORT_MODIFICATION_MASS)}>Mass {this.sortIcons(SORT_MODIFICATION_MASS)}</th>
                             <th onClick={() => this.sortBy(SORT_N_TERMINAL)}>N-terminal {this.sortIcons(SORT_N_TERMINAL)}</th>

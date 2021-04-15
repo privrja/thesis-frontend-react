@@ -5,6 +5,10 @@ import {Field, Form, Formik, FormikHelpers} from "formik";
 import FlashType from "../component/FlashType";
 import {ENDPOINT} from "../constant/Constants";
 import {Link} from "react-router-dom";
+import {TOKEN, USER_NAME} from "../constant/ApiConstants";
+import Helper from "../helper/Helper";
+import FetchHelper from "../helper/FetchHelper";
+import PopupYesNo from "../component/PopupYesNo";
 
 interface Values {
     name: string;
@@ -23,11 +27,13 @@ interface State {
 class RegisterPage extends React.Component<any, State> {
 
     flashRef: React.RefObject<Flash>;
+    popupRef: React.RefObject<PopupYesNo>;
 
     constructor(props: any) {
         super(props);
         this.flashRef = React.createRef();
-        this.state = {question: ''}
+        this.popupRef = React.createRef();
+        this.state = {question: ''};
     }
 
     componentDidMount(): void {
@@ -77,15 +83,48 @@ class RegisterPage extends React.Component<any, State> {
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
+                    fetch(ENDPOINT, {
+                        method: "GET",
+                        headers: {'x-auth-token': values.name + ':' + values.password},
+                    }).then(response => {
+                        if (response.status === 204) {
+                            const token = response.headers.get('x-auth-token');
+                            if (token) {
+                                localStorage.setItem(TOKEN, token);
+                                localStorage.setItem(USER_NAME, values.name);
+                                this.flashRef.current!.activate(FlashType.OK);
+                                Helper.resetUserStorage();
+                                if (response.headers.get('x-condition') !== "1") {
+                                    this.popupRef.current!.activateWithoutText();
+                                } else {
+                                    FetchHelper.refresh(this.props.history);
+                                }
+                            } else {
+                                this.flashRef.current!.activate(FlashType.BAD);
+                            }
+                        } else {
+                            this.flashRef.current!.activate(FlashType.BAD);
+                        }
+                        values.password2 = '';
+                        values.password = '';
+                    }).catch(() => {
+                        values.password2 = '';
+                        values.password = '';
+                        this.flashRef.current!.activate(FlashType.BAD)
+                    });
                 } else {
                     response.json().then(data => {
-                        this.flashRef.current!.activate(FlashType.BAD, data.message)
-                    })
+                        this.flashRef.current!.activate(FlashType.BAD, data.message);
+                        values.password2 = '';
+                        values.password = '';
+                    }).catch(() => {
+                        values.password2 = '';
+                        values.password = '';
+                        this.flashRef.current!.activate(FlashType.BAD)
+                    });
                 }
             });
         }
-        values.password2 = '';
-        values.password = '';
     }
 
     render() {
@@ -93,9 +132,10 @@ class RegisterPage extends React.Component<any, State> {
             <section className={styles.pageLogin + ' ' + styles.page}>
                 <section>
                     <h2>Registration</h2>
-
                     <Flash textBad='Registration failure!' textOk='Registration successful!' ref={this.flashRef}/>
-
+                    <PopupYesNo label={'You need to agree with'}
+                                defaultText={'<Link to=\'/condition\'>Terms and conditions</Link>'}
+                                onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
                     <Formik
                         initialValues={{
                             name: '',

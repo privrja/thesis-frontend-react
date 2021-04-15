@@ -14,7 +14,6 @@ class SettingPage extends React.Component<any, any> {
             <section className={styles.page}>
                 <PasswordComponent/>
                 <MailReset/>
-                {console.log()}
                 {CHEMSPIDER_ONE_KEY && CHEMSPIDER_ONE_KEY.length > 0 ? '' : <ChemSpiderKey/> }
                 <DeleteAccount/>
                 <AdminComponent/>
