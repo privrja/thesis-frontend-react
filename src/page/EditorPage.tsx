@@ -28,7 +28,6 @@ class EditorPage extends React.Component<any, State> {
             method: 'POST',
             body: JSON.stringify([{smiles: this.state.smiles}])
         }).then(response => {
-            console.log(response);
             if (response.status === 200) {
                 response.json().then(data => localStorage.setItem(EDITOR_SMILES, data[0].unique));
             } else {

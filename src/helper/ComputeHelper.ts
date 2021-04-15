@@ -125,7 +125,6 @@ class ComputeHelper {
     public static computeMass(formula: string) {
         let mass = 0;
         let map = this.formulaMap(formula);
-        console.log(map);
         map.forEach((value: number, key: string) => {
             // @ts-ignore
             mass += PERIODIC_TABLE[key] * value;

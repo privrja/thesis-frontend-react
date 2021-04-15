@@ -113,8 +113,9 @@ class BlockPage extends ListComponent<any, State> {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.state.selectedContainer) {
+            await this.fetchFamily();
             let key = Number(localStorage.getItem(EDITOR_ITEM));
             if (key === -1) {
                 this.defaultListTransformation(this.getEndpoint(), response => {
@@ -133,6 +134,7 @@ class BlockPage extends ListComponent<any, State> {
                             if (block.id === key) {
                                 array[index].smiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
                                 array[index].uniqueSmiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
+                                this.familyEditValue(response[index].family);
                                 this.refreshSmiles({target: {value: localStorage.getItem(EDITOR_SMILES) ?? block.smiles}});
                             }
                         });
@@ -141,7 +143,6 @@ class BlockPage extends ListComponent<any, State> {
                     this.resetStorage(key);
                 });
             }
-            this.fetchFamily();
         }
         const large = document.getElementById(ELEMENT_LARGE_SMILES);
         largeSmilesDrawer = new SmilesDrawer.Drawer({
