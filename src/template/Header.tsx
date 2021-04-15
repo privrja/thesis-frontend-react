@@ -5,7 +5,7 @@ import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import PopupYesNo from "../component/PopupYesNo";
 import FetchHelper from "../helper/FetchHelper";
 
-class Header extends React.Component {
+class Header extends React.Component<any, any> {
 
     popupRef: React.RefObject<PopupYesNo>;
 
@@ -23,7 +23,7 @@ class Header extends React.Component {
             <header>
                 <PopupYesNo label={'You need to agree with'}
                             defaultText={'<Link to=\'/condition\'>Terms and conditions</Link>'}
-                            onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
+                            onYes={() => FetchHelper.conditionsOk(this.props.history)} onNo={() => FetchHelper.conditionsKo(this.props.history)} ref={this.popupRef}/>
                 <div className={styles.headerContainer}>
                     <HeaderTile text={'MassSpecBlocks'} url={'/'}/>
                     <HeaderTile text={'Containers'} url={'/container'}/>

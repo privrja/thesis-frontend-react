@@ -68,7 +68,7 @@ class LoginPage extends React.Component<any> {
                     <Flash textBad='Login failure!' textOk='Login successful!' ref={this.flashRef}/>
                     <PopupYesNo label={'You need to agree with'}
                                 defaultText={'<Link to=\'/condition\'>Terms and conditions</Link>'}
-                                onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
+                                onYes={() => FetchHelper.conditionsOk(this.props.history)} onNo={() => FetchHelper.conditionsKo(this.props.history)} ref={this.popupRef}/>
 
                     <Formik
                         initialValues={{
