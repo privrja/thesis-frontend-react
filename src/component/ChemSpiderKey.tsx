@@ -19,6 +19,7 @@ class ChemSpiderKey extends React.Component<any, State> {
         super(props);
         this.flashRef = React.createRef();
         this.setupKey = this.setupKey.bind(this);
+        this.removeKey = this.removeKey.bind(this);
         this.state = {apiKey: ''};
     }
 
@@ -68,14 +69,37 @@ class ChemSpiderKey extends React.Component<any, State> {
         }
     }
 
+    removeKey() {
+        let token = localStorage.getItem(TOKEN);
+        if (token) {
+            fetch(ENDPOINT + 'chemspider/key', {
+                method: 'DELETE',
+                headers: {'x-auth-token': token},
+            }).then(response => {
+                if (response.status === 204) {
+                    this.flashRef.current!.activate(FlashType.OK);
+                    this.setState({apiKey: ''});
+                } else {
+                    response.json().then((data: any) =>
+                        this.flashRef.current!.activate(FlashType.BAD, data.message)
+                    ).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+                }
+            }).catch(() => this.flashRef.current!.activate(FlashType.BAD));
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
+        }
+    }
+
     render() {
         return (
             <section>
                 <h2>Set ChemSpider apikey</h2>
                 <Flash ref={this.flashRef}/>
                 <label htmlFor={'txt-key'}>API Key:</label>
-                <TextInput id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)} name={'txt-key'} value={this.state.apiKey}/>
+                <TextInput id={'txt-key'} onKeyDown={(e) => this.enterCall(e, this.setupKey)} name={'txt-key'}
+                           value={this.state.apiKey}/>
                 <button className={styles.update} onClick={this.setupKey}>Change</button>
+                <button className={styles.delete} onClick={this.removeKey}>Remove</button>
             </section>
         );
     }
