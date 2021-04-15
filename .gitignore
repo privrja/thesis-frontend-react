@@ -28,6 +28,3 @@ yarn-error.log*
 # FireBase
 .firebase
 .firebaserc
-
-# Setup file
-./src/constant/Constant.ts

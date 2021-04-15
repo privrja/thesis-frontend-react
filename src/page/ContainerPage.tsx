@@ -254,7 +254,7 @@ class ContainerPage extends ListComponent<any, State> {
                                             <button
                                                 onClick={() => this.props.history.push('/container/' + container.id)}>Details
                                             </button>
-                                            <button onClick={() => this.clone(container.id)}>Clone</button>
+                                            <button className={styles.create} onClick={() => this.clone(container.id)}>Clone</button>
                                             <button
                                                 onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
                                             </button>
@@ -293,7 +293,7 @@ class ContainerPage extends ListComponent<any, State> {
                                         this.props.history.push('/container');
                                     }}>Select
                                     </button>
-                                    <button onClick={() => this.clone(container.id)}>Clone</button>
+                                    <button className={styles.create} onClick={() => this.clone(container.id)}>Clone</button>
                                     {localStorage.getItem(USER_NAME) === 'admin' ? <button
                                         onClick={() => this.props.history.push('/container/' + container.id)}>Details</button> : ''}
                                     <button onClick={() => this.popupExportRef.current!.activate(container.id)}>Export
