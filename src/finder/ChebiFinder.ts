@@ -3,7 +3,7 @@ import SingleStructure from "./SingleStructure";
 import {ServerEnum} from "../enum/ServerEnum";
 import Sleep from "../helper/Sleep";
 
-const ENDPOINT_URI = 'https://thingproxy.freeboard.io/fetch/http://www.ebi.ac.uk:80/webservices/chebi/2.0/webservice';
+const ENDPOINT_URI = 'https://guarded-atoll-36331.herokuapp.com/http://www.ebi.ac.uk:80/webservices/chebi/2.0/webservice';
 const ENVELOPE_START = `<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/"><Body>`;
 const ENVELOPE_END = "</Body></Envelope>";
 const GET_COMPLETE_ENTITY_START = '<getCompleteEntity xmlns="https://www.ebi.ac.uk/webservices/chebi">';
