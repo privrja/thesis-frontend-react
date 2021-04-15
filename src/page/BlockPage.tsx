@@ -133,6 +133,7 @@ class BlockPage extends ListComponent<any, State> {
                             if (block.id === key) {
                                 array[index].smiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
                                 array[index].uniqueSmiles = localStorage.getItem(EDITOR_SMILES) ?? block.smiles;
+                                this.refreshSmiles({target: {value: localStorage.getItem(EDITOR_SMILES) ?? block.smiles}});
                             }
                         });
                     }
