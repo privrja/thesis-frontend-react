@@ -27,7 +27,7 @@ yarn-error.log*
 
 
 # FireBase
-.firebase
+.firebase/*
 .firebaserc
 
 # Setup file
