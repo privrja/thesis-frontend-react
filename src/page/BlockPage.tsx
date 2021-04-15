@@ -397,7 +397,7 @@ class BlockPage extends ListComponent<any, State> {
                                        options={this.state.familyOptions} onChange={this.newFamilyChange}/>
 
                             <button className={styles.update} onClick={() => this.editor(-1)}>Editor</button>
-                            <button className={styles.create} onClick={this.create}>Create new Block</button>
+                            <button className={styles.create} onClick={this.create}>Create new block</button>
                         </div> : ''
                     }
 

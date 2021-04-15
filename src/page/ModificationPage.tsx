@@ -170,11 +170,11 @@ class ModificationPage extends ListComponent<any, ListState> {
                                 <Form id="modificationCreate">
                                     <label htmlFor={MODIFICATION_NAME}>Modification name:</label>
                                     <Field id={MODIFICATION_NAME} name={MODIFICATION_NAME}
-                                           placeholder='Modification Name'/>
+                                           placeholder='Modification name'/>
 
                                     <label htmlFor={MODIFICATION_FORMULA}>Formula:</label>
                                     <Field id={MODIFICATION_FORMULA} name={MODIFICATION_FORMULA}
-                                           placeholder='Modification Formula'/>
+                                           placeholder='Modification formula'/>
 
                                     <label htmlFor={N_TERMINAL}>N-terminal:</label>
                                     <Field type={'checkbox'} id={N_TERMINAL} name={N_TERMINAL}/>
@@ -182,7 +182,7 @@ class ModificationPage extends ListComponent<any, ListState> {
                                     <label htmlFor={C_TERMINAL}>C-terminal:</label>
                                     <Field type={'checkbox'} id={C_TERMINAL} name={C_TERMINAL}/>
 
-                                    <button type="submit" className={styles.create}>Create new Modification</button>
+                                    <button type="submit" className={styles.create}>Create new modification</button>
                                 </Form>
                             </Formik>
 
