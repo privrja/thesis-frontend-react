@@ -280,7 +280,7 @@ class SequencePage extends ListComponent<any, State> {
                                     ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_NAME}
                                                  id={TXT_EDIT_SEQUENCE_NAME} value={sequence.sequenceName}/>
                                     : sequence.sequenceName}</td>
-                                <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
+                                <td className={styles.tdSequenceName} onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <SelectInput className={styles.filter} id={SEL_EDIT_SEQUENCE_TYPE} name={SEL_EDIT_SEQUENCE_TYPE} options={SequenceEnumHelper.getOptions()} selected={SequenceEnumHelper.getValue(sequence.sequenceType).toString()}/>
                                     : sequence.sequenceType}</td>
                                 <td className={styles.tdSequence}>{sequence.sequence}</td>
