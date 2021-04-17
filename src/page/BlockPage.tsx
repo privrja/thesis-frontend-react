@@ -153,7 +153,7 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     fetchFamily() {
-        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => this.setState({
+        FetchHelper.fetch(this.getEndpoint() + '/family?sort=blockFamilyName&order=asc', 'GET', (data: any) => this.setState({
             familyOptions: data.map((family: any) => {
                 return {value: family.id, label: family.family}
             })

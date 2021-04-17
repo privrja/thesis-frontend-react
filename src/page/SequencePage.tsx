@@ -115,7 +115,7 @@ class SequencePage extends ListComponent<any, State> {
     }
 
     fetchFamily() {
-        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => {
+        FetchHelper.fetch(this.getEndpoint() + '/family?sort=sequenceFamilyName&order=asc', 'GET', (data: any) => {
             this.setState({
                 familyOptions: data.map((family: any) => {
                     return {value: family.id, label: family.family}
@@ -125,7 +125,7 @@ class SequencePage extends ListComponent<any, State> {
     }
 
     fetchOrganism() {
-        FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism', 'GET', (data: any) => this.setState({
+        FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism?sort=organism&order=asc', 'GET', (data: any) => this.setState({
             organismOptions: data.map((organism: any) => {
                 return {value: organism.id, label: organism.organism}
             })
