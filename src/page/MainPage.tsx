@@ -1282,7 +1282,7 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     fetchBlockOptions() {
-        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
+        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block?sort=acronym&order=asc', {
             method: 'GET',
         }).then(response => {
             if (response.status === 200) {
