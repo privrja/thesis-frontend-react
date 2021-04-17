@@ -159,6 +159,8 @@ class MainPage extends React.Component<any, SequenceState> {
         this.initializeSmilesDrawers();
         this.getSequenceId();
         FetchHelper.initializeChemSpider();
+        this.fetchModifications();
+        this.fetchBlockOptions();
         this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
     }
 
@@ -591,8 +593,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 });
             }
         );
-        this.fetchModifications();
-        this.fetchBlockOptions();
     }
 
     async fetchModifications() {
@@ -796,7 +796,7 @@ class MainPage extends React.Component<any, SequenceState> {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
         this.setState({results: [], molecule: molecule}, () => this.drawSmiles(molecule.smiles));
-        this.props.history.push('#results');
+        window.scrollTo(0, 0);
     }
 
     /**
@@ -994,14 +994,22 @@ class MainPage extends React.Component<any, SequenceState> {
                                 molecule.mass = data[0].mass;
                             }
                         }
-                        this.setState({editorSequence: false, molecule: molecule, sequence: sequence}, () => this.drawSmiles(smiles));
+                        this.setState({
+                            editorSequence: false,
+                            molecule: molecule,
+                            sequence: sequence
+                        }, () => this.drawSmiles(smiles));
                     }).catch(() => this.setState({
                         editorSequence: false,
                         molecule: molecule,
                         sequence: sequence
                     }, () => this.drawSmiles(smiles)));
                 }
-            }).catch(() => this.setState({editorSequence: false, molecule: molecule, sequence: sequence}, () => this.drawSmiles(smiles)));
+            }).catch(() => this.setState({
+                editorSequence: false,
+                molecule: molecule,
+                sequence: sequence
+            }, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
@@ -1071,7 +1079,11 @@ class MainPage extends React.Component<any, SequenceState> {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let searchParam = (document.getElementById('search')) as HTMLSelectElement;
-        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam?.options[searchParam.selectedIndex].value});
+        this.setState({
+            molecule: this.moleculeData(),
+            source: search,
+            searchParam: searchParam?.options[searchParam.selectedIndex].value
+        });
     }
 
     refreshFormula(event: any) {
@@ -1270,26 +1282,22 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     fetchBlockOptions() {
-        const token = localStorage.getItem(TOKEN);
-        if (token) {
-            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
-                method: 'GET',
-                headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 200) {
-                    response.json().then(data => {
-                        let options = data.map((block: any) => {
-                            return {value: block.id, label: block.acronym}
-                        });
-                        options.unshift(new SelectOption('-1', 'Not in DB'));
-                        this.setState({
-                            blocksAll: data,
-                            blockOptions: options,
-                        })
+        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
+            method: 'GET',
+        }).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    let options = data.map((block: any) => {
+                        return {value: block.id, label: block.acronym}
                     });
-                }
-            });
-        }
+                    options.unshift(new SelectOption('-1', 'Not in DB'));
+                    this.setState({
+                        blocksAll: data,
+                        blockOptions: options,
+                    })
+                });
+            }
+        });
     }
 
     blockDbChange(newValue: any) {
@@ -1320,7 +1328,8 @@ class MainPage extends React.Component<any, SequenceState> {
                     <title>{this.state.title}</title>
                 </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
-                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor} ref={this.popupEditorRef}
+                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor}
+                             ref={this.popupEditorRef}
                              onClose={this.editorClose}/>
                 <section>
                     <div className={styles.drawerArea}>
@@ -1411,7 +1420,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 }
 
                 {this.state.blocks.length > 0 ?
-                    <section id='results'>
+                    <section id={'results'}>
                         <ModificationComponent containerId={this.state.selectedContainer}
                                                blockLength={this.state.blocks.length}
                                                sequenceType={this.state.sequence?.sequenceType}
