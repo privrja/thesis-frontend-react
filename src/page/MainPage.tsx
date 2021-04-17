@@ -979,6 +979,9 @@ class MainPage extends React.Component<any, SequenceState> {
                 molecule = this.moleculeData();
             }
             molecule.smiles = smiles;
+            let sequence = this.state.sequence;
+            sequence!.decays = '';
+
             fetch(ENDPOINT + 'smiles/formula', {
                 method: 'POST',
                 body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
@@ -991,13 +994,14 @@ class MainPage extends React.Component<any, SequenceState> {
                                 molecule.mass = data[0].mass;
                             }
                         }
-                        this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+                        this.setState({editorSequence: false, molecule: molecule, sequence: sequence}, () => this.drawSmiles(smiles));
                     }).catch(() => this.setState({
                         editorSequence: false,
-                        molecule: molecule
+                        molecule: molecule,
+                        sequence: sequence
                     }, () => this.drawSmiles(smiles)));
                 }
-            }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
+            }).catch(() => this.setState({editorSequence: false, molecule: molecule, sequence: sequence}, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
