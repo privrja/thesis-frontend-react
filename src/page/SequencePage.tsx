@@ -394,7 +394,7 @@ class SequencePage extends ListComponent<any, State> {
         });
     }
 
-    update(key: number): void {
+    update(key: number) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             let name = document.getElementById(TXT_EDIT_SEQUENCE_NAME) as HTMLInputElement;
@@ -419,6 +419,8 @@ class SequencePage extends ListComponent<any, State> {
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence ' + this.findName(key) + ' updated');
+                    this.fetchFamily();
+                    this.fetchOrganism();
                     this.list();
                 } else {
                     response.json().then(data => {
