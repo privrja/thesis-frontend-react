@@ -1282,9 +1282,16 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     fetchBlockOptions() {
-        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block?sort=acronym&order=asc', {
-            method: 'GET',
-        }).then(response => {
+        let token = localStorage.getItem(TOKEN);
+        let init: any = {method: 'GET'};
+        if (token) {
+            init = {
+                method: 'GET',
+                headers: {'x-auth-token': token},
+            };
+        }
+
+        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block?sort=acronym&order=asc', init).then(response => {
             if (response.status === 200) {
                 response.json().then(data => {
                     let options = data.map((block: any) => {
@@ -1358,7 +1365,12 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
-                                  value={this.state.molecule?.smiles ?? ''} onInput={() => { let sequence = this.state.sequence; sequence!.decays = ''; this.setState({sequence: sequence});  this.drawSmiles();}}
+                                  value={this.state.molecule?.smiles ?? ''} onInput={() => {
+                            let sequence = this.state.sequence;
+                            sequence!.decays = '';
+                            this.setState({sequence: sequence});
+                            this.drawSmiles();
+                        }}
                                   onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
