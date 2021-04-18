@@ -197,6 +197,8 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
+                        let databaseSelect = document.getElementById('database') as HTMLSelectElement;
+                        databaseSelect.selectedIndex = Number(Array.from(databaseSelect.options).find(e => e.value.toString() === sequence.source.toString())?.value ?? 0);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
