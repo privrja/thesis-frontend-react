@@ -15,7 +15,12 @@ class OrganismComponent extends ListComponent<Props, ListState> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer()};
+        this.state = {
+            list: [],
+            selectedContainer: ContainerHelper.getSelectedContainer(),
+            lastSortParam: 'organism',
+            lastSortOrder: 'asc'
+        };
     }
 
     create(): void {

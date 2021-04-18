@@ -98,6 +98,8 @@ class SequencePage extends ListComponent<any, State> {
             lastEditBlockId: -1,
             newFamily: [],
             newOrganism: [],
+            lastSortParam: 'sequenceName',
+            lastSortOrder: 'asc'
         };
     }
 
