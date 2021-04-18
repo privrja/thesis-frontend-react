@@ -1358,7 +1358,7 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
-                                  value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
+                                  value={this.state.molecule?.smiles ?? ''} onInput={() => { let sequence = this.state.sequence; sequence!.decays = ''; this.setState({sequence: sequence});  this.drawSmiles();}}
                                   onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
