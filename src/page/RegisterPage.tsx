@@ -92,15 +92,15 @@ class RegisterPage extends React.Component<any, State> {
                     fetch(ENDPOINT, {
                         method: "GET",
                         headers: {'x-auth-token': values.name + ':' + values.password},
-                    }).then(response => {
-                        if (response.status === 204) {
-                            const token = response.headers.get('x-auth-token');
+                    }).then(responseLogin => {
+                        if (responseLogin.status === 204) {
+                            const token = responseLogin.headers.get('x-auth-token');
                             if (token) {
                                 localStorage.setItem(TOKEN, token);
                                 localStorage.setItem(USER_NAME, values.name);
                                 this.flashRef.current!.activate(FlashType.OK);
                                 Helper.resetUserStorage();
-                                if (response.headers.get('x-condition') !== "1") {
+                                if (responseLogin.headers.get('x-condition') !== "1") {
                                     this.popupRef.current!.activateWithoutText();
                                 } else {
                                     FetchHelper.refresh(this.props.history);
