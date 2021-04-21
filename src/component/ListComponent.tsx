@@ -3,7 +3,7 @@ import Flash from "./Flash";
 import PopupYesNo from "./PopupYesNo";
 import {TOKEN} from "../constant/ApiConstants";
 import FlashType from "./FlashType";
-import {ERROR_LOGIN_NEEDED, OK_CREATED} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG, OK_CREATED} from "../constant/FlashConstants";
 import FetchHelper from "../helper/FetchHelper";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
@@ -48,6 +48,8 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
         this.addFilter = this.addFilter.bind(this);
         this.clearConcreteFilter = this.clearConcreteFilter.bind(this);
         this.sortIcons = this.sortIcons.bind(this);
+        this.clone = this.clone.bind(this);
+        this.cloneTransformation = this.cloneTransformation.bind(this);
     }
 
     componentDidMount(): void {
@@ -67,6 +69,15 @@ abstract class ListComponent<P extends any, S extends ListState> extends React.C
 
     editEnd(): void {
         this.setState({editable: undefined});
+    }
+
+    clone(key: number) {
+        FetchHelper.fetch(this.getEndpointWithId(key) + '/clone', 'POST', this.cloneTransformation, () => this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG));
+    }
+
+    cloneTransformation() {
+        this.flashRef.current!.activate(FlashType.OK);
+        this.list();
     }
 
     sortIcons(param: string) {

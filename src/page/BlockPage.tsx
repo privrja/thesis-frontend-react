@@ -109,16 +109,18 @@ class BlockPage extends ListComponent<any, State> {
             editFamily: [],
             selectedContainer: this.props.match.params.id,
             selectedContainerName: ContainerHelper.getSelectedContainerName(),
-            lastEditBlockId: -1
+            lastEditBlockId: -1,
+            lastSortParam: 'acronym',
+            lastSortOrder: 'asc'
         };
     }
 
-    async componentDidMount() {
+    componentDidMount() {
         if (this.state.selectedContainer) {
-            await this.fetchFamily();
+            this.fetchFamily();
             let key = Number(localStorage.getItem(EDITOR_ITEM));
             if (key === -1) {
-                this.defaultListTransformation(this.getEndpoint(), response => {
+                this.defaultListTransformation(this.getEndpoint() + '?sort=' + this.state.lastSortParam + '&order=' + this.state.lastSortOrder, response => {
                     this.setState({list: response});
                     (document.getElementById(BLOCK_NAME) as HTMLInputElement).value = localStorage.getItem(EDITOR_NEW_BLOCK_NAME) ?? (document.getElementById(BLOCK_NAME) as HTMLInputElement).value;
                     (document.getElementById(BLOCK_ACRONYM) as HTMLInputElement).value = localStorage.getItem(EDITOR_NEW_BLOCK_ACRONYM) ?? '';
@@ -127,7 +129,7 @@ class BlockPage extends ListComponent<any, State> {
                     this.resetStorage(key);
                 });
             } else {
-                this.defaultListTransformation(this.getEndpoint(), response => {
+                this.defaultListTransformation(this.getEndpoint() + '?sort=' + this.state.lastSortParam + '&order=' + this.state.lastSortOrder, response => {
                     if (!isNaN(key)) {
                         this.setState({editable: key});
                         response.forEach((block: any, index: number, array: any[]) => {
@@ -153,7 +155,7 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     fetchFamily() {
-        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => this.setState({
+        FetchHelper.fetch(this.getEndpoint() + '/family?sort=blockFamilyName&order=asc', 'GET', (data: any) => this.setState({
             familyOptions: data.map((family: any) => {
                 return {value: family.id, label: family.family}
             })
@@ -322,13 +324,13 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     familyEditValue(family: string) {
-        this.setState({editFamily: family.split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName))});
+        this.setState({editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName))});
     }
 
     edit(blockId: number, family?: string): void {
         if (family && this.state.lastEditBlockId !== blockId) {
             this.setState({
-                editFamily: family.split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)),
+                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)),
                 editable: blockId,
                 lastEditBlockId: blockId
             });
@@ -509,6 +511,7 @@ class BlockPage extends ListComponent<any, State> {
                                     <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
+                                    <button className={styles.create} onClick={() => this.clone(block.id)}>Clone</button>
                                     <button onClick={() => {
                                         this.props.history.push('/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage');
                                     }}>Usage

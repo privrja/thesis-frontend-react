@@ -18,7 +18,7 @@ class Family extends ListComponent<Props, ListState> {
     constructor(props: Props) {
         super(props);
         this.getNameFirstUpper = this.getNameFirstUpper.bind(this);
-        this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer()};
+        this.state = {list: [], selectedContainer: ContainerHelper.getSelectedContainer(), lastSortParam: this.props.type + 'FamilyName', lastSortOrder: 'asc'};
     }
 
     findName(key: number): string {

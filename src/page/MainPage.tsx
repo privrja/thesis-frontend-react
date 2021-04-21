@@ -159,6 +159,8 @@ class MainPage extends React.Component<any, SequenceState> {
         this.initializeSmilesDrawers();
         this.getSequenceId();
         FetchHelper.initializeChemSpider();
+        this.fetchModifications();
+        this.fetchBlockOptions();
         this.flashNotice.current!.activate(FlashType.NOTICE, 'Create new sequence');
     }
 
@@ -195,6 +197,8 @@ class MainPage extends React.Component<any, SequenceState> {
             fetch(ENDPOINT + 'container/' + ContainerHelper.getSelectedContainer() + '/sequence/' + sequenceId, init).then(response => {
                 if (response.status === 200) {
                     response.json().then(sequence => {
+                        let databaseSelect = document.getElementById('database') as HTMLSelectElement;
+                        databaseSelect.selectedIndex = Number(Array.from(databaseSelect.options).find(e => e.value.toString() === sequence.source?.toString())?.value ?? 0);
                         this.setState({
                             molecule: new SingleStructure(
                                 sequence.identifier,
@@ -591,8 +595,6 @@ class MainPage extends React.Component<any, SequenceState> {
                 });
             }
         );
-        this.fetchModifications();
-        this.fetchBlockOptions();
     }
 
     async fetchModifications() {
@@ -796,7 +798,7 @@ class MainPage extends React.Component<any, SequenceState> {
             molecule.structureName = nameInput?.value ?? molecule.structureName;
         }
         this.setState({results: [], molecule: molecule}, () => this.drawSmiles(molecule.smiles));
-        this.props.history.push('#results');
+        window.scrollTo(0, 0);
     }
 
     /**
@@ -979,6 +981,9 @@ class MainPage extends React.Component<any, SequenceState> {
                 molecule = this.moleculeData();
             }
             molecule.smiles = smiles;
+            let sequence = this.state.sequence;
+            sequence!.decays = '';
+
             fetch(ENDPOINT + 'smiles/formula', {
                 method: 'POST',
                 body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
@@ -991,13 +996,22 @@ class MainPage extends React.Component<any, SequenceState> {
                                 molecule.mass = data[0].mass;
                             }
                         }
-                        this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles));
+                        this.setState({
+                            editorSequence: false,
+                            molecule: molecule,
+                            sequence: sequence
+                        }, () => this.drawSmiles(smiles));
                     }).catch(() => this.setState({
                         editorSequence: false,
-                        molecule: molecule
+                        molecule: molecule,
+                        sequence: sequence
                     }, () => this.drawSmiles(smiles)));
                 }
-            }).catch(() => this.setState({editorSequence: false, molecule: molecule}, () => this.drawSmiles(smiles)));
+            }).catch(() => this.setState({
+                editorSequence: false,
+                molecule: molecule,
+                sequence: sequence
+            }, () => this.drawSmiles(smiles)));
         } else if (this.state.editorBlockId || this.state.editorBlockId === 0) {
             let blocks = this.state.blocks;
             let blocksCopy = [...blocks];
@@ -1067,7 +1081,11 @@ class MainPage extends React.Component<any, SequenceState> {
         let searchInput: HTMLSelectElement | null = document.getElementById('database') as HTMLSelectElement;
         let search = Number(searchInput?.options[searchInput.selectedIndex].value);
         let searchParam = (document.getElementById('search')) as HTMLSelectElement;
-        this.setState({molecule: this.moleculeData(), source: search, searchParam: searchParam?.options[searchParam.selectedIndex].value});
+        this.setState({
+            molecule: this.moleculeData(),
+            source: search,
+            searchParam: searchParam?.options[searchParam.selectedIndex].value
+        });
     }
 
     refreshFormula(event: any) {
@@ -1266,26 +1284,29 @@ class MainPage extends React.Component<any, SequenceState> {
     }
 
     fetchBlockOptions() {
-        const token = localStorage.getItem(TOKEN);
+        let token = localStorage.getItem(TOKEN);
+        let init: any = {method: 'GET'};
         if (token) {
-            fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block', {
+            init = {
                 method: 'GET',
-                headers: {'x-auth-token': token}
-            }).then(response => {
-                if (response.status === 200) {
-                    response.json().then(data => {
-                        let options = data.map((block: any) => {
-                            return {value: block.id, label: block.acronym}
-                        });
-                        options.unshift(new SelectOption('-1', 'Not in DB'));
-                        this.setState({
-                            blocksAll: data,
-                            blockOptions: options,
-                        })
-                    });
-                }
-            });
+                headers: {'x-auth-token': token},
+            };
         }
+
+        fetch(ENDPOINT + CONTAINER + '/' + this.state.selectedContainer + '/block?sort=acronym&order=asc', init).then(response => {
+            if (response.status === 200) {
+                response.json().then(data => {
+                    let options = data.map((block: any) => {
+                        return {value: block.id, label: block.acronym}
+                    });
+                    options.unshift(new SelectOption('-1', 'Not in DB'));
+                    this.setState({
+                        blocksAll: data,
+                        blockOptions: options,
+                    })
+                });
+            }
+        });
     }
 
     blockDbChange(newValue: any) {
@@ -1316,7 +1337,8 @@ class MainPage extends React.Component<any, SequenceState> {
                     <title>{this.state.title}</title>
                 </Helmet>
                 <PopupSmilesDrawer id='popupLargeSmiles' className={styles.popupLarge} ref={this.popupRef}/>
-                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor} ref={this.popupEditorRef}
+                <PopupEditor id={'popupEditor'} className={styles.popupLarge + ' ' + styles.popupLargeEditor}
+                             ref={this.popupEditorRef}
                              onClose={this.editorClose}/>
                 <section>
                     <div className={styles.drawerArea}>
@@ -1345,7 +1367,12 @@ class MainPage extends React.Component<any, SequenceState> {
 
                         <label htmlFor='smiles' className={styles.main}>SMILES</label>
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
-                                  value={this.state.molecule?.smiles ?? ''} onInput={this.drawSmiles}
+                                  value={this.state.molecule?.smiles ?? ''} onInput={() => {
+                            let sequence = this.state.sequence;
+                            sequence!.decays = '';
+                            this.setState({sequence: sequence});
+                            this.drawSmiles();
+                        }}
                                   onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
@@ -1407,7 +1434,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 }
 
                 {this.state.blocks.length > 0 ?
-                    <section id='results'>
+                    <section id={'results'}>
                         <ModificationComponent containerId={this.state.selectedContainer}
                                                blockLength={this.state.blocks.length}
                                                sequenceType={this.state.sequence?.sequenceType}

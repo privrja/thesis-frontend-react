@@ -16,6 +16,7 @@ interface Values {
     password2: string;
     conditions: boolean;
     cap: string;
+    mail: string;
 }
 
 const BAD_CAP = 'Something bad happen with Cap';
@@ -79,22 +80,27 @@ class RegisterPage extends React.Component<any, State> {
             fetch(ENDPOINT + 'register', {
                 credentials: "include",
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap})
+                body: JSON.stringify({
+                    name: values.name,
+                    password: values.password,
+                    answer: values.cap,
+                    mail: values.mail
+                })
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
                     fetch(ENDPOINT, {
                         method: "GET",
                         headers: {'x-auth-token': values.name + ':' + values.password},
-                    }).then(response => {
-                        if (response.status === 204) {
-                            const token = response.headers.get('x-auth-token');
+                    }).then(responseLogin => {
+                        if (responseLogin.status === 204) {
+                            const token = responseLogin.headers.get('x-auth-token');
                             if (token) {
                                 localStorage.setItem(TOKEN, token);
                                 localStorage.setItem(USER_NAME, values.name);
                                 this.flashRef.current!.activate(FlashType.OK);
                                 Helper.resetUserStorage();
-                                if (response.headers.get('x-condition') !== "1") {
+                                if (responseLogin.headers.get('x-condition') !== "1") {
                                     this.popupRef.current!.activateWithoutText();
                                 } else {
                                     FetchHelper.refresh(this.props.history);
@@ -135,14 +141,16 @@ class RegisterPage extends React.Component<any, State> {
                     <Flash textBad='Registration failure!' textOk='Registration successful!' ref={this.flashRef}/>
                     <PopupYesNo label={'You need to agree with'}
                                 defaultText={'<Link to=\'/condition\'>Terms and conditions</Link>'}
-                                onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
+                                onYes={() => FetchHelper.conditionsOk(this.props.history)}
+                                onNo={() => FetchHelper.conditionsKo(this.props.history)} ref={this.popupRef}/>
                     <Formik
                         initialValues={{
                             name: '',
                             password: '',
                             password2: '',
                             conditions: false,
-                            cap: ''
+                            cap: '',
+                            mail: ''
                         }}
                         onSubmit={(
                             values: Values,
@@ -168,7 +176,7 @@ class RegisterPage extends React.Component<any, State> {
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
 
                             <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a
-                                href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
+                                href={'https://en.wikipedia.org/wiki/Amino_acid'} target={'_blank'} rel={'noopener noreferrer'}>Wiki</a></label>
                             <Field id={'cap'} name={'cap'}/>
 
                             <label htmlFor="conditions">
