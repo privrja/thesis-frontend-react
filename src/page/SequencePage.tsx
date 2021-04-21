@@ -9,7 +9,7 @@ import {ServerEnumHelper} from "../enum/ServerEnum";
 import Helper from "../helper/Helper";
 import FetchHelper from "../helper/FetchHelper";
 import FlashType from "../component/FlashType";
-import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
@@ -77,8 +77,6 @@ class SequencePage extends ListComponent<any, State> {
         super(props);
         this.popupSmilesRef = React.createRef();
         this.detail = this.detail.bind(this);
-        this.clone = this.clone.bind(this);
-        this.cloneTransformation = this.cloneTransformation.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
         this.fetchFamily = this.fetchFamily.bind(this);
@@ -154,15 +152,6 @@ class SequencePage extends ListComponent<any, State> {
         localStorage.setItem(SEQUENCE_EDIT, 'Yes');
         localStorage.setItem(SEQUENCE_ID, key.toString());
         this.props.history.push('/');
-    }
-
-    clone(key: number) {
-        FetchHelper.fetch(this.getEndpointWithId(key) + '/clone', 'POST', this.cloneTransformation, () => this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG));
-    }
-
-    cloneTransformation() {
-        this.flashRef.current!.activate(FlashType.OK);
-        this.list();
     }
 
     filter() {
