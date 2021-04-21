@@ -70,7 +70,7 @@ class ReferencePage extends React.Component<any, any> {
                             <li><a href={'https://doi.org/10.1016/j.bbapap.2016.12.003'}>https://doi.org/10.1016/j.bbapap.2016.12.003</a></li>
                             <li><a href={'https://doi.org/10.1002/mas.21461'}>https://doi.org/10.1002/mas.21461</a></li>
                             <li><a href={'https://doi.org/10.1039/b906679a'}>https://doi.org/10.1039/b906679a</a></li>
-                            <li><a href={'http://bertrandsamuel.free.fr/siderophore_base/siderophores.php'}>http://bertrandsamuel.free.fr/siderophore_base/siderophores.php</a></li>
+                            <li><a href={'https://bertrandsamuel.free.fr/siderophore_base/siderophores.php'}>http://bertrandsamuel.free.fr/siderophore_base/siderophores.php</a></li>
                         </ul>
                         Container Siderophores and Secondary Metabolites (MS) is based on <a href={'https://doi.org/10.1002/mas.21461'}>https://doi.org/10.1002/mas.21461</a>
                     </p>

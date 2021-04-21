@@ -115,9 +115,9 @@ class BlockPage extends ListComponent<any, State> {
         };
     }
 
-    async componentDidMount() {
+    componentDidMount() {
         if (this.state.selectedContainer) {
-            await this.fetchFamily();
+            this.fetchFamily();
             let key = Number(localStorage.getItem(EDITOR_ITEM));
             if (key === -1) {
                 this.defaultListTransformation(this.getEndpoint() + '?sort=' + this.state.lastSortParam + '&order=' + this.state.lastSortOrder, response => {
