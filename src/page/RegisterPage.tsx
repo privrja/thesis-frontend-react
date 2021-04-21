@@ -176,7 +176,7 @@ class RegisterPage extends React.Component<any, State> {
                             <Field id="password2" name="password2" type="password" placeholder='******'/>
 
                             <label htmlFor={'cap'}>Write three letter code for {this.state.question} <a
-                                href={'https://en.wikipedia.org/wiki/Amino_acid'}>Wiki</a></label>
+                                href={'https://en.wikipedia.org/wiki/Amino_acid'} target={'_blank'} rel={'noopener noreferrer'}>Wiki</a></label>
                             <Field id={'cap'} name={'cap'}/>
 
                             <label htmlFor="conditions">
