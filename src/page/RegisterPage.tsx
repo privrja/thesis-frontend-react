@@ -16,6 +16,7 @@ interface Values {
     password2: string;
     conditions: boolean;
     cap: string;
+    mail: string;
 }
 
 const BAD_CAP = 'Something bad happen with Cap';
@@ -79,7 +80,7 @@ class RegisterPage extends React.Component<any, State> {
             fetch(ENDPOINT + 'register', {
                 credentials: "include",
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap})
+                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap, mail: values.mail})
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -142,7 +143,8 @@ class RegisterPage extends React.Component<any, State> {
                             password: '',
                             password2: '',
                             conditions: false,
-                            cap: ''
+                            cap: '',
+                            mail: ''
                         }}
                         onSubmit={(
                             values: Values,
