@@ -80,7 +80,12 @@ class RegisterPage extends React.Component<any, State> {
             fetch(ENDPOINT + 'register', {
                 credentials: "include",
                 method: 'POST',
-                body: JSON.stringify({name: values.name, password: values.password, answer: values.cap, mail: values.mail})
+                body: JSON.stringify({
+                    name: values.name,
+                    password: values.password,
+                    answer: values.cap,
+                    mail: values.mail
+                })
             }).then(response => {
                 if (response.status === 201) {
                     this.flashRef.current!.activate(FlashType.OK);
@@ -136,7 +141,8 @@ class RegisterPage extends React.Component<any, State> {
                     <Flash textBad='Registration failure!' textOk='Registration successful!' ref={this.flashRef}/>
                     <PopupYesNo label={'You need to agree with'}
                                 defaultText={'<Link to=\'/condition\'>Terms and conditions</Link>'}
-                                onYes={FetchHelper.conditionsOk} onNo={FetchHelper.conditionsKo} ref={this.popupRef}/>
+                                onYes={() => FetchHelper.conditionsOk(this.props.history)}
+                                onNo={() => FetchHelper.conditionsKo(this.props.history)} ref={this.popupRef}/>
                     <Formik
                         initialValues={{
                             name: '',
