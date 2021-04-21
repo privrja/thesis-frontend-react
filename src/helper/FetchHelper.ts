@@ -7,7 +7,7 @@ import {CHEMSPIDER_ONE_KEY, ENDPOINT} from "../constant/Constants";
 class FetchHelper {
 
     static async fetchModification(containerId: number, init: {}, callbackSuccess: Function, callbackFail: Function | null = null) {
-        fetch(ENDPOINT + 'container/' + containerId + '/modification', init).then(response => {
+        fetch(ENDPOINT + 'container/' + containerId + '/modification?sort=modificationName&order=asc', init).then(response => {
             if (response.status === 200) {
                 callbackSuccess(response.json());
             } else {

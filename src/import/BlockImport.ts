@@ -16,7 +16,7 @@ class BlockImport extends AbstractImport {
         if (ref) {
             this.okStack.push({
                 blockName: parts[0].replaceAll('.', ','),
-                acronym: parts[1],
+                acronym: parts[1].replaceAll('.', ','),
                 formula: parts[2],
                 mass: Number(parts[3]),
                 losses: parts[4] === '' ? null : parts[4],

@@ -9,7 +9,7 @@ import {ServerEnumHelper} from "../enum/ServerEnum";
 import Helper from "../helper/Helper";
 import FetchHelper from "../helper/FetchHelper";
 import FlashType from "../component/FlashType";
-import {ERROR_LOGIN_NEEDED, ERROR_SOMETHING_GOES_WRONG} from "../constant/FlashConstants";
+import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
 import ContainerHelper from "../helper/ContainerHelper";
 // @ts-ignore
 import * as SmilesDrawer from 'smiles-drawer';
@@ -77,8 +77,6 @@ class SequencePage extends ListComponent<any, State> {
         super(props);
         this.popupSmilesRef = React.createRef();
         this.detail = this.detail.bind(this);
-        this.clone = this.clone.bind(this);
-        this.cloneTransformation = this.cloneTransformation.bind(this);
         this.filter = this.filter.bind(this);
         this.clear = this.clear.bind(this);
         this.fetchFamily = this.fetchFamily.bind(this);
@@ -98,6 +96,8 @@ class SequencePage extends ListComponent<any, State> {
             lastEditBlockId: -1,
             newFamily: [],
             newOrganism: [],
+            lastSortParam: 'sequenceName',
+            lastSortOrder: 'asc'
         };
     }
 
@@ -115,7 +115,7 @@ class SequencePage extends ListComponent<any, State> {
     }
 
     fetchFamily() {
-        FetchHelper.fetch(this.getEndpoint() + '/family', 'GET', (data: any) => {
+        FetchHelper.fetch(this.getEndpoint() + '/family?sort=sequenceFamilyName&order=asc', 'GET', (data: any) => {
             this.setState({
                 familyOptions: data.map((family: any) => {
                     return {value: family.id, label: family.family}
@@ -125,7 +125,7 @@ class SequencePage extends ListComponent<any, State> {
     }
 
     fetchOrganism() {
-        FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism', 'GET', (data: any) => this.setState({
+        FetchHelper.fetch(ENDPOINT + 'container/' + this.state.selectedContainer + '/organism?sort=organism&order=asc', 'GET', (data: any) => this.setState({
             organismOptions: data.map((organism: any) => {
                 return {value: organism.id, label: organism.organism}
             })
@@ -152,15 +152,6 @@ class SequencePage extends ListComponent<any, State> {
         localStorage.setItem(SEQUENCE_EDIT, 'Yes');
         localStorage.setItem(SEQUENCE_ID, key.toString());
         this.props.history.push('/');
-    }
-
-    clone(key: number) {
-        FetchHelper.fetch(this.getEndpointWithId(key) + '/clone', 'POST', this.cloneTransformation, () => this.flashRef.current!.activate(FlashType.BAD, ERROR_SOMETHING_GOES_WRONG));
-    }
-
-    cloneTransformation() {
-        this.flashRef.current!.activate(FlashType.OK);
-        this.list();
     }
 
     filter() {
@@ -394,7 +385,7 @@ class SequencePage extends ListComponent<any, State> {
         });
     }
 
-    update(key: number): void {
+    update(key: number) {
         let token = localStorage.getItem(TOKEN);
         if (token) {
             let name = document.getElementById(TXT_EDIT_SEQUENCE_NAME) as HTMLInputElement;
@@ -419,6 +410,8 @@ class SequencePage extends ListComponent<any, State> {
             }).then(response => {
                 if (response.status === 204) {
                     this.flashRef.current!.activate(FlashType.OK, 'Sequence ' + this.findName(key) + ' updated');
+                    this.fetchFamily();
+                    this.fetchOrganism();
                     this.list();
                 } else {
                     response.json().then(data => {

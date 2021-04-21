@@ -57,7 +57,9 @@ class ModificationPage extends ListComponent<any, ListState> {
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
-            selectedContainerName: ContainerHelper.getSelectedContainerName()
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
+            lastSortParam: 'modificationName',
+            lastSortOrder: 'asc'
         };
     }
 
