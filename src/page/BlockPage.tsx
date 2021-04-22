@@ -330,7 +330,7 @@ class BlockPage extends ListComponent<any, State> {
     edit(blockId: number, family?: string): void {
         if (family && this.state.lastEditBlockId !== blockId) {
             this.setState({
-                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)),
+                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value),
                 editable: blockId,
                 lastEditBlockId: blockId
             });
