@@ -324,7 +324,7 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     familyEditValue(family: string) {
-        this.setState({editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName))});
+        this.setState({editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value)});
     }
 
     edit(blockId: number, family?: string): void {
@@ -511,7 +511,8 @@ class BlockPage extends ListComponent<any, State> {
                                     <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
-                                    <button className={styles.create} onClick={() => this.clone(block.id)}>Clone</button>
+                                    <button className={styles.create} onClick={() => this.clone(block.id)}>Clone
+                                    </button>
                                     <button onClick={() => {
                                         this.props.history.push('/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage');
                                     }}>Usage
