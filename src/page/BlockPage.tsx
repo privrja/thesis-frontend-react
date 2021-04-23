@@ -204,6 +204,8 @@ class BlockPage extends ListComponent<any, State> {
             formula: formula.value,
             smiles: smiles.value,
             family: this.state.newFamily.map((family: any) => family.value)
+        }, () => {
+            this.fetchFamily();
         });
     }
 
@@ -324,13 +326,13 @@ class BlockPage extends ListComponent<any, State> {
     }
 
     familyEditValue(family: string) {
-        this.setState({editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName))});
+        this.setState({editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value)});
     }
 
     edit(blockId: number, family?: string): void {
         if (family && this.state.lastEditBlockId !== blockId) {
             this.setState({
-                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)),
+                editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value),
                 editable: blockId,
                 lastEditBlockId: blockId
             });
@@ -341,7 +343,8 @@ class BlockPage extends ListComponent<any, State> {
 
     refreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
@@ -511,7 +514,8 @@ class BlockPage extends ListComponent<any, State> {
                                     <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
-                                    <button className={styles.create} onClick={() => this.clone(block.id)}>Clone</button>
+                                    <button className={styles.create} onClick={() => this.clone(block.id)}>Clone
+                                    </button>
                                     <button onClick={() => {
                                         this.props.history.push('/container/' + this.state.selectedContainer + '/block/' + block.id + '/usage');
                                     }}>Usage

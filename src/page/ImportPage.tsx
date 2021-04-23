@@ -52,38 +52,42 @@ class ImportPage extends React.Component<any, State> {
         area.value = '';
         let token = localStorage.getItem(TOKEN);
         if (token) {
-            const reader = new FileReader();
-            reader.onload = async () => {
-                let importType = document.getElementById(SEL_IMPORT_TYPE) as HTMLSelectElement;
-                let errorStack: string[] = [];
-                try {
-                    switch (importType.value) {
-                        case MODIFICATION:
-                            errorStack = await new ModificationImport(reader.result?.toString() ?? '').import();
-                            break;
-                        default:
-                        case BLOCK:
-                            errorStack = await new BlockImport(reader.result?.toString() ?? '').import();
-                            break;
-                        case MERGE_BLOCK:
-                            errorStack = await new BlockMergeImport(reader.result?.toString() ?? '').import();
-                            break;
-                        case SEQUENCE:
-                            errorStack = await new SequenceImport(reader.result?.toString() ?? '').import();
-                            break;
+            if (event.target.files[0].type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    let importType = document.getElementById(SEL_IMPORT_TYPE) as HTMLSelectElement;
+                    let errorStack: string[] = [];
+                    try {
+                        switch (importType.value) {
+                            case MODIFICATION:
+                                errorStack = await new ModificationImport(reader.result?.toString() ?? '').import();
+                                break;
+                            default:
+                            case BLOCK:
+                                errorStack = await new BlockImport(reader.result?.toString() ?? '').import();
+                                break;
+                            case MERGE_BLOCK:
+                                errorStack = await new BlockMergeImport(reader.result?.toString() ?? '').import();
+                                break;
+                            case SEQUENCE:
+                                errorStack = await new SequenceImport(reader.result?.toString() ?? '').import();
+                                break;
+                        }
+                        if (errorStack.length > 0) {
+                            this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
+                            area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
+                        } else {
+                            this.flashRef.current!.activate(FlashType.OK);
+                        }
+                    } catch (e) {
+                        this.flashRef.current!.activate(FlashType.BAD, e.message);
+                        throw e;
                     }
-                    if (errorStack.length > 0) {
-                        this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
-                        area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
-                    } else {
-                        this.flashRef.current!.activate(FlashType.OK);
-                    }
-                } catch (e) {
-                    this.flashRef.current!.activate(FlashType.BAD, e.message);
-                    throw e;
-                }
-            };
-            reader.readAsText(event.target.files[0])
+                };
+                reader.readAsText(event.target.files[0]);
+            } else {
+                this.flashRef.current!.activate(FlashType.BAD, 'Not supported file format');
+            }
         } else {
             this.flashRef.current!.activate(FlashType.BAD, ERROR_LOGIN_NEEDED);
         }

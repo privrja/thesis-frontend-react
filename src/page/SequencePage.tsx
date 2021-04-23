@@ -175,7 +175,7 @@ class SequencePage extends ListComponent<any, State> {
 
     edit(blockId: number, family?: string, organism?: string): void {
         if ((organism || family) && this.state.lastEditBlockId !== blockId) {
-                this.setState({
+            this.setState({
                 editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value),
                 editOrganism: (organism ?? '').split(',').map(organismName => this.state.organismOptions.find(org => org.label === organismName)).filter(value => value),
                 editable: blockId,
@@ -188,7 +188,8 @@ class SequencePage extends ListComponent<any, State> {
 
     refreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_SEQUENCE_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
@@ -320,8 +321,8 @@ class SequencePage extends ListComponent<any, State> {
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_MASS}
                                                  id={TXT_EDIT_SEQUENCE_MASS}
-                                                 value={sequence.mass.toFixed(DECIMAL_PLACES)}/>
-                                    : sequence.mass.toFixed(DECIMAL_PLACES)}</td>
+                                                 value={sequence.mass?.toFixed(DECIMAL_PLACES)}/>
+                                    : sequence.mass?.toFixed(DECIMAL_PLACES)}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <Creatable className={styles.creatable} isMulti={true}
                                                  id={'cre-edit-sequence-family'} options={this.state.familyOptions}
@@ -382,6 +383,9 @@ class SequencePage extends ListComponent<any, State> {
             formula: sequenceFormula.value,
             family: this.state.newFamily.map((family: any) => family.value),
             organism: this.state.newOrganism.map((organism: any) => organism.value)
+        }, () => {
+            this.fetchFamily();
+            this.fetchOrganism();
         });
     }
 

@@ -136,7 +136,8 @@ class ModificationPage extends ListComponent<any, ListState> {
 
     refreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
@@ -246,9 +247,9 @@ class ModificationPage extends ListComponent<any, ListState> {
                                                id={TXT_EDIT_FORMULA}/> : modification.modificationFormula}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
                                     <TextInput className={styles.filter}
-                                        value={modification.modificationMass.toFixed(DECIMAL_PLACES)}
-                                        name={TXT_EDIT_MASS}
-                                        id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>
+                                               value={modification.modificationMass.toFixed(DECIMAL_PLACES)}
+                                               name={TXT_EDIT_MASS}
+                                               id={TXT_EDIT_MASS}/> : modification.modificationMass.toFixed(DECIMAL_PLACES)}</td>
                                 <td onClick={() => this.edit(modification.id)}>{this.state.editable === modification.id ?
                                     <CheckInput checked={modification.nTerminal} name={TXT_EDIT_N_TERMINAL}
                                                 id={TXT_EDIT_N_TERMINAL}/> : NameHelper.booleanValue(modification.nTerminal)}</td>
