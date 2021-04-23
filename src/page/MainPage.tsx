@@ -443,6 +443,25 @@ class MainPage extends React.Component<any, SequenceState> {
                 if (block) {
                     block.formula = LossesHelper.removeFromFormula(block.formula, !item.isPolyketide);
                     block.mass = LossesHelper.removeFromMass(block.mass ?? 0, !item.isPolyketide);
+                } else {
+                    block = await fetch(ENDPOINT + 'smiles/formula', {
+                        method: 'POST',
+                        body: JSON.stringify([{smiles: item.smiles, computeLosses: item.isPolyketide ? '2H' : 'H2O'}])
+                    }).then(response => {
+                        if (response.status === 200) {
+                            return response.json().then(data => {
+                                if (data.length > 0) {
+                                    return new SingleStructure(
+                                        '0', ServerEnum.PUBCHEM, item.id, item.smiles, data[0].formula, data[0].mass
+                                    );
+                                } else {
+                                    return undefined;
+                                }
+                            }).catch(() => undefined);
+                        } else {
+                            return undefined;
+                        }
+                    }).catch(() => undefined);
                 }
                 return {
                     id: item.id,
