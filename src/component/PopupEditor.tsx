@@ -56,7 +56,7 @@ class PopupEditor extends React.Component<Props, State> {
     render() {
         if (this.state.isActive) {
             return (
-                <div className={this.props.className} onClick={this.deactivate}>
+                <div className={this.props.className}>
                     <Jsme height="80vh" width="50wv" options="oldlook,star" smiles={this.state.firstSmiles}
                           onChange={this.smiles}/>
                     <div>

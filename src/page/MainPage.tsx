@@ -1001,8 +1001,9 @@ class MainPage extends React.Component<any, SequenceState> {
             }
             molecule.smiles = smiles;
             let sequence = this.state.sequence;
-            sequence!.decays = '';
-
+            if (sequence) {
+                sequence!.decays = '';
+            }
             fetch(ENDPOINT + 'smiles/formula', {
                 method: 'POST',
                 body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
