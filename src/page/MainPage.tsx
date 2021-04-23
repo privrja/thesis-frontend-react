@@ -1118,7 +1118,8 @@ class MainPage extends React.Component<any, SequenceState> {
 
     blockRefreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
@@ -1369,11 +1370,12 @@ class MainPage extends React.Component<any, SequenceState> {
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
                                   value={this.state.molecule?.smiles ?? ''} onInput={() => {
                             let sequence = this.state.sequence;
-                            sequence!.decays = '';
-                            this.setState({sequence: sequence});
+                            if (sequence) {
+                                sequence!.decays = '';
+                                this.setState({sequence: sequence});
+                            }
                             this.drawSmiles();
-                        }}
-                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
+                        }} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
@@ -1417,10 +1419,12 @@ class MainPage extends React.Component<any, SequenceState> {
                         {this.state.results.map(molecule => (
                             <section className={styles.results} title={molecule.structureName}>
                                 <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
-                                        data-smiles={molecule.smiles}
-                                        onClick={() => this.showLargeSmiles(molecule.smiles)}/>
+                                        data-smiles={molecule.smiles ?? ''}
+                                        onClick={() => molecule.smiles ? this.showLargeSmiles(molecule.smiles) : () => {/* On purpose */
+                                        }}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
-                                <div className={styles.itemResults}>{molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
+                                <div
+                                    className={styles.itemResults}>{isNaN(molecule.mass ?? 0) ? '' : molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
