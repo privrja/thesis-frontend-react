@@ -136,7 +136,8 @@ class ModificationPage extends ListComponent<any, ListState> {
 
     refreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
