@@ -14,6 +14,7 @@ abstract class AbstractImport {
     protected text: string;
     protected errorStack: string[] = [];
     protected okStack: any[] = [];
+    protected importedOk: number = 0;
 
     public constructor(text: string) {
         this.text = text;
@@ -42,8 +43,12 @@ abstract class AbstractImport {
             }
             this.transformation(parts);
         }
+        let errorStackBeforeLength = this.errorStack.length;
         await this.finder();
-        return this.send();
+        let send = await this.send();
+        console.log(this.okStack.length, this.errorStack.length, errorStackBeforeLength);
+        this.importedOk = this.okStack.length - (this.errorStack.length - errorStackBeforeLength);
+        return send;
     }
 
     async send(): Promise<any[]> {
@@ -65,6 +70,10 @@ abstract class AbstractImport {
         } else {
             return this.errorStack.length === 1 && this.errorStack[0] === '' ? [] : this.errorStack;
         }
+    }
+
+    getImportedOk() {
+        return this.importedOk;
     }
 
     parseObject(obj: Object) {

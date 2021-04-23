@@ -57,27 +57,30 @@ class ImportPage extends React.Component<any, State> {
                 reader.onload = async () => {
                     let importType = document.getElementById(SEL_IMPORT_TYPE) as HTMLSelectElement;
                     let errorStack: string[] = [];
+                    let importedOk, importer;
                     try {
                         switch (importType.value) {
                             case MODIFICATION:
-                                errorStack = await new ModificationImport(reader.result?.toString() ?? '').import();
+                                importer = new ModificationImport(reader.result?.toString() ?? '');
                                 break;
                             default:
                             case BLOCK:
-                                errorStack = await new BlockImport(reader.result?.toString() ?? '').import();
+                                importer = new BlockImport(reader.result?.toString() ?? '');
                                 break;
                             case MERGE_BLOCK:
-                                errorStack = await new BlockMergeImport(reader.result?.toString() ?? '').import();
+                                importer = new BlockMergeImport(reader.result?.toString() ?? '');
                                 break;
                             case SEQUENCE:
-                                errorStack = await new SequenceImport(reader.result?.toString() ?? '').import();
+                                importer = new SequenceImport(reader.result?.toString() ?? '');
                                 break;
                         }
+                        errorStack = await importer.import();
+                        importedOk = importer.getImportedOk();
                         if (errorStack.length > 0) {
-                            this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed');
+                            this.flashRef.current!.activate(FlashType.WARNING, 'Some inputs can\'be processed - imported ' + importedOk + ' rows');
                             area.value = errorStack.reduce((acc, value) => acc + '\n' + value);
                         } else {
-                            this.flashRef.current!.activate(FlashType.OK);
+                            this.flashRef.current!.activate(FlashType.OK, 'Imported ' + importedOk + ' rows');
                         }
                     } catch (e) {
                         this.flashRef.current!.activate(FlashType.BAD, e.message);
