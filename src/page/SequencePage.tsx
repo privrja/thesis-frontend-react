@@ -175,7 +175,7 @@ class SequencePage extends ListComponent<any, State> {
 
     edit(blockId: number, family?: string, organism?: string): void {
         if ((organism || family) && this.state.lastEditBlockId !== blockId) {
-                this.setState({
+            this.setState({
                 editFamily: (family ?? '').split(',').map(familyName => this.state.familyOptions.find(fam => fam.label === familyName)).filter(value => value),
                 editOrganism: (organism ?? '').split(',').map(organismName => this.state.organismOptions.find(org => org.label === organismName)).filter(value => value),
                 editable: blockId,

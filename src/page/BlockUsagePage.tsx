@@ -164,9 +164,9 @@ class BlockUsagePage extends ListComponent<any, State> {
                         <tbody>
                         <tr>
                             {SHOW_ID ?
-                            <td><input className={styles.filter} type={'text'}
-                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
-                                       placeholder={'Id'}/></td> : '' }
+                                <td><input className={styles.filter} type={'text'}
+                                           onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
+                                           placeholder={'Id'}/></td> : '' }
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
                                        placeholder={'Name'}/></td>
