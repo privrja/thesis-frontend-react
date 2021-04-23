@@ -204,6 +204,8 @@ class BlockPage extends ListComponent<any, State> {
             formula: formula.value,
             smiles: smiles.value,
             family: this.state.newFamily.map((family: any) => family.value)
+        }, () => {
+            this.fetchFamily();
         });
     }
 
