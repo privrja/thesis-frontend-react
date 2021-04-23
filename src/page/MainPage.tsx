@@ -1417,10 +1417,10 @@ class MainPage extends React.Component<any, SequenceState> {
                         {this.state.results.map(molecule => (
                             <section className={styles.results} title={molecule.structureName}>
                                 <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
-                                        data-smiles={molecule.smiles}
-                                        onClick={() => this.showLargeSmiles(molecule.smiles)}/>
+                                        data-smiles={molecule.smiles ?? ''}
+                                        onClick={() => molecule.smiles ? this.showLargeSmiles(molecule.smiles) : () => {/* On purpose */}}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
-                                <div className={styles.itemResults}>{molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
+                                <div className={styles.itemResults}>{isNaN(molecule.mass ?? 0) ? '' : molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
