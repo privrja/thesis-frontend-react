@@ -321,8 +321,8 @@ class SequencePage extends ListComponent<any, State> {
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <TextInput className={styles.filter} name={TXT_EDIT_SEQUENCE_MASS}
                                                  id={TXT_EDIT_SEQUENCE_MASS}
-                                                 value={sequence.mass.toFixed(DECIMAL_PLACES)}/>
-                                    : sequence.mass.toFixed(DECIMAL_PLACES)}</td>
+                                                 value={sequence.mass?.toFixed(DECIMAL_PLACES)}/>
+                                    : sequence.mass?.toFixed(DECIMAL_PLACES)}</td>
                                 <td onClick={() => this.edit(sequence.id, sequence.family, sequence.organism)}>{this.state.editable === sequence.id
                                     ? <Creatable className={styles.creatable} isMulti={true}
                                                  id={'cre-edit-sequence-family'} options={this.state.familyOptions}
@@ -383,6 +383,9 @@ class SequencePage extends ListComponent<any, State> {
             formula: sequenceFormula.value,
             family: this.state.newFamily.map((family: any) => family.value),
             organism: this.state.newOrganism.map((organism: any) => organism.value)
+        }, () => {
+            this.fetchFamily();
+            this.fetchOrganism();
         });
     }
 
