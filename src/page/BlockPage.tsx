@@ -2,16 +2,17 @@ import * as React from "react";
 import "react-app-polyfill/ie11";
 import styles from "../main.module.scss"
 import {
-    SBLOCK,
     CONTAINER,
-    TOKEN,
     EDITOR_BACK,
     EDITOR_ITEM,
-    EDITOR_SMILES,
-    EDITOR_NEW_BLOCK_NAME,
     EDITOR_NEW_BLOCK_ACRONYM,
     EDITOR_NEW_BLOCK_FORMULA,
-    EDITOR_NEW_BLOCK_SMILES, ELEMENT_LARGE_SMILES
+    EDITOR_NEW_BLOCK_NAME,
+    EDITOR_NEW_BLOCK_SMILES,
+    EDITOR_SMILES,
+    ELEMENT_LARGE_SMILES,
+    SBLOCK,
+    TOKEN
 } from "../constant/ApiConstants";
 import Flash from "../component/Flash";
 import FlashType from "../component/FlashType";
@@ -19,7 +20,7 @@ import PopupYesNo from "../component/PopupYesNo";
 import TextInput from "../component/TextInput";
 import ListComponent, {ListState} from "../component/ListComponent";
 import {ERROR_LOGIN_NEEDED} from "../constant/FlashConstants";
-import {ServerEnumHelper} from "../enum/ServerEnum";
+import {ServerEnum, ServerEnumHelper} from "../enum/ServerEnum";
 import {SelectInput} from "../component/SelectInput";
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 // @ts-ignore
@@ -29,6 +30,7 @@ import Creatable from "react-select/creatable";
 import FetchHelper from "../helper/FetchHelper";
 import {DECIMAL_PLACES, ENDPOINT, SHOW_ID} from "../constant/Constants";
 import ComputeHelper, {H2, H2O} from "../helper/ComputeHelper";
+import PubChemFinder from "../finder/PubChemFinder";
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-blockName';
 const TXT_EDIT_ACRONYM = 'txt-edit-acronym';
@@ -102,6 +104,7 @@ class BlockPage extends ListComponent<any, State> {
         this.newFamilyChange = this.newFamilyChange.bind(this);
         this.familyEditChange = this.familyEditChange.bind(this);
         this.refreshSmiles = this.refreshSmiles.bind(this);
+        this.findReference = this.findReference.bind(this);
         this.state = {
             list: [],
             familyOptions: [],
@@ -369,6 +372,20 @@ class BlockPage extends ListComponent<any, State> {
         });
     }
 
+    async findReference(key: number, smiles: string) {
+        let finder = new PubChemFinder();
+        let blocks = await finder.findBySmiles(smiles);
+        if (blocks.length > 0) {
+            this.flashRef.current!.activate(FlashType.OK, 'Reference found CID: ' + blocks[0].identifier);
+            this.setState({editable: key}, () => {
+                (document.getElementById(SEL_EDIT_SOURCE) as HTMLSelectElement).selectedIndex = ServerEnum.PUBCHEM;
+                (document.getElementById(TXT_EDIT_IDENTIFIER) as HTMLInputElement).value = blocks[0].identifier;
+            });
+        } else {
+            this.flashRef.current!.activate(FlashType.BAD, 'Reference not found');
+        }
+    }
+
     render() {
         return (
             <section className={styles.page}>
@@ -514,6 +531,8 @@ class BlockPage extends ListComponent<any, State> {
                                     <button className={styles.update} onClick={() => this.editor(block.id)}>Editor
                                     </button>
                                     <button onClick={() => this.showLargeSmiles(block.uniqueSmiles)}>Show</button>
+                                    <button onClick={() => this.findReference(block.id, block.uniqueSmiles)}>FindRef
+                                    </button>
                                     <button className={styles.create} onClick={() => this.clone(block.id)}>Clone
                                     </button>
                                     <button onClick={() => {
