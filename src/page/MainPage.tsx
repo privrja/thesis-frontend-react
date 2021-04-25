@@ -528,7 +528,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 let nameHelper = new NameHelper();
                 Parallel.map(parData, async (item: BlockStructure) => {
                     if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
-                        let name = await finder.findName(item.block.identifier, item.block.structureName);
+                        let name = await finder.findName(item.block.identifier, item.block.structureName.toString());
                         return {
                             id: item.id,
                             databaseId: null,
@@ -611,7 +611,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
                     this.props.history.push('#results');
                     return data;
-                });
+                })
             }
         );
     }
