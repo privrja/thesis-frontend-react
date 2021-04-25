@@ -57,7 +57,7 @@ class PopupEditor extends React.Component<Props, State> {
         if (this.state.isActive) {
             return (
                 <div className={this.props.className}>
-                    <Jsme height="80vh" width="50wv" options="oldlook,star" smiles={this.state.firstSmiles}
+                    <Jsme height="80vh" width="50wv" options="oldlook,star,nocanonize" smiles={this.state.firstSmiles}
                           onChange={this.smiles}/>
                     <div>
                         <button onClick={this.done}>Done</button>
