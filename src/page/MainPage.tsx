@@ -914,6 +914,22 @@ class MainPage extends React.Component<any, SequenceState> {
         return sequence.replaceAll('[' + lastAcronym + ']', '[' + newAcronym + ']');
     }
 
+    replaceSequenceOne(sequence: string, blockId: number, lastAcronym: string, newAcronym: string) {
+        if (sequence === "") {
+            return sequence;
+        }
+        let n = 0;
+        for (let i = 0; i < this.state.blocks.length; ++i) {
+            if (this.state.blocks[i].acronym === lastAcronym) {
+                ++n;
+            }
+            if (this.state.blocks[i].id === blockId) {
+                break;
+            }
+        }
+        return sequence.replace(RegExp("^(?:.*?\\[" + lastAcronym + "\\]){" + n + "}"), '[' + newAcronym + ']');
+    }
+
     update(blockId: number) {
         let acronym = document.getElementById(TXT_EDIT_BLOCK_ACRONYM) as HTMLInputElement;
         let smiles = document.getElementById(TXT_EDIT_BLOCK_SMILES) as HTMLInputElement;
@@ -927,7 +943,11 @@ class MainPage extends React.Component<any, SequenceState> {
         let sequence = this.state.sequence;
         let blocks = this.state.blocks;
         if (sequence) {
-            sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
+            if (this.state.editSame) {
+                sequence.sequence = this.replaceSequence(sequence.sequence, blocks[blockId].acronym, acronym.value);
+            } else {
+                sequence.sequence = this.replaceSequenceOne(sequence.sequence, blockId, blocks[blockId].acronym, acronym.value);
+            }
         }
         if (this.state.editSame) {
             let blocksCopy = [...blocks];
@@ -960,6 +980,10 @@ class MainPage extends React.Component<any, SequenceState> {
                 } else {
                     blocks[block.id].databaseId = null;
                 }
+                let newSame = blocks.filter(same => same.id !== block.id).find(b => b.acronym === blocks[block.id].acronym && b.databaseId === blocks[block.id].databaseId);
+                if (newSame) {
+                    blocks[block.id].sameAs = newSame.id;
+                }
             });
         } else {
             blocks[blockId].acronym = acronym.value;
@@ -987,6 +1011,18 @@ class MainPage extends React.Component<any, SequenceState> {
                 blocks[blockId].databaseId = this.state.blockEdit.id;
             } else {
                 blocks[blockId].databaseId = null;
+            }
+            let pointerToThisBlock = blocks.filter(b => b.sameAs === blockId);
+            if (pointerToThisBlock.length > 0) {
+                let newBaseBlock = pointerToThisBlock[0];
+                pointerToThisBlock.forEach(b => blocks[b.id].sameAs = newBaseBlock.id);
+                blocks[newBaseBlock.id].sameAs = null;
+            } else {
+                blocks[blockId].sameAs = null;
+            }
+            let newSame = blocks.filter(same => same.id !== blockId).find(b => b.acronym === blocks[blockId].acronym && b.databaseId === blocks[blockId].databaseId);
+            if (newSame) {
+                blocks[blockId].sameAs = newSame.id;
             }
         }
         this.setState({blocks: blocks, sequence: sequence});
