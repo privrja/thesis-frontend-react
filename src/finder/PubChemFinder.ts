@@ -150,8 +150,8 @@ class PubChemFinder implements IFinder {
     }
 
     findName(id: string, defaultName: string): Promise<string> {
-        if(id === '') {
-            return new Promise(() => defaultName);
+        if(id === '' || Number(id) < 1) {
+            return new Promise((resolve) => setTimeout(() => resolve(defaultName), 0));
         }
         return fetch(ENDPOINT_URI + 'cid/' + id + '/synonyms/' + FORMAT_JSON, {
             method: 'GET',
@@ -166,7 +166,7 @@ class PubChemFinder implements IFinder {
             } else {
                 return defaultName;
             }
-        });
+        }).catch(() => defaultName);
     }
 
     private async jsonListResult(response: Response): Promise<SingleStructure[]> {
