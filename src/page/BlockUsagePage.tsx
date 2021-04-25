@@ -36,6 +36,7 @@ import * as SmilesDrawer from 'smiles-drawer';
 import PopupSmilesDrawer from "../component/PopupSmilesDrawer";
 import PopupYesNo from "../component/PopupYesNo";
 import Flash from "../component/Flash";
+import ContainerHelper from "../helper/ContainerHelper";
 
 interface State extends ListState {
     blockId: number;
@@ -58,6 +59,7 @@ class BlockUsagePage extends ListComponent<any, State> {
         this.state = {
             list: [],
             selectedContainer: this.props.match.params.id,
+            selectedContainerName: ContainerHelper.getSelectedContainerName(),
             blockId: this.props.match.params.blockId
         };
     }
@@ -138,7 +140,7 @@ class BlockUsagePage extends ListComponent<any, State> {
                     <PopupSmilesDrawer id={ELEMENT_LARGE_SMILES} className={styles.popupLarge}
                                        ref={this.popupSmilesRef}/>
                     <Flash textBad='Failure!' textOk='Success!' ref={this.flashRef}/>
-                    <h2>Usages of {this.state.block?.acronym}</h2>
+                    <h2>Usages of {this.state.block?.acronym} - {this.state.selectedContainerName} - {this.state.list.length} rows</h2>
                     <table>
                         <thead>
                         <tr>
@@ -162,9 +164,9 @@ class BlockUsagePage extends ListComponent<any, State> {
                         <tbody>
                         <tr>
                             {SHOW_ID ?
-                            <td><input className={styles.filter} type={'text'}
-                                       onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
-                                       placeholder={'Id'}/></td> : '' }
+                                <td><input className={styles.filter} type={'text'}
+                                           onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_ID}
+                                           placeholder={'Id'}/></td> : '' }
                             <td><input className={styles.filter} type={'text'}
                                        onKeyDown={(e) => this.enterCall(e, this.filter)} id={TXT_FILTER_SEQUENCE_NAME}
                                        placeholder={'Name'}/></td>

@@ -443,6 +443,25 @@ class MainPage extends React.Component<any, SequenceState> {
                 if (block) {
                     block.formula = LossesHelper.removeFromFormula(block.formula, !item.isPolyketide);
                     block.mass = LossesHelper.removeFromMass(block.mass ?? 0, !item.isPolyketide);
+                } else {
+                    block = await fetch(ENDPOINT + 'smiles/formula', {
+                        method: 'POST',
+                        body: JSON.stringify([{smiles: item.smiles, computeLosses: item.isPolyketide ? '2H' : 'H2O'}])
+                    }).then(response => {
+                        if (response.status === 200) {
+                            return response.json().then(data => {
+                                if (data.length > 0) {
+                                    return new SingleStructure(
+                                        '0', ServerEnum.PUBCHEM, item.id, item.smiles, data[0].formula, data[0].mass
+                                    );
+                                } else {
+                                    return undefined;
+                                }
+                            }).catch(() => undefined);
+                        } else {
+                            return undefined;
+                        }
+                    }).catch(() => undefined);
                 }
                 return {
                     id: item.id,
@@ -509,7 +528,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 let nameHelper = new NameHelper();
                 Parallel.map(parData, async (item: BlockStructure) => {
                     if (item.sameAs === null && item.block && !isNaN(Number(item.acronym))) {
-                        let name = await finder.findName(item.block.identifier, item.block.structureName);
+                        let name = await finder.findName(item.block.identifier, item.block.structureName.toString());
                         return {
                             id: item.id,
                             databaseId: null,
@@ -592,7 +611,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     this.flashRef.current!.activate(FlashType.OK, 'Done');
                     this.props.history.push('#results');
                     return data;
-                });
+                })
             }
         );
     }
@@ -982,8 +1001,9 @@ class MainPage extends React.Component<any, SequenceState> {
             }
             molecule.smiles = smiles;
             let sequence = this.state.sequence;
-            sequence!.decays = '';
-
+            if (sequence) {
+                sequence!.decays = '';
+            }
             fetch(ENDPOINT + 'smiles/formula', {
                 method: 'POST',
                 body: JSON.stringify([{smiles: smiles, computeLosses: 'None'}])
@@ -1118,7 +1138,8 @@ class MainPage extends React.Component<any, SequenceState> {
 
     blockRefreshFormula(event: any) {
         try {
-            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = ComputeHelper.computeMass(event.target.value).toFixed(DECIMAL_PLACES);
+            let mass = ComputeHelper.computeMass(event.target.value);
+            (document.getElementById(TXT_EDIT_BLOCK_MASS) as HTMLInputElement).value = isNaN(mass) ? '' : mass.toFixed(DECIMAL_PLACES);
         } catch (e) {
             /** Empty on purpose - wrong formula input*/
         }
@@ -1369,11 +1390,12 @@ class MainPage extends React.Component<any, SequenceState> {
                         <TextArea name={'smiles'} id={'smiles'} className={styles.main}
                                   value={this.state.molecule?.smiles ?? ''} onInput={() => {
                             let sequence = this.state.sequence;
-                            sequence!.decays = '';
-                            this.setState({sequence: sequence});
+                            if (sequence) {
+                                sequence!.decays = '';
+                                this.setState({sequence: sequence});
+                            }
                             this.drawSmiles();
-                        }}
-                                  onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
+                        }} onKeyDown={(e) => this.enterFind(e)} onChange={this.refreshSmiles}/>
 
                         <label htmlFor='formula' className={styles.main}>Molecular Formula</label>
                         <TextInput name={'formula'} id={'formula'} value={this.state.molecule?.formula ?? ''}
@@ -1417,10 +1439,12 @@ class MainPage extends React.Component<any, SequenceState> {
                         {this.state.results.map(molecule => (
                             <section className={styles.results} title={molecule.structureName}>
                                 <canvas id={'canvas-small-' + molecule.identifier} className={styles.canvasSmall}
-                                        data-smiles={molecule.smiles}
-                                        onClick={() => this.showLargeSmiles(molecule.smiles)}/>
+                                        data-smiles={molecule.smiles ?? ''}
+                                        onClick={() => molecule.smiles ? this.showLargeSmiles(molecule.smiles) : () => {/* On purpose */
+                                        }}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
-                                <div className={styles.itemResults}>{molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
+                                <div
+                                    className={styles.itemResults}>{isNaN(molecule.mass ?? 0) ? '' : molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
