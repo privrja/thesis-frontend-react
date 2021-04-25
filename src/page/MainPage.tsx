@@ -927,7 +927,7 @@ class MainPage extends React.Component<any, SequenceState> {
                 break;
             }
         }
-        return sequence.replace(RegExp("^(?:.*?\\[" + lastAcronym + "\\]){" + n + "}"), '[' + newAcronym + ']');
+        return sequence.replace(RegExp("(\\[" + lastAcronym + "\\]){" + n + "}"), '[' + newAcronym + ']');
     }
 
     update(blockId: number) {
