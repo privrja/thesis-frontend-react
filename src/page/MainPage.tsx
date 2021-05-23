@@ -1480,7 +1480,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                         }}/>
                                 <div className={styles.itemResults}>{molecule.formula}</div>
                                 <div
-                                    className={styles.itemResults}>{isNaN(molecule.mass ?? 0) ? '' : molecule.mass?.toFixed(DECIMAL_PLACES)}</div>
+                                    className={styles.itemResults}>{isNaN(molecule.mass ?? 0) ? '' : Number(molecule.mass).toFixed(DECIMAL_PLACES)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
                                      onClick={() => this.show(molecule.database, molecule.identifier)}>{ServerEnumHelper.getFullId(molecule.database, molecule.identifier)}</div>
                                 <div className={styles.itemResults + ' ' + styles.cursorPointer}
