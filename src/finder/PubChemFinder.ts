@@ -72,7 +72,7 @@ class PubChemFinder implements IFinder {
                     json.PropertyTable.Properties[0].IUPACName,
                     json.PropertyTable.Properties[0].CanonicalSMILES,
                     json.PropertyTable.Properties[0].MolecularFormula,
-                    json.PropertyTable.Properties[0].MonoisotopicMass
+                    Number(json.PropertyTable.Properties[0].MonoisotopicMass)
                 )];
             } else {
                 return [];
