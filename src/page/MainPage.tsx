@@ -1582,7 +1582,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                             <button className={styles.delete} onClick={this.editEnd}>Cancel</button> :
                                             <div/>}
                                         <button className={styles.update} onClick={() => {
-                                            this.setState({editorBlockId: block.id});
+                                            this.setState({editorBlockId: block.id, editable: block.id});
                                             this.popupEditorRef.current!.activate(block.unique ?? '');
                                         }}>Editor
                                         </button>
