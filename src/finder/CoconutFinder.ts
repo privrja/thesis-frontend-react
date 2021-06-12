@@ -22,7 +22,7 @@ class CoconutFinder implements IFinder {
         if (query.includes('simple?query')) {
             query += parameter;
         }
-        return await fetch(ENDPOINT_URI + query).then(async response => {
+        return fetch(ENDPOINT_URI + query).then(async response => {
                 if (response.status === 200) {
                     let json = await response.json().catch(() => []);
                     if (json === []) {
@@ -38,9 +38,9 @@ class CoconutFinder implements IFinder {
                             return new SingleStructure(
                                 molecule.coconut_id,
                                 ServerEnum.COCONUT,
-                                molecule.name ?? '',
-                                molecule.unique_smiles ?? '',
-                                molecule.molecular_formula ?? '',
+                                molecule.name,
+                                molecule.unique_smiles,
+                                molecule.molecular_formula,
                                 mass
                             )
                         });
@@ -52,7 +52,6 @@ class CoconutFinder implements IFinder {
                 }
             }
         ).catch(() => []);
-
     }
 
     findByFormula(formula: string): Promise<SingleStructure[]> {
@@ -63,7 +62,7 @@ class CoconutFinder implements IFinder {
         if (id === '') {
             return Sleep.noSleepPromise();
         }
-        return await fetch(ENDPOINT_URI + 'simple?query=' + id).then(async response => {
+        return fetch(ENDPOINT_URI + 'simple?query=' + id).then(async response => {
             if (response.status === 200) {
                 let json = await response.json().catch(() => []);
                 if (json === []) {
