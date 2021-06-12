@@ -452,7 +452,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             return response.json().then(data => {
                                 if (data.length > 0) {
                                     return new SingleStructure(
-                                        '0', ServerEnum.PUBCHEM, item.id, item.smiles, data[0].formula, data[0].mass
+                                        '0', ServerEnum.PUBCHEM, item.id.toString(), item.smiles, data[0].formula, data[0].mass
                                     );
                                 } else {
                                     return undefined;
@@ -532,7 +532,7 @@ class MainPage extends React.Component<any, SequenceState> {
                         return {
                             id: item.id,
                             databaseId: null,
-                            acronym: await nameHelper.acronymFromName(name),
+                            acronym: await nameHelper.acronymFromName(name ?? item.id.toString()),
                             smiles: item.smiles,
                             unique: item.unique,
                             sameAs: null,
@@ -540,7 +540,7 @@ class MainPage extends React.Component<any, SequenceState> {
                             block: {
                                 identifier: item.block.identifier,
                                 database: item.block.database,
-                                structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + name,
+                                structureName: (item.isPolyketide && !item.block.structureName.includes(POLYKETIDE_PREFIX) ? POLYKETIDE_PREFIX_SPACE : '') + (name ?? item.id.toString()),
                                 smiles: item.block.smiles,
                                 formula: item.block.formula,
                                 mass: item.block.mass
@@ -589,7 +589,7 @@ class MainPage extends React.Component<any, SequenceState> {
                     if (this.state.sequence) {
                         sequence = this.state.sequence;
                     }
-                    sameAsData.forEach(e => {
+                    sameAsData.forEach((e: any) => {
                         if (e.sameAs !== null) {
                             e.block = new SingleStructure(
                                 sameAsData[e.sameAs].block?.identifier ?? '',
