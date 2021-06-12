@@ -14,7 +14,7 @@ This repo use npm to manage many action.
 To install dependencies run ```npm install```
 To run development server use ```npm start```
 To run tests use ```npm test```
-And to build package use ```npom build```
+And to build package use ```npm build```
 
 ### CORS
 
