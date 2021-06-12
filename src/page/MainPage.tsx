@@ -88,7 +88,7 @@ interface BlockStructure {
     unique: string | null;
     sameAs: number | null;
     isPolyketide: boolean;
-    block: SingleStructure | null;
+    block: any | null;
 }
 
 const TXT_EDIT_BLOCK_NAME = 'txt-edit-name';
