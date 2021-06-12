@@ -23,35 +23,28 @@ class CoconutFinder implements IFinder {
             query += parameter;
         }
         return fetch(ENDPOINT_URI + query).then(async response => {
-                if (response.status === 200) {
-                    let json = await response.json().catch(() => []);
-                    if (json === []) {
-                        return [];
-                    }
-                    if (json.naturalProducts.length > 0) {
-                        return json.naturalProducts.map((molecule: Molecule) => {
-                            let mass = 0;
-                            try {
-                                mass = ComputeHelper.computeMass(ComputeHelper.removeUnnecessaryCharactersFromFormula(molecule.molecular_formula ?? ''));
-                            } catch (e) {
-                            }
-                            return new SingleStructure(
-                                molecule.coconut_id,
-                                ServerEnum.COCONUT,
-                                molecule.name,
-                                molecule.unique_smiles,
-                                molecule.molecular_formula,
-                                mass
-                            )
-                        });
-                    } else {
-                        return [];
-                    }
-                } else {
-                    return [];
+            if (response.status === 200) {
+                let json = await response.json().catch(() => []);
+                if (json.naturalProducts.length > 0) {
+                    return json.naturalProducts.map((molecule: Molecule) => {
+                        let mass = 0;
+                        try {
+                            mass = ComputeHelper.computeMass(ComputeHelper.removeUnnecessaryCharactersFromFormula(molecule.molecular_formula ?? ''));
+                        } catch (e) {
+                        }
+                        return new SingleStructure(
+                            molecule.coconut_id,
+                            ServerEnum.COCONUT,
+                            molecule.name,
+                            molecule.unique_smiles,
+                            molecule.molecular_formula,
+                            mass
+                        )
+                    });
                 }
             }
-        ).catch(() => []);
+            return [];
+        }).catch(() => []);
     }
 
     findByFormula(formula: string): Promise<SingleStructure[]> {
