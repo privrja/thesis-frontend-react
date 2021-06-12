@@ -195,7 +195,7 @@ class ModificationComponent extends React.Component<Props, State> {
                     <h3>Sequence - {this.props.blockLength} blocks</h3>
                     <label htmlFor="sel-sequence-type">Type</label>
                     <SelectInput id='sel-sequence-type' name='sel-sequence-type'
-                                 options={SequenceEnumHelper.getOptions()} onChange={this.updateModifications}/>
+                                 options={SequenceEnumHelper.getOptions()} onChange={this.updateModifications} selected={SequenceEnumHelper.getValue(this.props.sequenceType ?? '').toString()}/>
                     <label htmlFor="txt-sequence">Sequence</label>
                     <TextInput id="txt-sequence" name="sequence" size={60} value={this.state.sequence}/>
                     <div className={styles.padding}>
