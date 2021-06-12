@@ -6,6 +6,7 @@ import SmilesReferenceParser from "./SmilesReferenceParser";
 import NorineReferenceParser from "./NorineReferenceParser";
 import DoiParser from "./DoiParser";
 import LmfaParser from "./LmfaParser";
+import CoconutParser from "./CoconutParser";
 
 export class Reference {
     source: ServerEnum | null = null;
@@ -56,6 +57,13 @@ class ReferenceParser implements IParser {
         if (lfmaResult.isAccepted()) {
             return lfmaResult;
         }
+
+        let coconutParser = new CoconutParser();
+        let coconutResult = coconutParser.parse(text);
+        if (coconutResult.isAccepted()) {
+            return coconutResult;
+        }
+
         return this.reject();
     }
 
