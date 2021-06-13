@@ -86,10 +86,7 @@ class CoconutFinder implements IFinder {
     }
 
     findByMass(mass: number): Promise<SingleStructure[]> {
-        if (mass === 0) {
-            return Sleep.noSleepPromise();
-        }
-        return this.simpleFind(mass.toString(), 'molweight?minMass=' + (mass - 1) + '&maxMass=' + (mass + 1) + '&maxHits=100');
+        return Sleep.noSleepPromise();
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
@@ -97,7 +94,7 @@ class CoconutFinder implements IFinder {
     }
 
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
-        return this.simpleFind(smiles, 'exact-structure?type=inchi&smiles=' + smiles);
+        return this.simpleFind(smiles, 'exact-structure?type=inchi&max-hits=100&smiles=' + smiles);
     }
 
 
