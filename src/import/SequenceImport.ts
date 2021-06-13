@@ -33,6 +33,8 @@ class SequenceImport extends AbstractImport {
         let norineIds: string[] = [];
         let chebiIds: string[] = [];
         let chemspiderIds: string[] = [];
+        let coconutIds: string[] = [];
+        let npatlasIds: string[] = [];
         this.okStack.forEach((item: any) => {
             if (item.smiles === null && item.identifier) {
                 if (item.source === ServerEnum.PUBCHEM) {
@@ -43,10 +45,14 @@ class SequenceImport extends AbstractImport {
                     chebiIds.push(item.identifier);
                 } else if (item.source === ServerEnum.CHEMSPIDER) {
                     chemspiderIds.push(item.identifier);
+                } else if (item.source === ServerEnum.COCONUT) {
+                    coconutIds.push(item.identifier);
+                } else if (item.source === ServerEnum.NP_ATLAS) {
+                    npatlasIds.push(item.identifier);
                 }
             }
         });
-        await this.finders(pubChemIds, chebiIds, chemspiderIds, norineIds);
+        await this.finders(pubChemIds, chebiIds, chemspiderIds, norineIds, coconutIds, npatlasIds);
         return true;
     }
 

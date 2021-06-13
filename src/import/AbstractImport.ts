@@ -8,6 +8,8 @@ import ChebiFinder from "../finder/ChebiFinder";
 import ChemSpiderFinder from "../finder/ChemSpiderFinder";
 import NorineFinder from "../finder/NorineFinder";
 import FetchHelper from "../helper/FetchHelper";
+import CoconutFinder from "../finder/CoconutFinder";
+import NPAtlasFinder from "../finder/NPAtlasFinder";
 
 abstract class AbstractImport {
 
@@ -127,7 +129,7 @@ abstract class AbstractImport {
         return true;
     }
 
-    protected async finders(identifiers: string[], chebiIds: string[], chemspiderIds: string[], norineIds: string[]) {
+    protected async finders(identifiers: string[], chebiIds: string[], chemspiderIds: string[], norineIds: string[], coconutIds: string[], npatlasIds: string[]) {
         let finder = new PubChemFinder();
         await finder.findByIdentifiers(identifiers).then(blocks => {
             blocks.forEach(block => {
@@ -160,8 +162,25 @@ abstract class AbstractImport {
                 this.find(block.identifier).smiles = block.smiles;
             });
         });
-    }
 
+        let coconutFinder = new CoconutFinder();
+        for (const id of coconutIds) {
+            await coconutFinder.findByIdentifier(id).then(blocks => {
+                blocks.forEach(block => {
+                    this.find(block.identifier).smiles = block.smiles;
+                });
+            });
+        }
+
+        let npAtlasFinder = new NPAtlasFinder();
+        for (const id of npatlasIds) {
+            await npAtlasFinder.findByIdentifier(id).then(blocks => {
+                blocks.forEach(block => {
+                    this.find(block.identifier).smiles = block.smiles;
+                });
+            });
+        }
+    }
 
 }
 

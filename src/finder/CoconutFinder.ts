@@ -58,17 +58,19 @@ class CoconutFinder implements IFinder {
         return fetch(ENDPOINT_URI + 'simple?query=' + id).then(async response => {
             if (response.status === 200) {
                 let json = await response.json().catch(() => []);
-                if (json === []) {
-                    return [];
-                }
                 if (json.naturalProducts.length > 0) {
+                    let mass = 0;
+                    try {
+                        mass = ComputeHelper.computeMass(ComputeHelper.removeUnnecessaryCharactersFromFormula(json.naturalProducts[0].molecular_formula ?? ''));
+                    } catch (e) {
+                    }
                     return [new SingleStructure(
                         json.naturalProducts[0].coconut_id,
                         ServerEnum.COCONUT,
                         json.naturalProducts[0].name,
                         json.naturalProducts[0].unique_smiles,
                         json.naturalProducts[0].molecular_formula,
-                        ComputeHelper.computeMass(json.naturalProducts[0].molecular_formula)
+                        mass
                     )];
                 } else {
                     return [];
