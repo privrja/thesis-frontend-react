@@ -61,7 +61,7 @@ class ReferencePage extends React.Component<any, any> {
 
                     <h3>COCONUT</h3>
                     <p><a href={'https://coconut.naturalproducts.net'}>COCONUT</a> is COlleCtion of Open Natural prodUcTs used by MSB to search information.<br/>
-                        DOI: <a href={'http://doi.org/10.1186/s13321-020-00478-9'}>10.1186/s13321-020-00478-9</a>
+                        DOI: <a href={'https://doi.org/10.1186/s13321-020-00478-9'}>10.1186/s13321-020-00478-9</a>
                     </p>
 
                     <h3>NP Atlas</h3>
