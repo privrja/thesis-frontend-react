@@ -7,6 +7,7 @@ import NorineReferenceParser from "./NorineReferenceParser";
 import DoiParser from "./DoiParser";
 import LmfaParser from "./LmfaParser";
 import CoconutParser from "./CoconutParser";
+import NPAtlasParser from "./NPAtlasParser";
 
 export class Reference {
     source: ServerEnum | null = null;
@@ -62,6 +63,12 @@ class ReferenceParser implements IParser {
         let coconutResult = coconutParser.parse(text);
         if (coconutResult.isAccepted()) {
             return coconutResult;
+        }
+
+        let npAtlasParser = new NPAtlasParser();
+        let npAtlasResult = npAtlasParser.parse(text);
+        if (npAtlasResult.isAccepted()) {
+            return npAtlasResult;
         }
 
         return this.reject();

@@ -8,9 +8,10 @@ import MassSpecBlocksFinder from "../finder/MassSpecBlocksFinder";
 import {SELECTED_CONTAINER, TOKEN} from "../constant/ApiConstants";
 import ChebiFinder from "../finder/ChebiFinder";
 import CoconutFinder from "../finder/CoconutFinder";
+import NPAtlasFinder from "../finder/NPAtlasFinder";
 
 export enum ServerEnum {
-    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, MASS_SPEC_BLOCKS, DOI, SIDEROPHORE_BASE, LIPID_MAPS, COCONUT
+    PUBCHEM, CHEMSPIDER, NORINE, PDB, CHEBI, MASS_SPEC_BLOCKS, DOI, SIDEROPHORE_BASE, LIPID_MAPS, COCONUT, NP_ATLAS
 }
 
 export class ServerEnumHelper {
@@ -26,7 +27,8 @@ export class ServerEnumHelper {
             new SelectOption(ServerEnum.DOI.toString(), this.getName(ServerEnum.DOI)),
             new SelectOption(ServerEnum.SIDEROPHORE_BASE.toString(), this.getName(ServerEnum.SIDEROPHORE_BASE)),
             new SelectOption(ServerEnum.LIPID_MAPS.toString(), this.getName(ServerEnum.LIPID_MAPS)),
-            new SelectOption(ServerEnum.COCONUT.toString(), this.getName(ServerEnum.COCONUT))
+            new SelectOption(ServerEnum.COCONUT.toString(), this.getName(ServerEnum.COCONUT)),
+            new SelectOption(ServerEnum.NP_ATLAS.toString(), this.getName(ServerEnum.NP_ATLAS))
         ];
     }
 
@@ -38,6 +40,7 @@ export class ServerEnumHelper {
             new SelectOption(ServerEnum.PDB.toString(), this.getName(ServerEnum.PDB)),
             new SelectOption(ServerEnum.CHEBI.toString(), this.getName(ServerEnum.CHEBI)),
             new SelectOption(ServerEnum.COCONUT.toString(), this.getName(ServerEnum.COCONUT)),
+            new SelectOption(ServerEnum.NP_ATLAS.toString(), this.getName(ServerEnum.NP_ATLAS)),
             new SelectOption(ServerEnum.MASS_SPEC_BLOCKS.toString(), this.getName(ServerEnum.MASS_SPEC_BLOCKS) + (containerName ? (' - ' + containerName) : ''))
         ];
     }
@@ -66,6 +69,8 @@ export class ServerEnumHelper {
                 break;
             case ServerEnum.COCONUT:
                 return new CoconutFinder();
+            case ServerEnum.NP_ATLAS:
+                return new NPAtlasFinder();
         }
         return new PubChemFinder();
     }
@@ -93,6 +98,8 @@ export class ServerEnumHelper {
                 return 'Lipid Maps';
             case ServerEnum.COCONUT:
                 return 'COCONUT';
+            case ServerEnum.NP_ATLAS:
+                return 'NPAtlas';
         }
     }
 
@@ -117,6 +124,8 @@ export class ServerEnumHelper {
                 return "https://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + identifier;
             case ServerEnum.COCONUT:
                 return "https://coconut.naturalproducts.net/compound/coconut_id/" + identifier;
+            case ServerEnum.NP_ATLAS:
+                return "https://www.npatlas.org/explore/compounds/" + identifier;
         }
     }
 
@@ -128,6 +137,9 @@ export class ServerEnumHelper {
             return identifier;
         }
         if (identifier.toUpperCase().includes('CNP')) {
+            return identifier;
+        }
+        if (identifier.toUpperCase().includes('NPA')) {
             return identifier;
         }
         switch (database) {
@@ -151,6 +163,8 @@ export class ServerEnumHelper {
                 return 'SB: ' + identifier;
             case ServerEnum.COCONUT:
                 return 'CNP' + '0'.repeat(7 - identifier.length) + identifier;
+            case ServerEnum.NP_ATLAS:
+                return 'NPA' + '0'.repeat(6 - identifier.length) + identifier;
         }
     }
 

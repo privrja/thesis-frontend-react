@@ -89,6 +89,7 @@ export class SearchEnumHelper {
             case ServerEnum.CHEMSPIDER:
             case ServerEnum.MASS_SPEC_BLOCKS:
             case ServerEnum.COCONUT:
+            case ServerEnum.NP_ATLAS:
             default:
                 return this.getOptions();
         }
