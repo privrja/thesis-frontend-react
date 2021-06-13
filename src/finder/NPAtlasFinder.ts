@@ -68,7 +68,7 @@ class NPAtlasFinder implements IFinder {
         if (mass === 0) {
             return Sleep.noSleepPromise();
         }
-        return this.basicSearch(ENDPOINT_URI + 'compounds/massSearch?mass=' + mass + '&type=mol_weight&range=1000&unit=ppm&skip=0&limit=100', 'POST');
+        return this.basicSearch(ENDPOINT_URI + 'compounds/massSearch?mass=' + mass + '&type=exact_mass&range=100&skip=0&limit=100', 'POST');
     }
 
     findByName(name: string): Promise<SingleStructure[]> {
