@@ -116,7 +116,7 @@ abstract class AbstractImport {
     }
 
     find(key: string) {
-        return this.okStack.find(e => e.identifier === key);
+        return this.okStack.filter(e => e.identifier === key);
     }
 
     abstract getType(): string;
@@ -146,8 +146,7 @@ abstract class AbstractImport {
     async finderAll(finder: IFinder, ids: string[]) {
         await finder.findByIdentifiers(ids).then(blocks => {
             blocks.forEach(block => {
-                console.log(block);
-                this.find(block.identifier).smiles = block.smiles;
+                this.find(block.identifier).forEach(e => e.smiles = block.smiles);
             });
         });
     }
@@ -156,7 +155,7 @@ abstract class AbstractImport {
         for (const id of ids) {
             await finder.findByIdentifier(id).then(blocks => {
                 blocks.forEach(block => {
-                    this.find(block.identifier).smiles = block.smiles;
+                    this.find(block.identifier).forEach(e => e.smiles = block.smiles);
                 });
             });
         }
