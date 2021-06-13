@@ -26,7 +26,7 @@ class ServerNumReferenceParser implements IParser {
     }
 
     reject(): Reject {
-        return new Reject('Not match CSID: number | CID: number');
+        return new Reject('Not match CSID: <number> | CID: <number> | CHEBI: <number>');
     }
 
 }
