@@ -3,6 +3,7 @@ import ServerNumParser from "./ServerNumParser";
 import NatParser from "./NatParser";
 import {Reference} from "./ReferenceParser";
 import ZeroParser from "./ZeroParser";
+import {ServerEnum} from "../enum/ServerEnum";
 
 class ServerNumReferenceParser implements IParser {
     parse(text: string): ParseResult {
@@ -21,7 +22,7 @@ class ServerNumReferenceParser implements IParser {
             }
             return this.reject();
         }
-        return new Accept(new Reference(serverResult.getResult(), result.getResult()), result.getReminder());
+        return new Accept(new Reference(serverResult.getResult(), (serverResult.getResult() === ServerEnum.CHEBI ? 'CHEBI:' : '') + result.getResult()), result.getReminder());
     }
 
     reject(): Reject {

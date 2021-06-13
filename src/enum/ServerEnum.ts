@@ -134,13 +134,13 @@ export class ServerEnumHelper {
             identifier = "0";
         }
         if (identifier.toUpperCase().includes('CHEBI:')) {
-            return identifier;
+            return identifier.toUpperCase();
         }
         if (identifier.toUpperCase().includes('CNP')) {
-            return identifier;
+            return identifier.toUpperCase();
         }
         if (identifier.toUpperCase().includes('NPA')) {
-            return identifier;
+            return identifier.toUpperCase();
         }
         switch (database) {
             default:
@@ -154,7 +154,7 @@ export class ServerEnumHelper {
             case ServerEnum.PDB:
                 return 'PDB: ' + identifier;
             case ServerEnum.CHEBI:
-                return 'ChEBI:' + identifier;
+                return 'CHEBI:' + identifier;
             case ServerEnum.MASS_SPEC_BLOCKS:
                 return 'MSB: ' + identifier;
             case ServerEnum.DOI:
