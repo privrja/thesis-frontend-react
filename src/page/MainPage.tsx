@@ -1387,20 +1387,6 @@ class MainPage extends React.Component<any, SequenceState> {
         }
     }
 
-    async findReference(key: number, smiles: string) {
-        let finder = new PubChemFinder();
-        let blocks = await finder.findBySmiles(smiles);
-        if (blocks.length > 0) {
-            this.flashRef.current!.activate(FlashType.OK, 'Reference found CID: ' + blocks[0].identifier);
-            this.setState({editable: key}, () => {
-                (document.getElementById(SEL_EDIT_SOURCE) as HTMLSelectElement).selectedIndex = ServerEnum.PUBCHEM;
-                (document.getElementById(TXT_EDIT_IDENTIFIER) as HTMLInputElement).value = blocks[0].identifier;
-            });
-        } else {
-            this.flashRef.current!.activate(FlashType.BAD, 'Reference not found');
-        }
-    }
-
     render() {
         return (
             <section className={styles.page + ' ' + styles.mainPage} id={'main'}>
@@ -1600,7 +1586,7 @@ class MainPage extends React.Component<any, SequenceState> {
                                             this.popupEditorRef.current!.activate(block.unique ?? '');
                                         }}>Editor
                                         </button>
-                                        <button onClick={() => this.findReference(block.id, block.unique ?? block.smiles)}>FindRef</button>
+                                        <button onClick={() => FetchHelper.findReference(block.id, block.unique ?? block.smiles, this, SEL_EDIT_SOURCE, TXT_EDIT_IDENTIFIER)}>FindRef</button>
                                         <button className={styles.delete}
                                                 onClick={() => this.removeBlock(block.id)}>Remove
                                         </button>
