@@ -13,6 +13,9 @@ interface Molecule {
     mol_formula: string;
 }
 
+const BASIC_SEARCH = 'compounds/basicSearch?';
+const PARAMS = '&threshold=0&origin_type=all&rank=all&skip=0&limit=100';
+
 class NPAtlasFinder implements IFinder {
 
     basicSearch(endpoint: string, method: string, oneResult: boolean = false): Promise<SingleStructure[]> {
@@ -47,7 +50,7 @@ class NPAtlasFinder implements IFinder {
         if (formula === '') {
             return Sleep.noSleepPromise();
         }
-        return this.basicSearch(ENDPOINT_URI + 'compounds/basicSearch?' + 'formula=' + formula + '&threshold=0&origin_type=all&rank=all&skip=0&limit=100', 'POST');
+        return this.basicSearch(ENDPOINT_URI + BASIC_SEARCH + 'formula=' + formula + PARAMS, 'POST');
     }
 
     async findByIdentifier(id: string): Promise<SingleStructure[]> {
@@ -72,14 +75,14 @@ class NPAtlasFinder implements IFinder {
         if (name === '') {
             return Sleep.noSleepPromise();
         }
-        return this.basicSearch(ENDPOINT_URI + 'compounds/basicSearch?' + 'name=' + name + '&threshold=0&origin_type=all&rank=all&skip=0&limit=100', 'POST');
+        return this.basicSearch(ENDPOINT_URI + BASIC_SEARCH + 'name=' + name + PARAMS, 'POST');
     }
 
     findBySmiles(smiles: string): Promise<SingleStructure[]> {
         if (smiles === '') {
             return Sleep.noSleepPromise();
         }
-        return this.basicSearch(ENDPOINT_URI + 'compounds/basicSearch?' + 'smiles=' + smiles + '&method=sub' + '&threshold=0&origin_type=all&rank=all&skip=0&limit=100', 'POST');
+        return this.basicSearch(ENDPOINT_URI + BASIC_SEARCH + 'smiles=' + smiles + '&method=sub' + PARAMS, 'POST');
     }
 
 }
