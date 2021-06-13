@@ -28,6 +28,7 @@ abstract class AbstractImport {
         this.getType = this.getType.bind(this);
         this.getLineLength = this.getLineLength.bind(this);
         this.transformation = this.transformation.bind(this);
+        this.setupSmiles = this.setupSmiles.bind(this);
     }
 
     async import(): Promise<any[]> {
@@ -144,21 +145,19 @@ abstract class AbstractImport {
     }
 
     async finderAll(finder: IFinder, ids: string[]) {
-        await finder.findByIdentifiers(ids).then(blocks => {
-            blocks.forEach(block => {
-                this.find(block.identifier).forEach(e => e.smiles = block.smiles);
-            });
-        });
+        await finder.findByIdentifiers(ids).then(this.setupSmiles);
     }
 
     async forFinder(finder: IFinder, ids: string[]) {
         for (const id of ids) {
-            await finder.findByIdentifier(id).then(blocks => {
-                blocks.forEach(block => {
-                    this.find(block.identifier).forEach(e => e.smiles = block.smiles);
-                });
-            });
+            await finder.findByIdentifier(id).then(this.setupSmiles);
         }
+    }
+
+    setupSmiles(blocks: any[]) {
+        blocks.forEach(block => {
+            this.find(block.identifier).forEach(e => e.smiles = block.smiles);
+        });
     }
 
 }
