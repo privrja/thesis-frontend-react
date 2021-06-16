@@ -3,6 +3,8 @@ import FlashType from "../component/FlashType";
 import Flash from "../component/Flash";
 import Sleep from "./Sleep";
 import {CHEMSPIDER_ONE_KEY, ENDPOINT} from "../constant/Constants";
+import PubChemFinder from "../finder/PubChemFinder";
+import {ServerEnum} from "../enum/ServerEnum";
 
 class FetchHelper {
 
@@ -116,6 +118,19 @@ class FetchHelper {
         }
     }
 
+    static async findReference(key: number, smiles: string, context: any, SEL_EDIT_SOURCE: string, TXT_EDIT_IDENTIFIER: string) {
+        let finder = new PubChemFinder();
+        let blocks = await finder.findBySmiles(smiles);
+        if (blocks.length > 0) {
+            context.flashRef.current!.activate(FlashType.OK, 'Reference found CID: ' + blocks[0].identifier);
+            context.setState({editable: key}, () => {
+                (document.getElementById(SEL_EDIT_SOURCE) as HTMLSelectElement).selectedIndex = ServerEnum.PUBCHEM;
+                (document.getElementById(TXT_EDIT_IDENTIFIER) as HTMLInputElement).value = blocks[0].identifier;
+            });
+        } else {
+            context.flashRef.current!.activate(FlashType.BAD, 'Reference not found');
+        }
+    }
 
 }
 

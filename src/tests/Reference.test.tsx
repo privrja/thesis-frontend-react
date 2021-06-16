@@ -100,5 +100,5 @@ test('ChEBI reference test ok', () => {
     let parser = new ServerNumReferenceParser();
     let result = parser.parse('CHEBI: 69618');
     expect(result.isAccepted()).toEqual(true);
-    expect(result.getResult()).toEqual(new Reference(ServerEnum.CHEBI, '69618'));
+    expect(result.getResult()).toEqual(new Reference(ServerEnum.CHEBI, 'CHEBI:69618'));
 });

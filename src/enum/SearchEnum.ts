@@ -69,6 +69,7 @@ export class SearchEnumHelper {
     static getOptionsBySource(source: ServerEnum) {
         switch (source) {
             case ServerEnum.PUBCHEM:
+            case ServerEnum.COCONUT:
                 return [
                     new SelectOption(SearchEnum.NAME.toString(), this.getName(SearchEnum.NAME)),
                     new SelectOption(SearchEnum.SMILES.toString(), this.getName(SearchEnum.SMILES)),
@@ -88,6 +89,7 @@ export class SearchEnumHelper {
             case ServerEnum.CHEBI:
             case ServerEnum.CHEMSPIDER:
             case ServerEnum.MASS_SPEC_BLOCKS:
+            case ServerEnum.NP_ATLAS:
             default:
                 return this.getOptions();
         }
