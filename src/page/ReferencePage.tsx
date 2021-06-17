@@ -59,6 +59,16 @@ class ReferencePage extends React.Component<any, any> {
                         DOI: <a href={'https://doi.org/10.1093/nar/28.1.235'}>10.1093/nar/28.1.235</a>
                     </p>
 
+                    <h3>COCONUT</h3>
+                    <p><a href={'https://coconut.naturalproducts.net'}>COCONUT</a> is COlleCtion of Open Natural prodUcTs used by MSB to search information.<br/>
+                        DOI: <a href={'https://doi.org/10.1186/s13321-020-00478-9'}>10.1186/s13321-020-00478-9</a>
+                    </p>
+
+                    <h3>NP Atlas</h3>
+                    <p><a href={'https://www.npatlas.org'}>NP Atlas</a> is The Natural Products Atlas used by MSB to search information.<br/>
+                        DOI: <a href={'https://doi.org/10.1021/acscentsci.9b00806'}>10.1021/acscentsci.9b00806</a>
+                    </p>
+
                     <h3>Bbdgnc</h3>
                     <p>Bbdgnc is first version of this application developed for my bachelor's thesis. <br/>
                         Github: <a href={'https://github.com/privrja/bbdgnc'}>version</a></p>

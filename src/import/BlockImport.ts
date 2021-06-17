@@ -34,6 +34,8 @@ class BlockImport extends AbstractImport {
         let norineIds: string[] = [];
         let chebiIds: string[] = [];
         let chemspiderIds: string[] = [];
+        let coconutIds: string[] = [];
+        let npatlasIds: string[] = [];
         this.okStack.forEach((item: any) => {
             if (item.smiles === null && item.source === ServerEnum.PUBCHEM && item.identifier) {
                 identifiers.push(item.identifier);
@@ -43,9 +45,13 @@ class BlockImport extends AbstractImport {
                 chebiIds.push(item.identifier);
             } else if (item.smiles === null && item.source === ServerEnum.NORINE && item.identifier) {
                 norineIds.push(item.identifier);
+            } else if (item.smiles === null && item.source === ServerEnum.COCONUT && item.identifier) {
+                coconutIds.push(item.identifier);
+            } else if (item.smiles === null && item.source === ServerEnum.NP_ATLAS && item.identifier) {
+                npatlasIds.push(item.identifier);
             }
         });
-        await this.finders(identifiers, chebiIds, chemspiderIds, norineIds);
+        await this.finders(identifiers, chebiIds, chemspiderIds, norineIds, coconutIds, npatlasIds);
         return true;
     }
 
