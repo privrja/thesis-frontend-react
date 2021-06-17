@@ -122,6 +122,10 @@ export const H2 = 'H2';
 
 class ComputeHelper {
 
+    public static removeUnnecessaryCharactersFromFormula(formula: string) {
+        return formula.replaceAll(/[[\]+\-*/\\?.,;{}:"'|<>~!@#$%^&()]/g, '');
+    }
+
     public static computeMass(formula: string) {
         let mass = 0;
         let map = this.formulaMap(formula);
